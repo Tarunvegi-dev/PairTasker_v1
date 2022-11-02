@@ -174,35 +174,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 Text(
                                   'Verify your mail',
                                   style: GoogleFonts.poppins(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 const SizedBox(
                                   height: 25,
                                 ),
-                                SizedBox(
-                                  height: 70,
-                                  child: Container(
-                                    margin: const EdgeInsets.only(top: 5),
-                                    child: TextField(
-                                      keyboardType: TextInputType.number,
-                                      textAlign: TextAlign.center,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 24,
+                                Container(
+                                  margin: const EdgeInsets.only(top: 5),
+                                  child: TextField(
+                                    keyboardType: TextInputType.number,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 28,
                                         letterSpacing: 4,
-                                      ),
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                            Radius.circular(10),
-                                          ),
-                                          borderSide: BorderSide(
-                                            color: HexColor('AAABAB'),
-                                          ),
+                                        fontWeight: FontWeight.bold),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(10),
                                         ),
-                                        hintText: "CODE",
+                                        borderSide: BorderSide(
+                                          color: HexColor('AAABAB'),
+                                        ),
                                       ),
+                                      hintText: "CODE",
                                     ),
                                   ),
                                 ),

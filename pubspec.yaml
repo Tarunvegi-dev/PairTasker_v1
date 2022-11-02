@@ -61,6 +61,13 @@ flutter:
     - assets/images/name_logo.png
     - assets/images/icons/mail.svg
     - assets/images/icons/gender.svg
+    - assets/images/icons/menu.svg
+    - assets/images/icons/task.svg
+    - assets/images/icons/navbar/home.svg
+    - assets/images/icons/navbar/wishlist.svg
+    - assets/images/icons/navbar/my_requests.svg
+    - assets/images/icons/navbar/notifications.svg
+    - assets/images/icons/navbar/my_tasks.svg
   
   fonts:
     - family: PairTasker
