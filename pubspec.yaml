@@ -63,6 +63,8 @@ flutter:
     - assets/images/icons/gender.svg
     - assets/images/icons/menu.svg
     - assets/images/icons/task.svg
+    - assets/images/icons/warning.png
+    - assets/images/icons/announcement.png
     - assets/images/icons/navbar/home.svg
     - assets/images/icons/navbar/wishlist.svg
     - assets/images/icons/navbar/my_requests.svg

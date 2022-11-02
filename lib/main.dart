@@ -36,6 +36,8 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomePage(),
         '/userform': (context) => const UserFormScreen(),
+        '/wishlist': (context) => const WishlistScreen(),
+        '/notifications': (context) => const NotificationScreen()
       },
       debugShowCheckedModeBanner: false,
     );

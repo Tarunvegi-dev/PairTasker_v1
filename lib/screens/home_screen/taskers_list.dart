@@ -11,7 +11,7 @@ class TaskersList extends StatelessWidget {
       children: [
         Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(bottom: 3),
+          margin: const EdgeInsets.only(top: 3),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -175,7 +175,7 @@ class TaskersList extends StatelessWidget {
         ),
          Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(bottom: 3),
+          margin: const EdgeInsets.only(top: 3),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -332,7 +332,7 @@ class TaskersList extends StatelessWidget {
         ),
          Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(bottom: 3),
+          margin: const EdgeInsets.only(top: 3),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(
