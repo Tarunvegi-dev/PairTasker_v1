@@ -308,11 +308,21 @@ class NotificationScreen extends StatelessWidget {
                   "assets/images/icons/navbar/wishlist.svg",
                 ),
               ),
-              SvgPicture.asset(
-                "assets/images/icons/navbar/my_requests.svg",
+              InkWell(
+                onTap: () =>
+                    {Navigator.pushReplacementNamed(context, '/myrequests')},
+                child: SvgPicture.asset(
+                  "assets/images/icons/navbar/my_requests.svg",
+                ),
               ),
               SvgPicture.asset("assets/images/icons/navbar/notifications.svg"),
-              SvgPicture.asset("assets/images/icons/navbar/my_tasks.svg"),
+              InkWell(
+                onTap: () =>
+                    {Navigator.pushReplacementNamed(context, '/mytasks')},
+                child: SvgPicture.asset(
+                  "assets/images/icons/navbar/my_tasks.svg",
+                ),
+              ),
             ],
           ),
         ),
