@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import '../theme/widgets.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -36,16 +37,8 @@ class NotificationScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.black,
-                    width: 0.2,
-                  ),
-                ),
-              ),
-              height: MediaQuery.of(context).size.height * 80 / 100,
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 80.4 / 100,
               child: ListView(
                 children: [
                   const SizedBox(
@@ -287,46 +280,7 @@ class NotificationScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: SizedBox(
-        height: MediaQuery.of(context).size.height * 7 / 100,
-        width: MediaQuery.of(context).size.width,
-        child: Center(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              InkWell(
-                onTap: () => {Navigator.pushReplacementNamed(context, '/home')},
-                child: SvgPicture.asset(
-                  "assets/images/icons/navbar/home.svg",
-                ),
-              ),
-              InkWell(
-                onTap: () =>
-                    {Navigator.pushReplacementNamed(context, '/wishlist')},
-                child: SvgPicture.asset(
-                  "assets/images/icons/navbar/wishlist.svg",
-                ),
-              ),
-              InkWell(
-                onTap: () =>
-                    {Navigator.pushReplacementNamed(context, '/myrequests')},
-                child: SvgPicture.asset(
-                  "assets/images/icons/navbar/my_requests.svg",
-                ),
-              ),
-              SvgPicture.asset("assets/images/icons/navbar/notifications.svg"),
-              InkWell(
-                onTap: () =>
-                    {Navigator.pushReplacementNamed(context, '/mytasks')},
-                child: SvgPicture.asset(
-                  "assets/images/icons/navbar/my_tasks.svg",
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      bottomNavigationBar: const BottomNavBarWidget(3),
     );
   }
 }
