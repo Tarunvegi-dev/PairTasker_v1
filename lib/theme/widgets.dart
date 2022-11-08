@@ -21,9 +21,9 @@ class BottomNavBarWidget extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         border: Border(
-          bottom: BorderSide(
+          top: BorderSide(
             color: Colors.black,
-            width: 1,
+            width: 0.2,
           ),
         ),
       ),

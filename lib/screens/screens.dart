@@ -7,3 +7,4 @@ export './wishlist_screen.dart';
 export './notifications_screen.dart';
 export './my_requests_screen.dart';
 export './my_tasks_screen.dart';
+export './tasker_profile.dart';

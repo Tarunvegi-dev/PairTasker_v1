@@ -39,11 +39,11 @@ class WishlistScreen extends StatelessWidget {
               ),
             ),
             Container(
-              height: MediaQuery.of(context).size.height * 80.4 / 100,
               decoration: BoxDecoration(
                 color: HexColor('#E4ECF5'),
               ),
               child: ListView(
+                shrinkWrap: true,
                 children: const [TaskersList()],
               ),
             ),

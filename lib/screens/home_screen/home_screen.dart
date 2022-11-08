@@ -92,11 +92,11 @@ class HomePage extends StatelessWidget {
               ),
             ),
             Container(
-              height: MediaQuery.of(context).size.height * 81 / 100,
               decoration: BoxDecoration(
                 color: HexColor('#E4ECF5'),
               ),
               child: ListView(
+                shrinkWrap: true,
                 children: const [
                   Recents(),
                   TaskersList(),

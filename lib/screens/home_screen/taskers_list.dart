@@ -11,7 +11,7 @@ class TaskersList extends StatelessWidget {
       children: [
         Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(top: 3),
+          margin: const EdgeInsets.only(bottom: 4,),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -47,24 +47,28 @@ class TaskersList extends StatelessWidget {
                         const SizedBox(
                           width: 12,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Will Smith',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
+                        InkWell(
+                          onTap: () =>
+                              Navigator.of(context).pushNamed('/taskerprofile'),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Will Smith',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '@willsmith143',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: HexColor('#AAABAB'),
+                              Text(
+                                '@willsmith143',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: HexColor('#AAABAB'),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -173,9 +177,9 @@ class TaskersList extends StatelessWidget {
             ),
           ),
         ),
-         Container(
+        Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(top: 3),
+          margin: const EdgeInsets.only(bottom: 3),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -204,24 +208,28 @@ class TaskersList extends StatelessWidget {
                         const SizedBox(
                           width: 12,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Virat Kohli',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
+                        InkWell(
+                          onTap: () =>
+                              Navigator.of(context).pushNamed('/taskerprofile'),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Virat Kohli',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '@viratkohli18',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: HexColor('#AAABAB'),
+                              Text(
+                                '@viratkohli18',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: HexColor('#AAABAB'),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -330,9 +338,9 @@ class TaskersList extends StatelessWidget {
             ),
           ),
         ),
-         Container(
+        Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(top: 3),
+          margin: const EdgeInsets.only(bottom: 3),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -361,24 +369,28 @@ class TaskersList extends StatelessWidget {
                         const SizedBox(
                           width: 12,
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Virat Kohli',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
+                        InkWell(
+                          onTap: () =>
+                              Navigator.of(context).pushNamed('/taskerprofile'),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Virat Kohli',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            Text(
-                              '@viratkohli18',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: HexColor('#AAABAB'),
+                              Text(
+                                '@viratkohli18',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: HexColor('#AAABAB'),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),

@@ -41,12 +41,12 @@ class MyTasks extends StatelessWidget {
               decoration: BoxDecoration(
                 color: HexColor('#E4ECF5'),
               ),
-              height: MediaQuery.of(context).size.height * 80.4 / 100,
               child: ListView(
+                shrinkWrap: true,
                 children: [
                   Container(
                     color: Colors.white,
-                    margin: const EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(bottom: 5),
                     height: 130,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
@@ -125,7 +125,7 @@ class MyTasks extends StatelessWidget {
                   ),
                   Container(
                     color: Colors.white,
-                    margin: const EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(bottom: 5),
                     height: 130,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
@@ -204,7 +204,7 @@ class MyTasks extends StatelessWidget {
                   ),
                   Container(
                     color: Colors.white,
-                    margin: const EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(bottom: 5),
                     height: 130,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
@@ -283,7 +283,7 @@ class MyTasks extends StatelessWidget {
                   ),
                   Container(
                     color: Colors.white,
-                    margin: const EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(bottom: 5),
                     height: 130,
                     child: Container(
                       margin: const EdgeInsets.symmetric(

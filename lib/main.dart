@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
         '/notifications': (context) => const NotificationScreen(),
         '/myrequests': (context) => const MyRequests(),
         '/mytasks': (context) => const MyTasks(),
+        '/taskerprofile':(context) => const TaskerProfile(),
       },
       debugShowCheckedModeBanner: false,
     );
