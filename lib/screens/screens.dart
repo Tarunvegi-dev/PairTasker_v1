@@ -9,3 +9,4 @@ export './my_requests_screen.dart';
 export './my_tasks_screen.dart';
 export './tasker_profile.dart';
 export './my_profile_screen.dart';
+export 'chat_screen/chat_screen.dart';

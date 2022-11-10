@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:pairtasker/screens/screens.dart';
 import '../theme/widgets.dart';
 
 class MyTasks extends StatelessWidget {
@@ -44,82 +44,89 @@ class MyTasks extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  Container(
-                    color: Colors.white,
-                    margin: const EdgeInsets.only(bottom: 5),
-                    height: 130,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(
-                        vertical: 20,
-                        horizontal: 30,
+                  InkWell(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const ChatScreen('tasker'),
                       ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  const SizedBox(
-                                    height: 40,
-                                    width: 40,
-                                    child: CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage: NetworkImage(
-                                        'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
+                    ),
+                    child: Container(
+                      color: Colors.white,
+                      margin: const EdgeInsets.only(bottom: 5),
+                      height: 130,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 30,
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    const SizedBox(
+                                      height: 40,
+                                      width: 40,
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: NetworkImage(
+                                          'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(
-                                    width: 12,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Virat Kohli',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.black,
+                                    const SizedBox(
+                                      width: 12,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Virat Kohli',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        '@viratkohli18',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: HexColor('#AAABAB'),
+                                        Text(
+                                          '@viratkohli18',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: HexColor('#AAABAB'),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                color: HexColor('FFC72C'),
-                                padding: const EdgeInsets.all(6),
-                                child: const Text(
-                                  'DEALING',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              )
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            'Naaku oka 2 liters milk packet kaavali. And some vegetables. I will pay you 40 rupees  .......more.',
-                            style: TextStyle(
-                              color: HexColor('6F7273'),
-                              fontSize: 12,
+                                Container(
+                                  color: HexColor('FFC72C'),
+                                  padding: const EdgeInsets.all(6),
+                                  child: const Text(
+                                    'DEALING',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
-                          )
-                        ],
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Text(
+                              'Naaku oka 2 liters milk packet kaavali. And some vegetables. I will pay you 40 rupees  .......more.',
+                              style: TextStyle(
+                                color: HexColor('6F7273'),
+                                fontSize: 12,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),

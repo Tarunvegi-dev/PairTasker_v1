@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
         '/mytasks': (context) => const MyTasks(),
         '/taskerprofile':(context) => const TaskerProfile(),
         '/myprofile':(context) => const MyProfile(),
+        '/chatscreen':(context) => const ChatScreen('user'),
       },
       debugShowCheckedModeBanner: false,
     );
