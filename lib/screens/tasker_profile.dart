@@ -29,10 +29,15 @@ class TaskerProfile extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    Icons.close,
-                    size: 34,
-                    color: HexColor('99A4AE'),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Icon(
+                      Icons.close,
+                      size: 34,
+                      color: HexColor('99A4AE'),
+                    ),
                   ),
                   Text(
                     'ACTIVE',
@@ -59,7 +64,7 @@ class TaskerProfile extends StatelessWidget {
                   Container(
                     decoration: const BoxDecoration(color: Colors.white),
                     padding: const EdgeInsets.only(
-                      top: 38,
+                      top: 28,
                       left: 26,
                       right: 20,
                       bottom: 10,
@@ -73,8 +78,8 @@ class TaskerProfile extends StatelessWidget {
                             Row(
                               children: [
                                 Container(
-                                  height: 42,
-                                  width: 42,
+                                  height: 37,
+                                  width: 37,
                                   margin: const EdgeInsets.symmetric(
                                     vertical: 12,
                                   ),
@@ -135,7 +140,7 @@ class TaskerProfile extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(
-                          height: 30,
+                          height: 25,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,

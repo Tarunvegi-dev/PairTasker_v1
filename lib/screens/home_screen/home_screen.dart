@@ -6,12 +6,46 @@ import 'package:pairtasker/screens/home_screen/taskers_list.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'recents.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  GlobalKey<ScaffoldState> key = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Drawer Header'),
+            ),
+            ListTile(
+              title: const Text('Item 1'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: const Text('Item 2'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+          ],
+        ),
+      ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
@@ -34,22 +68,28 @@ class HomePage extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        margin: const EdgeInsets.only(
-                          right: 12,
-                        ),
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(125),
-                          ),
-                          color: Color.fromRGBO(0, 0, 0, 0.1),
-                        ),
+                      InkWell(
+                        onTap: () => key.currentState?.openDrawer(),
                         child: Container(
-                          padding: const EdgeInsets.all(10),
-                          child: SvgPicture.asset(
-                            'assets/images/icons/menu.svg',
+                          width: 36,
+                          height: 36,
+                          margin: const EdgeInsets.only(
+                            right: 12,
+                          ),
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(125),
+                            ),
+                            color: Color.fromRGBO(0, 0, 0, 0.1),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            child: InkWell(
+                              onTap: () => key.currentState?.openDrawer(),
+                              child: SvgPicture.asset(
+                                'assets/images/icons/menu.svg',
+                              ),
+                            ),
                           ),
                         ),
                       ),
