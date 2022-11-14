@@ -70,6 +70,11 @@ flutter:
     - assets/images/icons/navbar/my_requests.svg
     - assets/images/icons/navbar/notifications.svg
     - assets/images/icons/navbar/my_tasks.svg
+    - assets/images/icons/drawer/profile.png
+    - assets/images/icons/drawer/tasker_mode.png
+    - assets/images/icons/drawer/terms-and-conditions.png
+    - assets/images/icons/drawer/faq.png
+    - assets/images/icons/drawer/share.png
   
   fonts:
     - family: PairTasker
