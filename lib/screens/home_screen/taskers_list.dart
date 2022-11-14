@@ -179,7 +179,7 @@ class TaskersList extends StatelessWidget {
         ),
         Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(bottom: 3),
+          margin: const EdgeInsets.only(bottom: 4),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -340,7 +340,7 @@ class TaskersList extends StatelessWidget {
         ),
         Container(
           color: Colors.white,
-          margin: const EdgeInsets.only(bottom: 3),
+          margin: const EdgeInsets.only(bottom: 4),
           height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
             padding: const EdgeInsets.symmetric(

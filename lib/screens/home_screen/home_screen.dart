@@ -112,19 +112,22 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   SizedBox(
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(125),
+                    child: InkWell(
+                      onTap: () => Navigator.of(context).pushNamed('/searchscreen'),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(125),
+                          ),
+                          color: HexColor('007FFF'),
                         ),
-                        color: HexColor('007FFF'),
-                      ),
-                      child: const Icon(
-                        Icons.search_rounded,
-                        color: Colors.white,
-                        size: 20,
+                        child: const Icon(
+                          Icons.search_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   )
