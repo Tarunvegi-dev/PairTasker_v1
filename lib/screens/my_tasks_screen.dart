@@ -108,7 +108,7 @@ class MyTasks extends StatelessWidget {
                                     'DEALING',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                      fontSize: 12,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -188,7 +188,7 @@ class MyTasks extends StatelessWidget {
                                   'AGREED',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -267,7 +267,7 @@ class MyTasks extends StatelessWidget {
                                   'TASK DONE',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -346,7 +346,7 @@ class MyTasks extends StatelessWidget {
                                   'TERMINATED',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     color: Colors.white,
                                   ),
                                 ),

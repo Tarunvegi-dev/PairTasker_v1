@@ -18,7 +18,7 @@ class DrawerWidget extends StatelessWidget {
                   vertical: 20,
                 ),
                 margin: const EdgeInsets.only(
-                  top: 75,
+                  top: 40,
                 ),
                 color: Colors.white,
                 child: Column(
@@ -64,39 +64,47 @@ class DrawerWidget extends StatelessWidget {
                           color: HexColor('AAABAB'),
                           fontWeight: FontWeight.w600,
                         ),
-                      )
+                      ),
                     ]),
               ),
               Container(
                 color: HexColor('E4ECF5'),
                 child: Column(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 27,
-                      ),
-                      margin: const EdgeInsets.only(
-                        bottom: 5,
-                        top: 5,
-                      ),
-                      color: Colors.white,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset('assets/images/icons/drawer/profile.png'),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            'View Profile',
-                            style: TextStyle(
-                              color: HexColor('1A1E1F'),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                    InkWell(
+                      onTap: () =>
+                          Navigator.of(context).pushNamed('/myprofile'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 27,
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                          top: 5,
+                        ),
+                        color: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/images/icons/drawer/profile.png',
+                              width: 24,
+                              height: 24,
                             ),
-                          ),
-                        ],
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              'View Profile',
+                              style: TextStyle(
+                                color: HexColor('1A1E1F'),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Container(
@@ -112,7 +120,10 @@ class DrawerWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Image.asset(
-                              'assets/images/icons/drawer/tasker_mode.png'),
+                            'assets/images/icons/drawer/tasker_mode.png',
+                            width: 24,
+                            height: 24,
+                          ),
                           const SizedBox(
                             width: 20,
                           ),
@@ -130,7 +141,7 @@ class DrawerWidget extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
-                        horizontal: 20,
+                        horizontal: 23,
                       ),
                       margin: const EdgeInsets.only(
                         bottom: 5,
@@ -140,7 +151,10 @@ class DrawerWidget extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Image.asset(
-                              'assets/images/icons/drawer/terms-and-conditions.png'),
+                            'assets/images/icons/drawer/terms-and-conditions.png',
+                            width: 24,
+                            height: 24,
+                          ),
                           const SizedBox(
                             width: 20,
                           ),
@@ -158,7 +172,7 @@ class DrawerWidget extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
-                        horizontal: 20,
+                        horizontal: 23,
                       ),
                       margin: const EdgeInsets.only(
                         bottom: 5,
@@ -167,7 +181,11 @@ class DrawerWidget extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Image.asset('assets/images/icons/drawer/faq.png'),
+                          Image.asset(
+                            'assets/images/icons/drawer/faq.png',
+                            width: 24,
+                            height: 24,
+                          ),
                           const SizedBox(
                             width: 20,
                           ),
@@ -185,7 +203,7 @@ class DrawerWidget extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
-                        horizontal: 20,
+                        horizontal: 23,
                       ),
                       margin: const EdgeInsets.only(
                         bottom: 5,
@@ -194,7 +212,11 @@ class DrawerWidget extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Image.asset('assets/images/icons/drawer/share.png'),
+                          Image.asset(
+                            'assets/images/icons/drawer/share.png',
+                            width: 24,
+                            height: 24,
+                          ),
                           const SizedBox(
                             width: 20,
                           ),

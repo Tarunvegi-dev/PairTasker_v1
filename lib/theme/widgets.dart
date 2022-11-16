@@ -63,7 +63,7 @@ class BottomNavBarWidget extends StatelessWidget {
             BottomNavigationBarItem(
               icon: SvgPicture.asset(
                 "assets/images/icons/navbar/wishlist.svg",
-                width: 25,
+                width: 23,
                 color: selectedScreen == 1
                     ? HexColor('007FFF')
                     : HexColor('99A4AE'),
