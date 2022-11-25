@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../theme/widgets.dart';
+import '../helpers/methods.dart';
 
 class NotificationScreen extends StatelessWidget {
   const NotificationScreen({super.key});
@@ -10,17 +10,17 @@ class NotificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
                     width: 0.2,
                   ),
                 ),
@@ -38,18 +38,22 @@ class NotificationScreen extends StatelessWidget {
               ),
             ),
             SizedBox(
-              height: MediaQuery.of(context).size.height * 80.4 / 100,
               child: ListView(
+                shrinkWrap: true,
                 children: [
                   const SizedBox(
                     height: 12,
                   ),
                   Container(
-                    height: 145,
-                    margin:
-                        const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+                    margin: const EdgeInsets.only(
+                      left: 12,
+                      right: 12,
+                      bottom: 12,
+                    ),
                     decoration: BoxDecoration(
-                      color: HexColor('E4ECF5'),
+                      color: Helper.isDark(context)
+                          ? HexColor('252B30')
+                          : HexColor('E4ECF5'),
                       borderRadius: const BorderRadius.all(
                         Radius.circular(10),
                       ),
@@ -62,13 +66,14 @@ class NotificationScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           Row(
-                            children: [
-                              const CircleAvatar(
+                            children: const [
+                              CircleAvatar(
                                 radius: 18,
                                 backgroundImage: NetworkImage(
-                                    'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg'),
+                                  'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
+                                ),
                               ),
-                              const SizedBox(
+                              SizedBox(
                                 width: 12,
                               ),
                               Text(
@@ -76,7 +81,6 @@ class NotificationScreen extends StatelessWidget {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: HexColor('#1A1E1F'),
                                 ),
                               )
                             ],
@@ -87,13 +91,15 @@ class NotificationScreen extends StatelessWidget {
                           Text(
                             'Naaku oka 2 liters milk packet kaavali. And some vegetables. I will pay you 40 rupees .......more.',
                             style: TextStyle(
-                              color: HexColor('#6F7273'),
+                              color: Helper.isDark(context)
+                                  ? HexColor('99A4AE')
+                                  : HexColor('#6F7273'),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(
-                            height: 14,
+                            height: 16,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -157,11 +163,23 @@ class NotificationScreen extends StatelessWidget {
                       right: 12,
                       bottom: 12,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Color.fromRGBO(255, 199, 44, 0.25),
-                      borderRadius: BorderRadius.all(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(
                         Radius.circular(10),
                       ),
+                      color: !Helper.isDark(context)
+                          ? const Color.fromRGBO(255, 199, 44, 0.25)
+                          : null,
+                      gradient: Helper.isDark(context)
+                          ? const LinearGradient(
+                              colors: [
+                                Color.fromRGBO(255, 199, 44, 0.25),
+                                Colors.white
+                              ],
+                              begin: Alignment(0, 0),
+                              end: Alignment(0, 0),
+                            )
+                          : null,
                     ),
                     child: Container(
                       margin: const EdgeInsets.symmetric(
@@ -177,6 +195,8 @@ class NotificationScreen extends StatelessWidget {
                               SizedBox(
                                 child: Image.asset(
                                   'assets/images/icons/warning.png',
+                                  width: 24,
+                                  height: 24,
                                 ),
                               ),
                               const SizedBox(

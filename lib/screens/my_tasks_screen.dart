@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/screens/screens.dart';
 import '../theme/widgets.dart';
+import '../helpers/methods.dart';
 
 class MyTasks extends StatelessWidget {
   const MyTasks({super.key});
@@ -10,17 +11,17 @@ class MyTasks extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
                     width: 0.2,
                   ),
                 ),
@@ -39,7 +40,7 @@ class MyTasks extends StatelessWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                color: HexColor('#E4ECF5'),
+                color: HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
               ),
               child: ListView(
                 shrinkWrap: true,
@@ -51,13 +52,14 @@ class MyTasks extends StatelessWidget {
                       ),
                     ),
                     child: Container(
-                      color: Colors.white,
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
                       margin: const EdgeInsets.only(bottom: 5),
                       height: 130,
                       child: Container(
                         margin: const EdgeInsets.symmetric(
                           vertical: 20,
-                          horizontal: 30,
+                          horizontal: 20,
                         ),
                         child: Column(
                           children: [
@@ -87,13 +89,12 @@ class MyTasks extends StatelessWidget {
                                           'Virat Kohli',
                                           style: TextStyle(
                                             fontSize: 14,
-                                            color: Colors.black,
                                           ),
                                         ),
                                         Text(
                                           '@viratkohli18',
                                           style: TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 10,
                                             color: HexColor('#AAABAB'),
                                           ),
                                         ),
@@ -131,13 +132,13 @@ class MyTasks extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     margin: const EdgeInsets.only(bottom: 5),
                     height: 130,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 20,
-                        horizontal: 30,
+                        horizontal: 20,
                       ),
                       child: Column(
                         children: [
@@ -167,13 +168,12 @@ class MyTasks extends StatelessWidget {
                                         'Virat Kohli',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.black,
                                         ),
                                       ),
                                       Text(
                                         '@viratkohli18',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 10,
                                           color: HexColor('#AAABAB'),
                                         ),
                                       ),
@@ -210,13 +210,13 @@ class MyTasks extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     margin: const EdgeInsets.only(bottom: 5),
                     height: 130,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 20,
-                        horizontal: 30,
+                        horizontal: 20,
                       ),
                       child: Column(
                         children: [
@@ -246,13 +246,12 @@ class MyTasks extends StatelessWidget {
                                         'Virat Kohli',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.black,
                                         ),
                                       ),
                                       Text(
                                         '@viratkohli18',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 10,
                                           color: HexColor('#AAABAB'),
                                         ),
                                       ),
@@ -289,13 +288,13 @@ class MyTasks extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     margin: const EdgeInsets.only(bottom: 5),
                     height: 130,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 20,
-                        horizontal: 30,
+                        horizontal: 20,
                       ),
                       child: Column(
                         children: [
@@ -325,13 +324,12 @@ class MyTasks extends StatelessWidget {
                                         'Virat Kohli',
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: Colors.black,
                                         ),
                                       ),
                                       Text(
                                         '@viratkohli18',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 10,
                                           color: HexColor('#AAABAB'),
                                         ),
                                       ),

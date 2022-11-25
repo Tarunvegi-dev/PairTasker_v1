@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/theme.dart';
+import '../helpers/methods.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -17,8 +18,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -158,6 +159,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         isDismissible: true,
                         context: context,
                         builder: (context) => Container(
+                          color: Helper.isDark(context)
+                              ? Colors.black
+                              : Colors.white,
                           padding: EdgeInsets.only(
                             bottom: MediaQuery.of(context).viewInsets.bottom,
                           ),

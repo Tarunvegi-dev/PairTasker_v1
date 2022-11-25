@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/screens/home_screen/taskers_list.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/theme/widgets.dart';
+import '../helpers/methods.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
@@ -11,17 +11,17 @@ class WishlistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
                     width: 0.2,
                   ),
                 ),
@@ -40,7 +40,7 @@ class WishlistScreen extends StatelessWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                color: HexColor('#E4ECF5'),
+                color: HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
               ),
               child: ListView(
                 shrinkWrap: true,

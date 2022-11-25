@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pairtasker/helpers/methods.dart';
 
 class TaskersList extends StatelessWidget {
   const TaskersList({super.key});
@@ -10,13 +12,12 @@ class TaskersList extends StatelessWidget {
     return Column(
       children: [
         Container(
-          color: Colors.white,
-          margin: const EdgeInsets.only(bottom: 4,),
-          height: MediaQuery.of(context).size.height * 13 / 100,
+          color: Helper.isDark(context) ? Colors.black : Colors.white,
+          margin: const EdgeInsets.only(
+            bottom: 4,
+          ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
               children: [
                 Row(
@@ -27,9 +28,6 @@ class TaskersList extends StatelessWidget {
                         Container(
                           height: 40,
                           width: 40,
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 12,
-                          ),
                           decoration: BoxDecoration(
                             borderRadius: const BorderRadius.all(
                               Radius.circular(125),
@@ -53,17 +51,16 @@ class TaskersList extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                               Text(
                                 'Will Smith',
-                                style: TextStyle(
+                                style: GoogleFonts.lato(
                                   fontSize: 14,
-                                  color: Colors.black,
                                 ),
                               ),
                               Text(
                                 '@willsmith143',
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: GoogleFonts.lato(
+                                  fontSize: 10,
                                   color: HexColor('#AAABAB'),
                                 ),
                               ),
@@ -74,7 +71,7 @@ class TaskersList extends StatelessWidget {
                     ),
                     Text(
                       'SELECTED',
-                      style: TextStyle(
+                      style: GoogleFonts.lato(
                         color: HexColor('#007FFF'),
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -83,7 +80,7 @@ class TaskersList extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(
-                  height: 5,
+                  height: 20,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -97,17 +94,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.star,
                             color: HexColor('#FFC72C'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '4.8',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -117,17 +113,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.favorite,
                             color: HexColor('#FF033E'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '10',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -137,7 +132,7 @@ class TaskersList extends StatelessWidget {
                           SizedBox(
                             child: SvgPicture.asset(
                               'assets/images/icons/task.svg',
-                              height: 20,
+                              height: 18,
                             ),
                           ),
                           const SizedBox(
@@ -145,27 +140,28 @@ class TaskersList extends StatelessWidget {
                           ),
                           Text(
                             '10',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
                       ),
                       Row(
                         children: [
-                          Icon(Icons.location_on_rounded,
-                              color: HexColor('#007FFF'), size: 20),
+                          Icon(
+                            Icons.location_on_rounded,
+                            color: HexColor('#007FFF'),
+                            size: 18,
+                          ),
                           const SizedBox(
                             width: 4,
                           ),
                           Text(
                             '2 km',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -178,13 +174,10 @@ class TaskersList extends StatelessWidget {
           ),
         ),
         Container(
-          color: Colors.white,
+          color: Helper.isDark(context) ? Colors.black : Colors.white,
           margin: const EdgeInsets.only(bottom: 4),
-          height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
               children: [
                 Row(
@@ -192,13 +185,10 @@ class TaskersList extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Container(
+                        const SizedBox(
                           height: 40,
                           width: 40,
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 12,
-                          ),
-                          child: const CircleAvatar(
+                          child: CircleAvatar(
                             radius: 30,
                             backgroundImage: NetworkImage(
                               'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
@@ -214,17 +204,16 @@ class TaskersList extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Virat Kohli',
-                                style: TextStyle(
+                                style: GoogleFonts.lato(
                                   fontSize: 14,
-                                  color: Colors.black,
                                 ),
                               ),
                               Text(
                                 '@viratkohli18',
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: GoogleFonts.lato(
+                                  fontSize: 10,
                                   color: HexColor('#AAABAB'),
                                 ),
                               ),
@@ -235,13 +224,16 @@ class TaskersList extends StatelessWidget {
                     ),
                     Text(
                       'BUSY',
-                      style: TextStyle(
+                      style: GoogleFonts.lato(
                         color: HexColor('#FF033E'),
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     )
                   ],
+                ),
+                const SizedBox(
+                  height: 20,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -255,17 +247,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.star,
                             color: HexColor('#FFC72C'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '4.8',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -275,17 +266,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.favorite,
                             color: HexColor('#FF033E'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '10',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -295,7 +285,7 @@ class TaskersList extends StatelessWidget {
                           SizedBox(
                             child: SvgPicture.asset(
                               'assets/images/icons/task.svg',
-                              height: 20,
+                              height: 18,
                             ),
                           ),
                           const SizedBox(
@@ -303,10 +293,9 @@ class TaskersList extends StatelessWidget {
                           ),
                           Text(
                             '10',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -316,17 +305,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.location_on_rounded,
                             color: HexColor('#007FFF'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '2 km',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -339,13 +327,10 @@ class TaskersList extends StatelessWidget {
           ),
         ),
         Container(
-          color: Colors.white,
+          color: Helper.isDark(context) ? Colors.black : Colors.white,
           margin: const EdgeInsets.only(bottom: 4),
-          height: MediaQuery.of(context).size.height * 13 / 100,
           child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
               children: [
                 Row(
@@ -353,13 +338,10 @@ class TaskersList extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Container(
+                        const SizedBox(
                           height: 40,
                           width: 40,
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 12,
-                          ),
-                          child: const CircleAvatar(
+                          child: CircleAvatar(
                             radius: 30,
                             backgroundImage: NetworkImage(
                               'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
@@ -375,17 +357,16 @@ class TaskersList extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Virat Kohli',
-                                style: TextStyle(
+                                style: GoogleFonts.lato(
                                   fontSize: 14,
-                                  color: Colors.black,
                                 ),
                               ),
                               Text(
                                 '@viratkohli18',
-                                style: TextStyle(
-                                  fontSize: 12,
+                                style: GoogleFonts.lato(
+                                  fontSize: 10,
                                   color: HexColor('#AAABAB'),
                                 ),
                               ),
@@ -395,14 +376,17 @@ class TaskersList extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      'BUSY',
-                      style: TextStyle(
-                        color: HexColor('#FF033E'),
+                      'AVAILABLE',
+                      style: GoogleFonts.lato(
+                        color: HexColor('#32DE84'),
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     )
                   ],
+                ),
+                const SizedBox(
+                  height: 20,
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -416,17 +400,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.star,
                             color: HexColor('#FFC72C'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '4.8',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -436,17 +419,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.favorite,
                             color: HexColor('#FF033E'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '10',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -456,7 +438,7 @@ class TaskersList extends StatelessWidget {
                           SizedBox(
                             child: SvgPicture.asset(
                               'assets/images/icons/task.svg',
-                              height: 20,
+                              height: 18,
                             ),
                           ),
                           const SizedBox(
@@ -464,10 +446,9 @@ class TaskersList extends StatelessWidget {
                           ),
                           Text(
                             '10',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],
@@ -477,17 +458,16 @@ class TaskersList extends StatelessWidget {
                           Icon(
                             Icons.location_on_rounded,
                             color: HexColor('#007FFF'),
-                            size: 20,
+                            size: 18,
                           ),
                           const SizedBox(
                             width: 5,
                           ),
                           Text(
                             '2 km',
-                            style: TextStyle(
+                            style: GoogleFonts.lato(
                               color: HexColor('#AAABAB'),
                               fontSize: 14,
-                              fontWeight: FontWeight.w700,
                             ),
                           )
                         ],

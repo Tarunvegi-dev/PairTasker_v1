@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../helpers/methods.dart';
 
 class ChatScreen extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
@@ -11,17 +12,17 @@ class ChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
                     width: 0.2,
                   ),
                 ),
@@ -52,7 +53,6 @@ class ChatScreen extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: HexColor('1A1E1F'),
                           ),
                         ),
                       if (screenType == 'tasker')
@@ -74,16 +74,15 @@ class ChatScreen extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Will Smith',
-                                  style: TextStyle(
+                                  style: GoogleFonts.lato(
                                     fontSize: 14,
-                                    color: Colors.black,
                                   ),
                                 ),
                                 Text(
                                   '@willsmith143',
-                                  style: TextStyle(
+                                  style: GoogleFonts.lato(
                                     fontSize: 12,
                                     color: HexColor('#AAABAB'),
                                   ),
@@ -111,13 +110,14 @@ class ChatScreen extends StatelessWidget {
                   horizontal: 25,
                   vertical: 5,
                 ),
-                color: HexColor('E4ECF5'),
+                color: Helper.isDark(context)
+                    ? HexColor('252B30')
+                    : HexColor('E4ECF5'),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
                       width: 80,
-                      height: 28,
                       child: Stack(
                         children: const [
                           CircleAvatar(
@@ -167,7 +167,9 @@ class ChatScreen extends StatelessWidget {
                 horizontal: 25,
                 vertical: 12,
               ),
-              color: HexColor('E4ECF5'),
+              color: Helper.isDark(context)
+                  ? HexColor('252B30')
+                  : HexColor('E4ECF5'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -184,7 +186,7 @@ class ChatScreen extends StatelessWidget {
                   ),
                   Text(
                     'Naaku oka 2 liters milk packet kaavali. And some vegetables. I will pay you 40 rupees .......more., ',
-                    style: TextStyle(
+                    style: GoogleFonts.lato(
                       color: HexColor('6F7273'),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -209,11 +211,13 @@ class ChatScreen extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: HexColor('DEE0E0'),
+                          color: Helper.isDark(context)
+                              ? HexColor('252B30')
+                              : HexColor('DEE0E0'),
                         ),
                         child: Text(
                           'willsmith143 accepted your request',
-                          style: TextStyle(
+                          style: GoogleFonts.lato(
                             color: HexColor('99A4AE'),
                             fontSize: 12,
                           ),
@@ -246,9 +250,9 @@ class ChatScreen extends StatelessWidget {
                             bottomRight: Radius.circular(10),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Hello',
-                          style: TextStyle(
+                          style: GoogleFonts.lato(
                             color: Colors.white,
                             fontSize: 14,
                           ),
@@ -272,17 +276,18 @@ class ChatScreen extends StatelessWidget {
                           horizontal: 15,
                         ),
                         decoration: BoxDecoration(
-                          color: HexColor('DEE0E0'),
+                          color: Helper.isDark(context)
+                              ? HexColor('252B30')
+                              : HexColor('DEE0E0'),
                           borderRadius: const BorderRadius.only(
                             topRight: Radius.circular(10),
                             bottomLeft: Radius.circular(10),
                             bottomRight: Radius.circular(10),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Hello',
-                          style: TextStyle(
-                            color: Colors.black,
+                          style: GoogleFonts.lato(
                             fontSize: 14,
                           ),
                         ),
@@ -295,15 +300,19 @@ class ChatScreen extends StatelessWidget {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                height: MediaQuery.of(context).size.height * 9 / 100,
+                height: MediaQuery.of(context).size.height * 8 / 100,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 17,
+                  horizontal: 15,
+                  vertical: 12,
                 ),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
+                  color: Helper.isDark(context)
+                      ? HexColor('252B30')
+                      : Colors.white,
                   border: Border(
                     top: BorderSide(
-                      color: Colors.black,
+                      color:
+                          Helper.isDark(context) ? Colors.white : Colors.black,
                       width: 0.2,
                     ),
                   ),
@@ -312,9 +321,11 @@ class ChatScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      width: 250,
+                      width: 270,
                       decoration: BoxDecoration(
-                        color: HexColor('E4ECF5'),
+                        color: Helper.isDark(context)
+                            ? HexColor('FFFFFF')
+                            : HexColor('E4ECF5'),
                         borderRadius: BorderRadius.circular(25),
                       ),
                       padding: const EdgeInsets.only(
@@ -324,8 +335,10 @@ class ChatScreen extends StatelessWidget {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: "Type....",
-                          hintStyle: TextStyle(
-                            color: HexColor('AAABAB'),
+                          hintStyle: GoogleFonts.lato(
+                            color: Helper.isDark(context)
+                                ? HexColor('252B30')
+                                : HexColor('AAABAB'),
                           ),
                         ),
                       ),

@@ -6,6 +6,7 @@ import 'package:pairtasker/screens/home_screen/drawer.dart';
 import 'package:pairtasker/screens/home_screen/taskers_list.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'recents.dart';
+import '../../helpers/methods.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -20,8 +21,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       drawer: const DrawerWidget(),
-      backgroundColor: Colors.white,
       body: Builder(
         builder: (context) => SafeArea(
           child: Column(
@@ -52,11 +53,13 @@ class _HomePageState extends State<HomePage> {
                             margin: const EdgeInsets.only(
                               right: 12,
                             ),
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(
                                 Radius.circular(125),
                               ),
-                              color: Color.fromRGBO(0, 0, 0, 0.1),
+                              color: Helper.isDark(context)
+                                  ? const Color.fromRGBO(242, 242, 243, 0.35)
+                                  : const Color.fromRGBO(0, 0, 0, 0.1),
                             ),
                             child: Container(
                               padding: const EdgeInsets.all(10),
@@ -113,7 +116,8 @@ class _HomePageState extends State<HomePage> {
               ),
               Container(
                 decoration: BoxDecoration(
-                  color: HexColor('#E4ECF5'),
+                  color:
+                      HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
                 ),
                 child: ListView(
                   shrinkWrap: true,

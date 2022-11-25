@@ -6,7 +6,6 @@ class PairTaskerTheme {
   PairTaskerTheme._();
 
   static TextStyle title1 = GoogleFonts.poppins(
-    color: Colors.black,
     fontSize: 35,
     fontWeight: FontWeight.bold,
   );
@@ -14,7 +13,6 @@ class PairTaskerTheme {
   static TextStyle title2 = GoogleFonts.poppins(
     fontSize: 28,
     fontWeight: FontWeight.bold,
-    color: Colors.black,
   );
 
   static TextStyle title3 = GoogleFonts.poppins(

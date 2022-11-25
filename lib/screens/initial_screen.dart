@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import '../helpers/methods.dart';
 
 class InitialScreen extends StatelessWidget {
   const InitialScreen({Key? key}) : super(key: key);
@@ -9,8 +10,8 @@ class InitialScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     PageController pageController = PageController();
     return Scaffold(
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

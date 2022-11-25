@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../screens/screens.dart';
+import '../helpers/methods.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
@@ -19,10 +20,10 @@ class BottomNavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: Colors.black,
+            color: Helper.isDark(context) ? Colors.white : Colors.black,
             width: 0.2,
           ),
         ),
@@ -35,7 +36,7 @@ class BottomNavBarWidget extends StatelessWidget {
           showSelectedLabels: false,
           showUnselectedLabels: false,
           elevation: 3,
-          backgroundColor: Colors.white,
+          backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
           type: BottomNavigationBarType.fixed,
           onTap: (value) {
             if (value != selectedScreen) {

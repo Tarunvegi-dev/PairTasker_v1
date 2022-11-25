@@ -4,6 +4,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:intl/intl.dart';
 import 'package:pairtasker/theme/theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../helpers/methods.dart';
 
 class UserFormScreen extends StatefulWidget {
   const UserFormScreen({Key? key}) : super(key: key);
@@ -22,11 +23,11 @@ class _UserFormScreenState extends State<UserFormScreen> {
     return ScrollConfiguration(
       behavior: const MaterialScrollBehavior().copyWith(overscroll: false),
       child: Scaffold(
+        backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
         resizeToAvoidBottomInset: true,
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
+            padding: const EdgeInsets.fromLTRB(15, 50, 15, 0),
             child: ListView(
               children: <Widget>[
                 Text(
@@ -175,11 +176,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                                 // print(value.toString());
                               },
                             ),
-                            const Text(
+                            Text(
                               'Male',
-                              style: TextStyle(
+                              style: GoogleFonts.lato(
                                 fontSize: 14,
-                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -195,11 +195,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                                 setState(() => gender = value.toString());
                               },
                             ),
-                            const Text(
+                            Text(
                               'Female',
-                              style: TextStyle(
+                              style: GoogleFonts.lato(
                                 fontSize: 14,
-                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -215,11 +214,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                                 setState(() => gender = value.toString());
                               },
                             ),
-                            const Text(
+                            Text(
                               'Others',
-                              style: TextStyle(
+                              style: GoogleFonts.lato(
                                 fontSize: 14,
-                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -262,14 +260,15 @@ class _UserFormScreenState extends State<UserFormScreen> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: HexColor("#E4ECF5"),
+                        color: HexColor(
+                            Helper.isDark(context) ? "252B30" : "E4ECF5"),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
                         child: Text(
                           "You can get benfits of making money by doing tasks. You will get tasks from our app users nearby. You can charge the users according to the situations, distance and profit.",
-                          style: TextStyle(letterSpacing: 0.7),
+                          style: GoogleFonts.lato(letterSpacing: 0.7),
                         ),
                       ),
                     ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import '../../helpers/methods.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DrawerWidget extends StatelessWidget {
   const DrawerWidget({super.key});
@@ -7,6 +9,7 @@ class DrawerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -20,7 +23,6 @@ class DrawerWidget extends StatelessWidget {
                 margin: const EdgeInsets.only(
                   top: 40,
                 ),
-                color: Colors.white,
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -51,30 +53,35 @@ class DrawerWidget extends StatelessWidget {
                       const SizedBox(
                         height: 15,
                       ),
-                      const Text(
+                      Text(
                         'Will Smith',
-                        style: TextStyle(
-                          color: Colors.black,
+                        style: GoogleFonts.lato(
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
                         '@willsmith143',
-                        style: TextStyle(
+                        style: GoogleFonts.lato(
+                          fontSize: 12,
                           color: HexColor('AAABAB'),
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ]),
               ),
               Container(
-                color: HexColor('E4ECF5'),
+                color: Helper.isDark(context)
+                    ? HexColor('252B30')
+                    : HexColor('E4ECF5'),
                 child: Column(
                   children: [
                     InkWell(
                       onTap: () =>
                           Navigator.of(context).pushNamed('/myprofile'),
                       child: Container(
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
                         padding: const EdgeInsets.symmetric(
                           vertical: 15,
                           horizontal: 27,
@@ -83,7 +90,6 @@ class DrawerWidget extends StatelessWidget {
                           bottom: 5,
                           top: 5,
                         ),
-                        color: Colors.white,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -97,8 +103,7 @@ class DrawerWidget extends StatelessWidget {
                             ),
                             Text(
                               'View Profile',
-                              style: TextStyle(
-                                color: HexColor('1A1E1F'),
+                              style: GoogleFonts.lato(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -108,6 +113,8 @@ class DrawerWidget extends StatelessWidget {
                       ),
                     ),
                     Container(
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
                         horizontal: 27,
@@ -115,7 +122,6 @@ class DrawerWidget extends StatelessWidget {
                       margin: const EdgeInsets.only(
                         bottom: 5,
                       ),
-                      color: Colors.white,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -129,8 +135,7 @@ class DrawerWidget extends StatelessWidget {
                           ),
                           Text(
                             'Tasker Mode',
-                            style: TextStyle(
-                              color: HexColor('1A1E1F'),
+                            style: GoogleFonts.lato(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -139,6 +144,8 @@ class DrawerWidget extends StatelessWidget {
                       ),
                     ),
                     Container(
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
                         horizontal: 23,
@@ -146,7 +153,6 @@ class DrawerWidget extends StatelessWidget {
                       margin: const EdgeInsets.only(
                         bottom: 5,
                       ),
-                      color: Colors.white,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -160,8 +166,7 @@ class DrawerWidget extends StatelessWidget {
                           ),
                           Text(
                             'Terms & Conditions',
-                            style: TextStyle(
-                              color: HexColor('1A1E1F'),
+                            style: GoogleFonts.lato(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -170,6 +175,8 @@ class DrawerWidget extends StatelessWidget {
                       ),
                     ),
                     Container(
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
                         horizontal: 23,
@@ -177,7 +184,6 @@ class DrawerWidget extends StatelessWidget {
                       margin: const EdgeInsets.only(
                         bottom: 5,
                       ),
-                      color: Colors.white,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -191,8 +197,7 @@ class DrawerWidget extends StatelessWidget {
                           ),
                           Text(
                             "FAQ's",
-                            style: TextStyle(
-                              color: HexColor('1A1E1F'),
+                            style: GoogleFonts.lato(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -201,6 +206,8 @@ class DrawerWidget extends StatelessWidget {
                       ),
                     ),
                     Container(
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
                       padding: const EdgeInsets.symmetric(
                         vertical: 15,
                         horizontal: 23,
@@ -208,7 +215,6 @@ class DrawerWidget extends StatelessWidget {
                       margin: const EdgeInsets.only(
                         bottom: 5,
                       ),
-                      color: Colors.white,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -222,8 +228,7 @@ class DrawerWidget extends StatelessWidget {
                           ),
                           Text(
                             'Share the app',
-                            style: TextStyle(
-                              color: HexColor('1A1E1F'),
+                            style: GoogleFonts.lato(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),

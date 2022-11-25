@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:getwidget/components/radio/gf_radio.dart';
-import 'package:getwidget/getwidget.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/theme/theme.dart';
 import 'package:intl/intl.dart';
+import '../helpers/methods.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class MyProfile extends StatefulWidget {
@@ -22,17 +21,17 @@ class _MyProfileState extends State<MyProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
                     width: 0.2,
                   ),
                 ),
@@ -62,7 +61,6 @@ class _MyProfileState extends State<MyProfile> {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: HexColor('1A1E1F'),
                         ),
                       ),
                     ],
@@ -118,16 +116,16 @@ class _MyProfileState extends State<MyProfile> {
                             const SizedBox(
                               height: 17,
                             ),
-                            const Text(
+                            Text(
                               'Will Smith',
-                              style: TextStyle(
+                              style: GoogleFonts.lato(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
                             ),
                             Text(
                               '@willsmith143',
-                              style: TextStyle(
+                              style: GoogleFonts.lato(
                                 fontSize: 12,
                                 color: HexColor('AAABAB'),
                               ),
@@ -287,11 +285,10 @@ class _MyProfileState extends State<MyProfile> {
                                         // print(value.toString());
                                       },
                                     ),
-                                    const Text(
+                                    Text(
                                       'Male',
-                                      style: TextStyle(
+                                      style: GoogleFonts.lato(
                                         fontSize: 14,
-                                        color: Colors.black,
                                       ),
                                     ),
                                   ],
@@ -308,11 +305,10 @@ class _MyProfileState extends State<MyProfile> {
                                             () => gender = value.toString());
                                       },
                                     ),
-                                    const Text(
+                                    Text(
                                       'Female',
-                                      style: TextStyle(
+                                      style: GoogleFonts.lato(
                                         fontSize: 14,
-                                        color: Colors.black,
                                       ),
                                     ),
                                   ],
@@ -329,11 +325,10 @@ class _MyProfileState extends State<MyProfile> {
                                             () => gender = value.toString());
                                       },
                                     ),
-                                    const Text(
+                                    Text(
                                       'Others',
-                                      style: TextStyle(
+                                      style: GoogleFonts.lato(
                                         fontSize: 14,
-                                        color: Colors.black,
                                       ),
                                     ),
                                   ],
@@ -358,9 +353,9 @@ class _MyProfileState extends State<MyProfile> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text(
+                                Text(
                                   'Want to be a Tasker?',
-                                  style: TextStyle(
+                                  style: GoogleFonts.lato(
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                     fontSize: 14,
@@ -401,8 +396,7 @@ class _MyProfileState extends State<MyProfile> {
                             children: [
                               Text(
                                 'Working Categories',
-                                style: TextStyle(
-                                  color: HexColor('6F7273'),
+                                style: GoogleFonts.lato(
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -435,10 +429,9 @@ class _MyProfileState extends State<MyProfile> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Mechanic',
-                                    style: TextStyle(
-                                      color: Colors.black,
+                                    style: GoogleFonts.lato(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -483,10 +476,9 @@ class _MyProfileState extends State<MyProfile> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Delivery Boy',
-                                    style: TextStyle(
-                                      color: Colors.black,
+                                    style: GoogleFonts.lato(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -521,6 +513,9 @@ class _MyProfileState extends State<MyProfile> {
                                   ),
                                 ),
                               ),
+                              margin: const EdgeInsets.only(
+                                bottom: 41,
+                              ),
                               padding: const EdgeInsets.only(
                                 bottom: 12,
                                 top: 12,
@@ -531,10 +526,9 @@ class _MyProfileState extends State<MyProfile> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Camera Man',
-                                    style: TextStyle(
-                                      color: Colors.black,
+                                    style: GoogleFonts.lato(
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -560,9 +554,6 @@ class _MyProfileState extends State<MyProfile> {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 41,
-            ),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -575,13 +566,15 @@ class _MyProfileState extends State<MyProfile> {
                       Radius.circular(0),
                     ),
                   ),
-                  backgroundColor: HexColor('E4ECF5'),
+                  backgroundColor: Helper.isDark(context)
+                      ? HexColor('252B30')
+                      : HexColor('DEE0E0'),
                   elevation: 0,
                 ),
                 onPressed: () {},
                 child: Text(
                   'Edit',
-                  style: TextStyle(
+                  style: GoogleFonts.lato(
                     color: HexColor('007FFF'),
                     fontWeight: FontWeight.bold,
                   ),

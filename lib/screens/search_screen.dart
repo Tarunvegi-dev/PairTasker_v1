@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/screens/home_screen/taskers_list.dart';
+import '../helpers/methods.dart';
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
@@ -8,16 +9,17 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
           child: Column(
         children: [
           Container(
             width: double.infinity,
             height: MediaQuery.of(context).size.height * 8 / 100,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.black,
+                  color: Helper.isDark(context) ? Colors.white : Colors.black,
                   width: 0.2,
                 ),
               ),
@@ -51,7 +53,6 @@ class SearchScreen extends StatelessWidget {
             ),
           ),
           Container(
-            color: Colors.white,
             padding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 15,
@@ -77,7 +78,6 @@ class SearchScreen extends StatelessWidget {
                       'Mechanic',
                       style: TextStyle(
                         fontSize: 10,
-                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -90,7 +90,9 @@ class SearchScreen extends StatelessWidget {
                   ),
                   margin: const EdgeInsets.only(right: 5),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(0, 0, 0, 0.1),
+                    color: Helper.isDark(context)
+                        ? const Color.fromRGBO(255, 255, 255, 0.1)
+                        : const Color.fromRGBO(0, 0, 0, 0.1),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: const Center(
@@ -98,7 +100,6 @@ class SearchScreen extends StatelessWidget {
                       'Delivery Boy',
                       style: TextStyle(
                         fontSize: 10,
-                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -111,7 +112,9 @@ class SearchScreen extends StatelessWidget {
                   ),
                   margin: const EdgeInsets.only(right: 5),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(0, 0, 0, 0.1),
+                    color: Helper.isDark(context)
+                        ? const Color.fromRGBO(255, 255, 255, 0.1)
+                        : const Color.fromRGBO(0, 0, 0, 0.1),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: const Center(
@@ -119,7 +122,6 @@ class SearchScreen extends StatelessWidget {
                       'Cameraman',
                       style: TextStyle(
                         fontSize: 10,
-                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -132,7 +134,9 @@ class SearchScreen extends StatelessWidget {
                   ),
                   margin: const EdgeInsets.only(right: 5),
                   decoration: BoxDecoration(
-                    color: const Color.fromRGBO(0, 0, 0, 0.1),
+                    color: Helper.isDark(context)
+                        ? const Color.fromRGBO(255, 255, 255, 0.1)
+                        : const Color.fromRGBO(0, 0, 0, 0.1),
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: const Center(
@@ -140,7 +144,6 @@ class SearchScreen extends StatelessWidget {
                       'Cook',
                       style: TextStyle(
                         fontSize: 10,
-                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -151,7 +154,9 @@ class SearchScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.only(top: 4),
             decoration: BoxDecoration(
-              color: HexColor('#E4ECF5'),
+              color: Helper.isDark(context)
+                  ? HexColor('252B30')
+                  : HexColor('DEE0E0'),
             ),
             child: ListView(
               shrinkWrap: true,

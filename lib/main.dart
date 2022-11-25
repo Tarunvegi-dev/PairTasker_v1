@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'screens/screens.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -13,12 +13,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'PairTasker',
-      theme: ThemeData(
-        textTheme: GoogleFonts.latoTextTheme(
-          Theme.of(context).textTheme,
-        ),
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       initialRoute: '/',
       routes: {
         '/': (context) => const InitialScreen(),
@@ -30,10 +26,10 @@ class MyApp extends StatelessWidget {
         '/notifications': (context) => const NotificationScreen(),
         '/myrequests': (context) => const MyRequests(),
         '/mytasks': (context) => const MyTasks(),
-        '/taskerprofile':(context) => const TaskerProfile(),
-        '/myprofile':(context) => const MyProfile(),
-        '/chatscreen':(context) => const ChatScreen('user'),
-        '/searchscreen':(context) => const SearchScreen(),
+        '/taskerprofile': (context) => const TaskerProfile(),
+        '/myprofile': (context) => const MyProfile(),
+        '/chatscreen': (context) => const ChatScreen('user'),
+        '/searchscreen': (context) => const SearchScreen(),
       },
       debugShowCheckedModeBanner: false,
     );

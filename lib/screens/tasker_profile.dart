@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../helpers/methods.dart';
 
 class TaskerProfile extends StatelessWidget {
   const TaskerProfile({super.key});
@@ -9,15 +10,15 @@ class TaskerProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
                     width: 0.2,
                   ),
                 ),
@@ -57,12 +58,14 @@ class TaskerProfile extends StatelessWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                color: HexColor('#E4ECF5'),
+                color: Helper.isDark(context)
+                    ? HexColor('252B30')
+                    : HexColor('DEE0E0'),
               ),
               child: Column(
                 children: [
                   Container(
-                    decoration: const BoxDecoration(color: Colors.white),
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     padding: const EdgeInsets.only(
                       top: 28,
                       left: 26,
@@ -100,7 +103,6 @@ class TaskerProfile extends StatelessWidget {
                                       'Virat Kohli',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Colors.black,
                                       ),
                                     ),
                                     Text(
@@ -231,7 +233,9 @@ class TaskerProfile extends StatelessWidget {
                       shrinkWrap: true,
                       children: [
                         Container(
-                          color: Colors.white,
+                          color: Helper.isDark(context)
+                              ? Colors.black
+                              : Colors.white,
                           padding: const EdgeInsets.only(
                             left: 20,
                             right: 30,
@@ -274,7 +278,6 @@ class TaskerProfile extends StatelessWidget {
                                             'Virat Kohli',
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: Colors.black,
                                             ),
                                           ),
                                           Text(
@@ -319,7 +322,9 @@ class TaskerProfile extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          color: Colors.white,
+                          color: Helper.isDark(context)
+                              ? Colors.black
+                              : Colors.white,
                           padding: const EdgeInsets.only(
                             left: 20,
                             right: 30,
@@ -362,7 +367,6 @@ class TaskerProfile extends StatelessWidget {
                                             'Virat Kohli',
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: Colors.black,
                                             ),
                                           ),
                                           Text(

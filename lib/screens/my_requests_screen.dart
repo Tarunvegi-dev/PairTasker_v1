@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/screens/screens.dart';
 import '../theme/widgets.dart';
+import '../helpers/methods.dart';
 
 class MyRequests extends StatelessWidget {
   const MyRequests({super.key});
@@ -10,17 +11,17 @@ class MyRequests extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
                     width: 0.2,
                   ),
                 ),
@@ -39,7 +40,7 @@ class MyRequests extends StatelessWidget {
             ),
             Container(
               decoration: BoxDecoration(
-                color: HexColor('#E4ECF5'),
+                color: HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
               ),
               child: ListView(
                 shrinkWrap: true,
@@ -51,13 +52,14 @@ class MyRequests extends StatelessWidget {
                       ),
                     ),
                     child: Container(
-                      color: Colors.white,
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
                       margin: const EdgeInsets.only(bottom: 5),
                       height: 120,
                       child: Container(
                         margin: const EdgeInsets.symmetric(
                           vertical: 20,
-                          horizontal: 30,
+                          horizontal: 20,
                         ),
                         child: Column(
                           children: [
@@ -108,13 +110,13 @@ class MyRequests extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     margin: const EdgeInsets.only(bottom: 5),
                     height: 120,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 20,
-                        horizontal: 30,
+                        horizontal: 20,
                       ),
                       child: Column(
                         children: [
@@ -168,13 +170,13 @@ class MyRequests extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     margin: const EdgeInsets.only(bottom: 5),
                     height: 120,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 20,
-                        horizontal: 30,
+                        horizontal: 20,
                       ),
                       child: Column(
                         children: [
@@ -228,13 +230,13 @@ class MyRequests extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     margin: const EdgeInsets.only(bottom: 5),
                     height: 120,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 20,
-                        horizontal: 30,
+                        horizontal: 20,
                       ),
                       child: Column(
                         children: [
@@ -288,13 +290,13 @@ class MyRequests extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: Helper.isDark(context) ? Colors.black : Colors.white,
                     margin: const EdgeInsets.only(bottom: 5),
                     height: 120,
                     child: Container(
                       margin: const EdgeInsets.symmetric(
                         vertical: 20,
-                        horizontal: 30,
+                        horizontal: 20,
                       ),
                       child: Column(
                         children: [
