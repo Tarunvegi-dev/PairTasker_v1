@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/screens.dart';
+import 'providers/auth.dart';
+import 'screens/splash_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,27 +14,41 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PairTasker',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const InitialScreen(),
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const HomePage(),
-        '/userform': (context) => const UserFormScreen(),
-        '/wishlist': (context) => const WishlistScreen(),
-        '/notifications': (context) => const NotificationScreen(),
-        '/myrequests': (context) => const MyRequests(),
-        '/mytasks': (context) => const MyTasks(),
-        '/taskerprofile': (context) => const TaskerProfile(),
-        '/myprofile': (context) => const MyProfile(),
-        '/chatscreen': (context) => const ChatScreen('user'),
-        '/searchscreen': (context) => const SearchScreen(),
-      },
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (ctx) => Auth())],
+      child: Consumer<Auth>(
+        builder: (ctx, auth, _) => MaterialApp(
+          title: 'PairTasker',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          home: auth.isAuth && auth.isSignUpCompleted
+              ? const HomePage()
+              : auth.isAuth && !auth.isSignUpCompleted
+                  ? const UserFormScreen()
+                  : FutureBuilder(
+                      future: auth.tryAutoLogin(),
+                      builder: (ctx, authResult) =>
+                          authResult.connectionState == ConnectionState.waiting
+                              ? const SplashScreen()
+                              : const InitialScreen(),
+                    ),
+          routes: {
+            '/login': (context) => const LoginScreen(),
+            '/register': (context) => const RegisterScreen(),
+            '/home': (context) => const HomePage(),
+            '/userform': (context) => const UserFormScreen(),
+            '/wishlist': (context) => const WishlistScreen(),
+            '/notifications': (context) => const NotificationScreen(),
+            '/myrequests': (context) => const MyRequests(),
+            '/mytasks': (context) => const MyTasks(),
+            '/taskerprofile': (context) => const TaskerProfile(),
+            '/myprofile': (context) => const MyProfile(),
+            '/chatscreen': (context) => const ChatScreen('user'),
+            '/searchscreen': (context) => const SearchScreen(),
+          },
+          debugShowCheckedModeBanner: false,
+        ),
+      ),
     );
   }
 }

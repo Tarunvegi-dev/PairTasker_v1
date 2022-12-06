@@ -3,6 +3,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import '../screens/screens.dart';
 import '../helpers/methods.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class BottomNavBarWidget extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
@@ -102,6 +104,38 @@ class BottomNavBarWidget extends StatelessWidget {
               label: "mytasks",
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class LoadingSpinner extends StatelessWidget {
+  const LoadingSpinner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SpinKitChasingDots(
+      color: Colors.white,
+      size: 25.0,
+    );
+  }
+}
+
+class ErrorMessage extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
+  final message;
+
+  const ErrorMessage(this.message, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        message,
+        style: GoogleFonts.lato(
+          color: Colors.red,
+          fontSize: 12,
         ),
       ),
     );

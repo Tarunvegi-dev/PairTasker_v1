@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pairtasker/providers/auth.dart';
+import 'package:pairtasker/screens/otp_verification_screen.dart';
+import 'package:pairtasker/theme/widgets.dart';
+import 'package:provider/provider.dart';
 import '../theme/theme.dart';
 import '../helpers/methods.dart';
 
@@ -12,8 +16,49 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final _formKey = GlobalKey<FormState>();
   bool _obscuretext = true;
-  bool isChecked = false;
+  bool _obscuretext2 = true;
+  bool isTermsAgreed = false;
+  bool isLoading = false;
+
+  final email = TextEditingController();
+  final password = TextEditingController();
+  var error = '';
+
+  Future<void> registerUser() async {
+    setState(() {
+      error = '';
+    });
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    final response = await Provider.of<Auth>(context, listen: false).signup(
+      email.text,
+      password.text,
+      isTermsAgreed,
+    );
+    if (response.statusCode != 200) {
+      setState(() {
+        error = response.body;
+        isLoading = false;
+      });
+    } else {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => OtpVerification(email.text, password.text),
+        ),
+      );
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,285 +70,233 @@ class _RegisterScreenState extends State<RegisterScreen> {
           padding: const EdgeInsets.all(20),
           child: Padding(
             padding: const EdgeInsets.only(top: 200),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  "Sign up",
-                  style: PairTaskerTheme.title1,
-                ),
-                const SizedBox(
-                  height: 50,
-                ),
-                TextField(
-                  decoration: InputDecoration(
-                    border: const UnderlineInputBorder(),
-                    labelText: "Email address",
-                    hintText: "Enter your email",
-                    prefixIcon: Container(
-                        margin: const EdgeInsets.only(
-                          right: 15,
-                        ),
-                        child: const Icon(Icons.email)),
-                    labelStyle: PairTaskerTheme.inputLabel,
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: HexColor("#99A4AE"),
-                      ),
-                    ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "Sign up",
+                    style: PairTaskerTheme.title1,
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  obscureText: _obscuretext,
-                  // enableSuggestions: false,
-                  // autocorrect: false,
-                  decoration: InputDecoration(
-                    border: const UnderlineInputBorder(),
-                    labelText: "Password",
-                    prefixIcon: Container(
-                      margin: const EdgeInsets.only(
-                        right: 15,
-                      ),
-                      child: const Icon(Icons.key),
-                    ),
-                    suffixIcon: InkWell(
-                      child: Icon(
-                        _obscuretext
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        color: _obscuretext ? Colors.grey : HexColor("#99A4AE"),
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _obscuretext = !_obscuretext;
-                        });
-                      },
-                    ),
-                    hintText: "Enter password",
-                    labelStyle: PairTaskerTheme.inputLabel,
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: HexColor("#99A4AE"),
-                      ),
-                    ),
+                  const SizedBox(
+                    height: 50,
                   ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  obscureText: true,
-                  // enableSuggestions: false,
-                  // autocorrect: false,
-                  decoration: InputDecoration(
-                    border: const UnderlineInputBorder(),
-                    labelText: "Confirm Password",
-                    hintText: "Re-Enter password",
-                    prefixIcon: Container(
-                        margin: const EdgeInsets.only(
-                          right: 15,
-                        ),
-                        child: const Icon(Icons.key)),
-                    labelStyle: PairTaskerTheme.inputLabel,
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: HexColor("#99A4AE"),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: Checkbox(
-                          activeColor: HexColor('#007FFF'),
-                          value: isChecked,
-                          onChanged: (bool? value) => {
-                            setState(() {
-                              isChecked = value!;
-                            })
-                          },
-                        ),
-                      ),
-                    ),
-                    Text(
-                      'Policy and Terms',
-                      style: GoogleFonts.nunito(
-                        color: HexColor('#007FFF'),
-                        fontSize: 14,
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 90 / 100,
-                  height: 43,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                        isScrollControlled: true,
-                        isDismissible: true,
-                        context: context,
-                        builder: (context) => Container(
-                          color: Helper.isDark(context)
-                              ? Colors.black
-                              : Colors.white,
-                          padding: EdgeInsets.only(
-                            bottom: MediaQuery.of(context).viewInsets.bottom,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 40,
-                              horizontal: 20,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Verify your mail',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 25,
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 5),
-                                  child: TextField(
-                                    keyboardType: TextInputType.number,
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(
-                                        fontSize: 28,
-                                        letterSpacing: 4,
-                                        fontWeight: FontWeight.bold),
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(10),
-                                        ),
-                                        borderSide: BorderSide(
-                                          color: HexColor('AAABAB'),
-                                        ),
-                                      ),
-                                      hintText: "CODE",
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 25,
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Resend Code in ',
-                                      style: TextStyle(
-                                        color: HexColor('#AAABAB'),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    Text(
-                                      '0:48 sec',
-                                      style: TextStyle(
-                                          color: HexColor('FF033E'),
-                                          fontWeight: FontWeight.w600),
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 25,
-                                ),
-                                SizedBox(
-                                  width: MediaQuery.of(context).size.width *
-                                      90 /
-                                      100,
-                                  height: 43,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pushNamed(context, '/userform');
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: HexColor('007FFF'),
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(5),
-                                        ),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Verify',
-                                      style: PairTaskerTheme.buttonText,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
+                  TextFormField(
+                    controller: email,
+                    validator: (value) {
+                      if (value!.isEmpty ||
+                          !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(value)) {
+                        return 'Enter a valid email!';
+                      }
+                      return null;
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(0, 127, 255, 1),
-                      elevation: 3,
-                      shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5))),
-                    ),
-                    child: Text(
-                      'Register',
-                      style: PairTaskerTheme.buttonText,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Already had account?',
-                      style: TextStyle(
-                        color: HexColor('#99A4AE'),
-                        fontSize: 14,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.popAndPushNamed(context, '/login');
-                      },
-                      style: TextButton.styleFrom(
-                        splashFactory: NoSplash.splashFactory,
-                      ),
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          color: HexColor('#007FFF'),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                    decoration: InputDecoration(
+                      border: const UnderlineInputBorder(),
+                      labelText: "Email address",
+                      hintText: "Enter your email",
+                      prefixIcon: Container(
+                          margin: const EdgeInsets.only(
+                            right: 15,
+                          ),
+                          child: const Icon(Icons.email)),
+                      labelStyle: PairTaskerTheme.inputLabel,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: HexColor("#99A4AE"),
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    controller: password,
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Enter a valid password!';
+                      }
+                      return null;
+                    },
+                    obscureText: _obscuretext,
+                    decoration: InputDecoration(
+                      border: const UnderlineInputBorder(),
+                      labelText: "Password",
+                      prefixIcon: Container(
+                        margin: const EdgeInsets.only(
+                          right: 15,
+                        ),
+                        child: const Icon(Icons.key),
+                      ),
+                      suffixIcon: InkWell(
+                        child: Icon(
+                          _obscuretext
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color:
+                              _obscuretext ? Colors.grey : HexColor("#99A4AE"),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _obscuretext = !_obscuretext;
+                          });
+                        },
+                      ),
+                      hintText: "Enter password",
+                      labelStyle: PairTaskerTheme.inputLabel,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: HexColor("#99A4AE"),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Enter a valid password!';
+                      }
+                      if (value != password.text) {
+                        return 'Passwords dont match!';
+                      }
+                      return null;
+                    },
+                    obscureText: _obscuretext2,
+                    decoration: InputDecoration(
+                      suffixIcon: InkWell(
+                        child: Icon(
+                          _obscuretext2
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                          color:
+                              _obscuretext ? Colors.grey : HexColor("#99A4AE"),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _obscuretext2 = !_obscuretext2;
+                          });
+                        },
+                      ),
+                      border: const UnderlineInputBorder(),
+                      labelText: "Confirm Password",
+                      hintText: "Re-Enter password",
+                      prefixIcon: Container(
+                          margin: const EdgeInsets.only(
+                            right: 15,
+                          ),
+                          child: const Icon(Icons.key)),
+                      labelStyle: PairTaskerTheme.inputLabel,
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: HexColor("#99A4AE"),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: Checkbox(
+                            activeColor: HexColor('#007FFF'),
+                            value: isTermsAgreed,
+                            onChanged: (bool? value) => {
+                              setState(() {
+                                isTermsAgreed = value!;
+                              })
+                            },
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'Policy and Terms',
+                        style: GoogleFonts.nunito(
+                          color: HexColor('#007FFF'),
+                          fontSize: 14,
+                        ),
+                      )
+                    ],
+                  ),
+                  if (error != '')
+                    Column(
+                      children: [
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        ErrorMessage(error)
+                      ],
+                    ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 90 / 100,
+                    height: 43,
+                    child: ElevatedButton(
+                      onPressed:
+                          isLoading || !isTermsAgreed ? null : registerUser,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(0, 127, 255, 1),
+                        elevation: 3,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(5),
+                          ),
+                        ),
+                      ),
+                      child: isLoading
+                          ? const LoadingSpinner()
+                          : Text(
+                              'Register',
+                              style: PairTaskerTheme.buttonText,
+                            ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 25,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Already had account?',
+                        style: GoogleFonts.lato(
+                          color: HexColor('#99A4AE'),
+                          fontSize: 14,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.popAndPushNamed(context, '/login');
+                        },
+                        style: TextButton.styleFrom(
+                          splashFactory: NoSplash.splashFactory,
+                        ),
+                        child: Text(
+                          'Login',
+                          style: GoogleFonts.lato(
+                            color: HexColor('#007FFF'),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),

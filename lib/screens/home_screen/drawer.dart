@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:provider/provider.dart';
 import '../../helpers/methods.dart';
+import '../../providers/auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DrawerWidget extends StatelessWidget {
@@ -256,7 +258,8 @@ class DrawerWidget extends StatelessWidget {
                 ),
               ),
               child: const Text('Logout'),
-              onPressed: () {},
+              onPressed: () =>
+                  Provider.of<Auth>(context, listen: false).logout(),
             ),
           )
         ],

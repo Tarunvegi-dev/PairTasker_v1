@@ -116,8 +116,9 @@ class _HomePageState extends State<HomePage> {
               ),
               Container(
                 decoration: BoxDecoration(
-                  color:
-                      HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
+                  color: HexColor(
+                    Helper.isDark(context) ? '252B30' : '#E4ECF5',
+                  ),
                 ),
                 child: ListView(
                   shrinkWrap: true,

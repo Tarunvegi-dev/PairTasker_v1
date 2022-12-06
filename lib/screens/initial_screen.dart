@@ -96,7 +96,7 @@ class InitialScreen extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/register');
+                      Navigator.pushReplacementNamed(context, '/register');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromRGBO(0, 127, 255, 1),
