@@ -46,15 +46,15 @@ class _OtpVerificationState extends State<OtpVerification> {
     );
     if (response.statusCode != 200) {
       setState(() {
-        error = response.body;
+        error = response.data;
         isLoading = false;
       });
     } else {
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pushReplacementNamed('/userform');
       setState(() {
         isLoading = false;
       });
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/userform');
     }
   }
 
@@ -62,7 +62,7 @@ class _OtpVerificationState extends State<OtpVerification> {
     setState(() {
       error = '';
     });
-    var url = Uri.parse('https://pairtasker.herokuapp.com/api/auth/register');
+    var url = Uri.parse('${BaseURL.url}auth/register');
     var res = await http.post(url, body: {
       'email': widget.email,
       'password': widget.password,

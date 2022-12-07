@@ -11,3 +11,4 @@ export './tasker_profile.dart';
 export './my_profile_screen.dart';
 export 'chat_screen/chat_screen.dart';
 export './search_screen.dart';
+export './tasker_details_screen.dart';

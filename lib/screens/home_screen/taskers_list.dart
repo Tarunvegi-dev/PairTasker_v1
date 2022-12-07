@@ -191,7 +191,7 @@ class TaskersList extends StatelessWidget {
                           child: CircleAvatar(
                             radius: 30,
                             backgroundImage: NetworkImage(
-                              'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
+                              'https://img.freepik.com/premium-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg?w=2000',
                             ),
                           ),
                         ),
@@ -344,7 +344,7 @@ class TaskersList extends StatelessWidget {
                           child: CircleAvatar(
                             radius: 30,
                             backgroundImage: NetworkImage(
-                              'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
+                              'https://img.freepik.com/premium-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg?w=2000',
                             ),
                           ),
                         ),

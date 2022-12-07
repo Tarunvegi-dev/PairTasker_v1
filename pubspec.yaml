@@ -76,6 +76,7 @@ flutter:
     - assets/images/selecting_person.svg
     - assets/images/self_employment.svg
     - assets/images/name_logo.png
+    - assets/images/icons/close.png
     - assets/images/icons/mail.svg
     - assets/images/icons/gender.svg
     - assets/images/icons/menu.svg

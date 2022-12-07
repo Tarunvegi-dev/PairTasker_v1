@@ -44,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
     if (response.statusCode != 200) {
       setState(() {
-        error = response.body;
+        error = response.data;
         isLoading = false;
       });
     } else {

@@ -180,7 +180,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
         isLoading = false;
       });
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/home');
+      Navigator.of(context)
+          .pushReplacementNamed(isChecked ? '/taskerform' : '/home');
     }
   }
 

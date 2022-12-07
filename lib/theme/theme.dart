@@ -17,9 +17,7 @@ class PairTaskerTheme {
 
   static TextStyle title3 = GoogleFonts.poppins(
     fontSize: 20,
-    fontWeight: FontWeight.w500,
-    fontStyle: FontStyle.italic,
-    color: HexColor('#303030'),
+    fontWeight: FontWeight.bold,
   );
 
   static TextStyle inputLabel =
