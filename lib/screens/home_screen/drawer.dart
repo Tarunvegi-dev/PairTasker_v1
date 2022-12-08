@@ -259,7 +259,7 @@ class DrawerWidget extends StatelessWidget {
               ),
               child: const Text('Logout'),
               onPressed: () =>
-                  Provider.of<Auth>(context, listen: false).logout(),
+                  Provider.of<Auth>(context, listen: false).logout(context),
             ),
           )
         ],

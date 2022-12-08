@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
@@ -66,11 +65,13 @@ class Auth with ChangeNotifier {
     return true;
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     _token = '';
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
+    // ignore: use_build_context_synchronously
+    Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
   Future<Response> signIn(String email, String password) async {

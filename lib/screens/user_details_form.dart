@@ -27,7 +27,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
   bool isChecked = false;
   String token = '';
   // ignore: unused_field, avoid_init_to_null
-  var _storedImage = null;
+  File? _storedImage;
   final username = TextEditingController();
   final displayName = TextEditingController();
   final mobileNumber = TextEditingController();
@@ -129,7 +129,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
   Future<void> _takePicture(ImageSource source) async {
     Navigator.of(context).pop();
     final ImagePicker picker = ImagePicker();
-    final imageFile = await picker.pickImage(
+    XFile? imageFile = await picker.pickImage(
       source: source,
       maxWidth: 600,
     );
@@ -154,11 +154,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
       isLoading = true;
     });
     FormData formData = FormData.fromMap(
-      <String, dynamic>{
-        // 'image': await MultipartFile.fromFile(
-        //   _storedImage,
-        //   contentType: MediaType('image', 'png'),
-        // ),
+      {
+        'image': await MultipartFile.fromFile(
+          _storedImage!.path,
+        ),
         'username': username.text,
         'displayName': displayName.text,
         'mobileNumber': mobileNumber.text,
@@ -221,7 +220,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                               child: CircleAvatar(
                                 // ignore: unnecessary_null_comparison
                                 backgroundImage: _storedImage != null
-                                    ? FileImage(_storedImage)
+                                    ? FileImage(_storedImage!)
                                     : const AssetImage(
                                         "assets/images/user_profile.png",
                                       ) as ImageProvider,
