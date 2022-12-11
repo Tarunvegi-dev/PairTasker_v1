@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pairtasker/providers/taskers.dart';
 import 'screens/screens.dart';
 import 'providers/auth.dart';
 import 'screens/splash_screen.dart';
@@ -15,7 +16,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [ChangeNotifierProvider(create: (ctx) => Auth())],
+      providers: [
+        ChangeNotifierProvider(
+          create: (ctx) => Auth(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => Tasker(),
+        )
+      ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'PairTasker',

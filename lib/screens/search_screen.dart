@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:pairtasker/screens/home_screen/taskers_list.dart';
+import 'package:pairtasker/screens/home_screen/Tasker.dart';
 import '../helpers/methods.dart';
 
 class SearchScreen extends StatelessWidget {
@@ -160,7 +160,7 @@ class SearchScreen extends StatelessWidget {
             ),
             child: ListView(
               shrinkWrap: true,
-              children: const [TaskersList()],
+              children: const [],
             ),
           )
         ],

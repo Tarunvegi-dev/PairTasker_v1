@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import 'package:dio/dio.dart';
 import '../theme/widgets.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class UserFormScreen extends StatefulWidget {
   const UserFormScreen({Key? key}) : super(key: key);
@@ -28,6 +29,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
   String token = '';
   // ignore: unused_field, avoid_init_to_null
   File? _storedImage;
+  File? _croppedFile;
+
   final username = TextEditingController();
   final displayName = TextEditingController();
   final mobileNumber = TextEditingController();
@@ -126,6 +129,33 @@ class _UserFormScreenState extends State<UserFormScreen> {
     );
   }
 
+    Future<void> _cropImage() async {
+    if (_storedImage != null) {
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: _storedImage!.path,
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 60,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop the image',
+            toolbarColor: HexColor('007FFF'),
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: false,
+          ),
+          IOSUiSettings(
+            title: 'Cropper',
+          ),
+        ],
+      );
+      if (croppedFile != null) {
+        setState(() {
+          _croppedFile = File(croppedFile.path);
+        });
+      }
+    }
+  }
+
   Future<void> _takePicture(ImageSource source) async {
     Navigator.of(context).pop();
     final ImagePicker picker = ImagePicker();
@@ -140,6 +170,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
     setState(() {
       _storedImage = File(imageFile.path);
     });
+    _cropImage();
   }
 
   Future<void> updateUserDetails() async {
@@ -155,9 +186,9 @@ class _UserFormScreenState extends State<UserFormScreen> {
     });
     FormData formData = FormData.fromMap(
       {
-        'image': _storedImage != null
+        'image': _croppedFile != null
             ? await MultipartFile.fromFile(
-                _storedImage!.path,
+                _croppedFile!.path,
               )
             : null,
         'username': username.text,
@@ -165,7 +196,6 @@ class _UserFormScreenState extends State<UserFormScreen> {
         'mobileNumber': mobileNumber.text,
         'dob': _currentDate.toString(),
         'gender': gender,
-        'isTasker': isChecked.toString(),
       },
     );
     // ignore: use_build_context_synchronously
@@ -221,8 +251,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
                               onTap: _selectSource,
                               child: CircleAvatar(
                                 // ignore: unnecessary_null_comparison
-                                backgroundImage: _storedImage != null
-                                    ? FileImage(_storedImage!)
+                                backgroundImage: _croppedFile != null
+                                    ? FileImage(_croppedFile!)
                                     : const AssetImage(
                                         "assets/images/user_profile.png",
                                       ) as ImageProvider,

@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../helpers/methods.dart';
 
 class Auth with ChangeNotifier {
   String _token = '';
   String _username = '';
-  String _userid = '';
 
   bool get isAuth {
     return _token != '';
@@ -26,31 +27,15 @@ class Auth with ChangeNotifier {
 
   Future<bool> checkisSignUpCompleted() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('username')) {
-      final username = prefs.getString('username');
-      _username = username!;
-      notifyListeners();
-      return true;
-    } else {
-      const url = '${BaseURL.url}/user/get-user';
-      final response = await Dio().get(
-        url,
-        options: Options(
-          validateStatus: (_) => true,
-          headers: {
-            'token': _token,
-          },
-        ),
-      );
-      final responseData = response.data;
-      if (response.statusCode == 200 && responseData['username'] != null) {
-        _username = responseData['username'];
-        notifyListeners();
-        prefs.setString('username', responseData['username']);
-        return true;
-      }
+    if (!prefs.containsKey('userdata')) {
+      return false;
     }
-    return false;
+    final userPref = prefs.getString('userdata');
+    Map<String, dynamic> userdata =
+        jsonDecode(userPref!) as Map<String, dynamic>;
+    _username = userdata['username'];
+    notifyListeners();
+    return true;
   }
 
   Future<bool> tryAutoLogin() async {
@@ -74,6 +59,28 @@ class Auth with ChangeNotifier {
     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
+  Future<void> getUserData() async {
+    const url = '${BaseURL.url}/user/get-user';
+
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': _token,
+        },
+      ),
+    );
+
+    final responseData = response.data;
+    if (response.statusCode == 200 && responseData['username'] != null) {
+      _username = responseData['username'];
+      notifyListeners();
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('userdata', jsonEncode(responseData));
+    }
+  }
+
   Future<Response> signIn(String email, String password) async {
     const url = '${BaseURL.url}/auth/login';
 
@@ -91,11 +98,10 @@ class Auth with ChangeNotifier {
     final responseData = response.data;
     if (response.statusCode == 200) {
       _token = responseData['token'];
-      _username = responseData['username'];
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
-      prefs.setString('username', responseData['username']);
+      getUserData();
     }
 
     return response;
@@ -127,7 +133,7 @@ class Auth with ChangeNotifier {
 
     final response = await Dio().post(
       url,
-      data: {'email': email, 'otp': otp},
+      data: {'email': email.trim().toLowerCase(), 'otp': otp},
       options: Options(
         validateStatus: (_) => true,
       ),
@@ -162,11 +168,9 @@ class Auth with ChangeNotifier {
     final responseData = response.data;
     if (response.statusCode == 200) {
       _username = responseData['data']['username'];
-      _userid = responseData['data']['id'];
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
-      prefs.setString('username', responseData['data']['username']);
-      prefs.setString('userid', responseData['data']['id']);
+      prefs.setString('userdata', jsonEncode(responseData['data']));
     }
 
     return response;
@@ -187,11 +191,18 @@ class Auth with ChangeNotifier {
       ),
     );
 
+    final responseData = response.data;
+    if (response.statusCode == 200) {
+      final prefs = await SharedPreferences.getInstance();
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      userdata['tasker'] = responseData['data'];
+      prefs.setString('userdata', jsonEncode(userdata));
+    }
+
     return response;
   }
 }
 
-class BaseURL {
-  static const url =
-      'http://node-express-env.eba-p9xtnay4.ap-south-1.elasticbeanstalk.com/api';
-}
+

@@ -1,10 +1,14 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pairtasker/providers/taskers.dart';
 import 'package:pairtasker/screens/home_screen/drawer.dart';
-import 'package:pairtasker/screens/home_screen/taskers_list.dart';
+import 'package:pairtasker/screens/home_screen/Tasker.dart';
 import 'package:pairtasker/theme/widgets.dart';
+import 'package:provider/provider.dart';
 import 'recents.dart';
 import '../../helpers/methods.dart';
 
@@ -17,9 +21,44 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> key = GlobalKey();
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<Tasker>(context).getTaskers().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  List<dynamic> selectedTaskers = [];
+
+  void selectTaskers(String id) {
+    if (selectedTaskers.contains(id)) {
+      setState(() {
+        selectedTaskers.remove(id);
+      });
+    } else {
+      setState(() {
+        selectedTaskers.add(id);
+      });
+    }
+    print(selectedTaskers);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final taskersdata = Provider.of<Tasker>(context);
+    final loadedTaskers = taskersdata.taskers;
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       drawer: const DrawerWidget(),
@@ -120,11 +159,28 @@ class _HomePageState extends State<HomePage> {
                     Helper.isDark(context) ? '252B30' : '#E4ECF5',
                   ),
                 ),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: const [
-                    Recents(),
-                    TaskersList(),
+                child: Column(
+                  children: [
+                    const Recents(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: loadedTaskers.length,
+                      itemBuilder: (ctx, i) => TaskerWidget(
+                        index: i,
+                        username: loadedTaskers[i]['user']['username'],
+                        id: loadedTaskers[i]['id'],
+                        displayName: loadedTaskers[i]['user']['displayName'],
+                        rating: loadedTaskers[i]['rating'].toString(),
+                        saves: loadedTaskers[i]['saves'].toString(),
+                        tasks: loadedTaskers[i]['totalTasks'].toString(),
+                        profilePicture: loadedTaskers[i]['user']
+                                ['profilePicture']
+                            .toString(),
+                        selectedTaskers: selectedTaskers,
+                        isSelected: selectedTaskers.contains(loadedTaskers[i]['id']) != false,
+                        selectTaskers: selectTaskers,
+                      ),
+                    ),
                   ],
                 ),
               )

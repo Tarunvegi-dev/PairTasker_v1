@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pairtasker/screens/home_screen/taskers_list.dart';
+import 'package:pairtasker/screens/home_screen/Tasker.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import '../helpers/methods.dart';
@@ -44,7 +44,7 @@ class WishlistScreen extends StatelessWidget {
               ),
               child: ListView(
                 shrinkWrap: true,
-                children: const [TaskersList()],
+                children: const [],
               ),
             ),
           ],
