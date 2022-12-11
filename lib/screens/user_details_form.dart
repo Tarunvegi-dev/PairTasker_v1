@@ -155,9 +155,11 @@ class _UserFormScreenState extends State<UserFormScreen> {
     });
     FormData formData = FormData.fromMap(
       {
-        'image': await MultipartFile.fromFile(
-          _storedImage!.path,
-        ),
+        'image': _storedImage != null
+            ? await MultipartFile.fromFile(
+                _storedImage!.path,
+              )
+            : null,
         'username': username.text,
         'displayName': displayName.text,
         'mobileNumber': mobileNumber.text,
@@ -290,8 +292,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
                         TextFormField(
                           controller: mobileNumber,
                           validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'This Field is required';
+                            if (value!.isEmpty != true && value.length < 10) {
+                              return 'Enter Valid Mobile Number';
                             }
                             return null;
                           },

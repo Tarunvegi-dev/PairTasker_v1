@@ -91,9 +91,11 @@ class Auth with ChangeNotifier {
     final responseData = response.data;
     if (response.statusCode == 200) {
       _token = responseData['token'];
+      _username = responseData['username'];
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
+      prefs.setString('username', responseData['username']);
     }
 
     return response;
@@ -111,7 +113,7 @@ class Auth with ChangeNotifier {
       data: {
         'email': email.trim().toLowerCase(),
         'password': password,
-        'tremsAgreed': isTermsAgreed.toString(),
+        'termsAgreed': isTermsAgreed.toString(),
       },
       options: Options(
         validateStatus: (_) => true,
@@ -166,6 +168,24 @@ class Auth with ChangeNotifier {
       prefs.setString('username', responseData['data']['username']);
       prefs.setString('userid', responseData['data']['id']);
     }
+
+    return response;
+  }
+
+  Future<Response> createTasker(List<String> workingCategories) async {
+    const url = '${BaseURL.url}/tasker/create-tasker';
+    final response = await Dio().post(
+      url,
+      data: {
+        'workingCategories': workingCategories,
+      },
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': _token,
+        },
+      ),
+    );
 
     return response;
   }
