@@ -117,8 +117,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   TextFormField(
                     controller: password,
                     validator: (value) {
-                      if (value!.isEmpty) {
+                      if (value!.isEmpty ||
+                          !RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+                              .hasMatch(value)) {
                         return 'Enter a valid password!';
+                      }
+                      if (value.length < 8) {
+                        return 'Password should contain at least 8 characters';
                       }
                       return null;
                     },
@@ -160,11 +165,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   TextFormField(
                     validator: (value) {
-                      if (value!.isEmpty) {
+                      if (value!.isEmpty ||
+                          !RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+                              .hasMatch(value)) {
                         return 'Enter a valid password!';
                       }
                       if (value != password.text) {
                         return 'Passwords dont match!';
+                      }
+                      if (value.length < 8) {
+                        return 'Password should contain at least 8 characters';
                       }
                       return null;
                     },

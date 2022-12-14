@@ -4,12 +4,54 @@ import 'package:pairtasker/screens/home_screen/Tasker.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import '../helpers/methods.dart';
+import 'package:provider/provider.dart';
+import '../providers/taskers.dart';
 
-class WishlistScreen extends StatelessWidget {
+class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
 
   @override
+  State<WishlistScreen> createState() => _WishlistScreenState();
+}
+
+class _WishlistScreenState extends State<WishlistScreen> {
+  var _isInit = true;
+  var _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<Tasker>(context).getWishlist().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  List<dynamic> selectedTaskers = [];
+
+  void selectTaskers(String id) {
+    if (selectedTaskers.contains(id)) {
+      setState(() {
+        selectedTaskers.remove(id);
+      });
+    } else {
+      setState(() {
+        selectedTaskers.add(id);
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final taskersdata = Provider.of<Tasker>(context);
+    final loadedTaskers = taskersdata.wishlist;
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
@@ -42,9 +84,24 @@ class WishlistScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
               ),
-              child: ListView(
+              child: ListView.builder(
                 shrinkWrap: true,
-                children: const [],
+                itemCount: loadedTaskers.length,
+                itemBuilder: (ctx, i) => TaskerWidget(
+                  index: i,
+                  username: loadedTaskers[i]['user']['username'],
+                  id: loadedTaskers[i]['id'],
+                  displayName: loadedTaskers[i]['user']['displayName'],
+                  rating: loadedTaskers[i]['rating'].toString(),
+                  saves: loadedTaskers[i]['saves'].toString(),
+                  tasks: loadedTaskers[i]['totalTasks'].toString(),
+                  profilePicture:
+                      loadedTaskers[i]['user']['profilePicture'].toString(),
+                  selectedTaskers: selectedTaskers,
+                  isSelected:
+                      selectedTaskers.contains(loadedTaskers[i]['id']) != false,
+                  selectTaskers: selectTaskers,
+                ),
               ),
             ),
           ],

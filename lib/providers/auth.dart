@@ -33,6 +33,7 @@ class Auth with ChangeNotifier {
     final userPref = prefs.getString('userdata');
     Map<String, dynamic> userdata =
         jsonDecode(userPref!) as Map<String, dynamic>;
+    print(userdata);
     _username = userdata['username'];
     notifyListeners();
     return true;
@@ -166,11 +167,27 @@ class Auth with ChangeNotifier {
     );
 
     final responseData = response.data;
+    final prefs = await SharedPreferences.getInstance();
     if (response.statusCode == 200) {
-      _username = responseData['data']['username'];
-      notifyListeners();
-      final prefs = await SharedPreferences.getInstance();
-      prefs.setString('userdata', jsonEncode(responseData['data']));
+      if (!prefs.containsKey('userdata')) {
+        _username = responseData['data']['username'];
+        notifyListeners();
+        prefs.setString('userdata', jsonEncode(responseData['data']));
+      } else {
+        final userPref = prefs.getString('userdata');
+        Map<String, dynamic> userdata =
+            jsonDecode(userPref!) as Map<String, dynamic>;
+        Map<String, dynamic> updatedUserData = {
+          ...userdata,
+          'username': responseData['data']['username'],
+          'displayName': responseData['data']['displayName'],
+          'mobileNumber': responseData['data']['mobileNumber'],
+          'dob': responseData['data']['dob'],
+          'profilePicture': responseData['data']['profilePicture'],
+          'gender': responseData['data']['gender']
+        };
+        prefs.setString('userdata', jsonEncode(updatedUserData));
+      }
     }
 
     return response;
@@ -197,6 +214,7 @@ class Auth with ChangeNotifier {
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
+      userdata['isTasker'] = true;
       userdata['tasker'] = responseData['data'];
       prefs.setString('userdata', jsonEncode(userdata));
     }
@@ -204,5 +222,3 @@ class Auth with ChangeNotifier {
     return response;
   }
 }
-
-

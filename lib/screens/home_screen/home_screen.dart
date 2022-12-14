@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -52,7 +50,6 @@ class _HomePageState extends State<HomePage> {
         selectedTaskers.add(id);
       });
     }
-    print(selectedTaskers);
   }
 
   @override
