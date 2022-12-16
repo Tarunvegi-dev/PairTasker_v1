@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/providers/auth.dart';
+import 'package:pairtasker/providers/taskers.dart';
+import 'package:pairtasker/screens/screens.dart';
 import 'package:pairtasker/theme/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:pairtasker/theme/widgets.dart';
@@ -59,9 +61,9 @@ class _MyProfileState extends State<MyProfile> {
             ? DateTime.parse(userdata['dob'])
             : DateTime.now();
         gender = userdata['gender'] ?? '';
-        _isTasker = userdata['isTasker'] ?? '';
+        _isTasker = userdata['isTasker'] ?? false;
       });
-      if (userdata['isTasker']) {
+      if (userdata['isTasker'] != null && userdata['isTasker'] != false) {
         setState(() {
           taskerMode = userdata['tasker']['isOnline'];
           workingCategories = userdata['tasker']['workingCategories'];
@@ -76,6 +78,7 @@ class _MyProfileState extends State<MyProfile> {
     setState(() {
       isLoading = true;
     });
+    String dob = DateFormat('yyyy-MM-dd').format(_dob);
     FormData formData = FormData.fromMap(
       {
         'image': _croppedFile != null
@@ -86,7 +89,7 @@ class _MyProfileState extends State<MyProfile> {
         'username': username.text,
         'displayName': displayName.text,
         'mobileNumber': mobileNumber.text,
-        // 'dob': _dob.toString(),
+        'dob': dob,
         'gender': gender,
       },
     );
@@ -96,7 +99,7 @@ class _MyProfileState extends State<MyProfile> {
     if (response.statusCode != 200) {
       setState(() {
         isLoading = false;
-        error = response.data.toString();
+        error = response.data['message'];
       });
     } else {
       setState(() {
@@ -227,6 +230,30 @@ class _MyProfileState extends State<MyProfile> {
       _storedImage = File(imageFile.path);
     });
     _cropImage();
+  }
+
+  Future<void> updateTaskerStatus(bool status) async {
+    setState(() {
+      taskerMode = status;
+    });
+    final response = await Provider.of<Tasker>(context, listen: false)
+        .setTaskerOnline(status);
+    if (response.statusCode == 200) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          // ignore: use_build_context_synchronously
+          backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
+          content: Text(
+            response.data['message'],
+            style: GoogleFonts.poppins(
+              // ignore: use_build_context_synchronously
+              color: Helper.isDark(context) ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -395,7 +422,8 @@ class _MyProfileState extends State<MyProfile> {
                             prefixIcon: Padding(
                               padding: const EdgeInsets.all(12),
                               child: SvgPicture.asset(
-                                  "assets/images/icons/mail.svg"),
+                                "assets/images/icons/mail.svg",
+                              ),
                             ),
                             labelStyle: PairTaskerTheme.inputLabel,
                             focusedBorder: UnderlineInputBorder(
@@ -624,11 +652,8 @@ class _MyProfileState extends State<MyProfile> {
                                         child: Switch(
                                           value: taskerMode,
                                           activeColor: Colors.white,
-                                          onChanged: (bool position) {
-                                            setState(
-                                              () => taskerMode = !taskerMode,
-                                            );
-                                          },
+                                          onChanged: (value) =>
+                                              updateTaskerStatus(value),
                                         ),
                                       ),
                                     ],
@@ -661,10 +686,22 @@ class _MyProfileState extends State<MyProfile> {
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                    Text(
-                                      'manage',
-                                      style: GoogleFonts.lato(
-                                        color: HexColor('007FFF'),
+                                    InkWell(
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: ((context) => TaskerDetails(
+                                                workingCategories:
+                                                    workingCategories,
+                                                isUpdating: true,
+                                              )),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        'manage',
+                                        style: GoogleFonts.lato(
+                                          color: HexColor('007FFF'),
+                                        ),
                                       ),
                                     )
                                   ],

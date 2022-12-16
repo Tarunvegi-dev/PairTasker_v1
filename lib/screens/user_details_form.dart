@@ -129,7 +129,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
     );
   }
 
-    Future<void> _cropImage() async {
+  Future<void> _cropImage() async {
     if (_storedImage != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: _storedImage!.path,
@@ -184,6 +184,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
     setState(() {
       isLoading = true;
     });
+    String dob = DateFormat('yyyy-MM-dd').format(_currentDate);
     FormData formData = FormData.fromMap(
       {
         'image': _croppedFile != null
@@ -191,10 +192,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                 _croppedFile!.path,
               )
             : null,
-        'username': username.text,
+        'username': username.text.trim(),
         'displayName': displayName.text,
         'mobileNumber': mobileNumber.text,
-        'dob': _currentDate.toString(),
+        'dob': dob,
         'gender': gender,
       },
     );
@@ -203,7 +204,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
         .updateUserDetails(formData);
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data;
+        error = response.data['message'];
         isLoading = false;
       });
     } else {
@@ -322,7 +323,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                         TextFormField(
                           controller: mobileNumber,
                           validator: (value) {
-                            if (value!.isEmpty != true && value.length < 10) {
+                            if (value!.isEmpty || value.length < 10) {
                               return 'Enter Valid Mobile Number';
                             }
                             return null;

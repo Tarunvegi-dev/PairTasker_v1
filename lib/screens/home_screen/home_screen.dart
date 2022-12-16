@@ -159,12 +159,27 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     const Recents(),
+                    if (loadedTaskers.isEmpty)
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                        child: const Center(
+                          child: Text('No Taskers Found, please try again!'),
+                        ),
+                      ),
                     ListView.builder(
                       shrinkWrap: true,
                       itemCount: loadedTaskers.length,
                       itemBuilder: (ctx, i) => TaskerWidget(
                         index: i,
                         username: loadedTaskers[i]['user']['username'],
+                        availability: loadedTaskers[i]['availability'],
                         id: loadedTaskers[i]['id'],
                         displayName: loadedTaskers[i]['user']['displayName'],
                         rating: loadedTaskers[i]['rating'].toString(),
@@ -174,7 +189,9 @@ class _HomePageState extends State<HomePage> {
                                 ['profilePicture']
                             .toString(),
                         selectedTaskers: selectedTaskers,
-                        isSelected: selectedTaskers.contains(loadedTaskers[i]['id']) != false,
+                        isSelected:
+                            selectedTaskers.contains(loadedTaskers[i]['id']) !=
+                                false,
                         selectTaskers: selectTaskers,
                       ),
                     ),

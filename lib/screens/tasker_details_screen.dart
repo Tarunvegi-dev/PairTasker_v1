@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -9,7 +8,11 @@ import 'package:provider/provider.dart';
 import '../theme/theme.dart';
 
 class TaskerDetails extends StatefulWidget {
-  const TaskerDetails({super.key});
+  final List<dynamic> workingCategories;
+  final bool isUpdating;
+
+  const TaskerDetails(
+      {required this.workingCategories, required this.isUpdating, super.key});
 
   @override
   State<TaskerDetails> createState() => _TaskerDetailsState();
@@ -22,10 +25,18 @@ class _TaskerDetailsState extends State<TaskerDetails> {
     'photographer',
   ];
 
-  final List<String> _workingCategories = <String>[];
+  List<dynamic> _workingCategories = <String>[];
   final category = TextEditingController();
   bool isLoading = false;
   var error = '';
+
+  @override
+  void initState() {
+    setState(() {
+      _workingCategories = widget.workingCategories;
+    });
+    super.initState();
+  }
 
   Future<void> createTasker() async {
     setState(() {
@@ -36,7 +47,7 @@ class _TaskerDetailsState extends State<TaskerDetails> {
         .createTasker(_workingCategories);
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data;
+        error = response.data['message'];
         isLoading = false;
       });
     } else {
@@ -45,6 +56,27 @@ class _TaskerDetailsState extends State<TaskerDetails> {
       });
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  Future<void> updateTasker() async {
+    setState(() {
+      error = '';
+      isLoading = true;
+    });
+    final response = await Provider.of<Auth>(context, listen: false)
+        .updateTasker(_workingCategories);
+    if (response.statusCode != 200) {
+      setState(() {
+        error = response.data['message'];
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+      // ignore: use_build_context_synchronously
+      Navigator.of(context).pop();
     }
   }
 
@@ -236,7 +268,9 @@ class _TaskerDetailsState extends State<TaskerDetails> {
                       ),
                       onPressed: isLoading || _workingCategories.isEmpty
                           ? null
-                          : createTasker,
+                          : widget.isUpdating
+                              ? updateTasker
+                              : createTasker,
                       child: isLoading
                           ? const LoadingSpinner()
                           : Text(

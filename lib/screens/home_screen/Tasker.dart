@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/helpers/methods.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class TaskerWidget extends StatelessWidget {
   final index;
@@ -15,6 +16,7 @@ class TaskerWidget extends StatelessWidget {
   final saves;
   final profilePicture;
   final isSelected;
+  final availability;
   final List<dynamic> selectedTaskers;
   final Function selectTaskers;
 
@@ -28,6 +30,7 @@ class TaskerWidget extends StatelessWidget {
       this.tasks,
       this.profilePicture,
       this.isSelected,
+      this.availability,
       required this.selectedTaskers,
       required this.selectTaskers,
       super.key});
@@ -36,9 +39,8 @@ class TaskerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onLongPress: () => isSelected ? null : selectTaskers(id),
-      onTap: () => isSelected || selectedTaskers.isNotEmpty
-          ? selectTaskers(id)
-          : null,
+      onTap: () =>
+          isSelected || selectedTaskers.isNotEmpty ? selectTaskers(id) : null,
       child: Container(
         color: Helper.isDark(context) ? Colors.black : Colors.white,
         margin: const EdgeInsets.only(
@@ -111,14 +113,30 @@ class TaskerWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Text(
-                    isSelected ? 'SELECTED' : 'AVAILABLE',
-                    style: GoogleFonts.lato(
-                      color: HexColor('#007FFF'),
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
+                  !isSelected
+                      ? LinearPercentIndicator(
+                          backgroundColor: HexColor('FF0303'),
+                          progressColor: HexColor('00CE15'),
+                          percent: availability / 100,
+                          width: 100.0,
+                          lineHeight: 8.0,
+                          trailing: Text(
+                            '$availability%',
+                            style: GoogleFonts.lato(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                          barRadius: const Radius.circular(25),
+                        )
+                      : Text(
+                          'SELECTED',
+                          style: GoogleFonts.lato(
+                            color: HexColor('#007FFF'),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
                 ],
               ),
               const SizedBox(

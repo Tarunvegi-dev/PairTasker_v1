@@ -42,10 +42,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       password.text,
       isTermsAgreed,
     );
-    print(response.data);
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data;
+        error = response.data['message'];
         isLoading = false;
       });
     } else {

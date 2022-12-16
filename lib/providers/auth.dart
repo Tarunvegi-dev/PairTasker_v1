@@ -193,7 +193,7 @@ class Auth with ChangeNotifier {
     return response;
   }
 
-  Future<Response> createTasker(List<String> workingCategories) async {
+  Future<Response> createTasker(List<dynamic> workingCategories) async {
     const url = '${BaseURL.url}/tasker/create-tasker';
     final response = await Dio().post(
       url,
@@ -218,7 +218,32 @@ class Auth with ChangeNotifier {
       userdata['tasker'] = responseData['data'];
       prefs.setString('userdata', jsonEncode(userdata));
     }
+    return response;
+  }
 
+  Future<Response> updateTasker(List<dynamic> workingCategories) async {
+    const url = '${BaseURL.url}/tasker/update-tasker';
+    final response = await Dio().patch(
+      url,
+      data: {
+        'workingCategories': workingCategories,
+      },
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': _token,
+        },
+      ),
+    );
+    print(response.data);
+    if (response.statusCode == 200) {
+      final prefs = await SharedPreferences.getInstance();
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      userdata['tasker']['workingCategories'] = workingCategories;
+      prefs.setString('userdata', jsonEncode(userdata));
+    }
     return response;
   }
 }

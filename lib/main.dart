@@ -53,7 +53,10 @@ class MyApp extends StatelessWidget {
             '/myprofile': (context) => const MyProfile(),
             '/chatscreen': (context) => const ChatScreen('user'),
             '/searchscreen': (context) => const SearchScreen(),
-            '/taskerform': (context) => const TaskerDetails(),
+            '/taskerform': (context) => const TaskerDetails(
+                  workingCategories: [],
+                  isUpdating: false,
+                ),
           },
           debugShowCheckedModeBanner: false,
         ),

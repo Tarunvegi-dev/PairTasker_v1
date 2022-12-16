@@ -1,12 +1,40 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
 import '../../helpers/methods.dart';
 import '../../providers/auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DrawerWidget extends StatelessWidget {
+class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
+
+  @override
+  State<DrawerWidget> createState() => _DrawerWidgetState();
+}
+
+class _DrawerWidgetState extends State<DrawerWidget> {
+  var username = '';
+  var displayName = '';
+  var profilePicture = '';
+  var _isinit = true;
+
+  @override
+  void didChangeDependencies() async {
+    if (_isinit) {
+      final prefs = await SharedPreferences.getInstance();
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      setState(() {
+        username = userdata['username'] ?? '';
+        displayName = userdata['displayName'] ?? '';
+        profilePicture = userdata['profilePicture'];
+      });
+    }
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,26 +72,29 @@ class DrawerWidget extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      const SizedBox(
+                      SizedBox(
                         width: 60,
                         height: 60,
                         child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjdKRG2b-Z-wzIFPlATwulI-kKBy9LiKNcpAdBG4u5mf2X3aVPp2p62JYts9jz-1ABOnI&usqp=CAU'),
+                          backgroundImage: profilePicture != ''
+                              ? NetworkImage(profilePicture)
+                              : const AssetImage(
+                                  'assets/images/default_user.png',
+                                ) as ImageProvider,
                         ),
                       ),
                       const SizedBox(
                         height: 15,
                       ),
                       Text(
-                        'Will Smith',
+                        displayName,
                         style: GoogleFonts.lato(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       Text(
-                        '@willsmith143',
+                        '@$username',
                         style: GoogleFonts.lato(
                           fontSize: 12,
                           color: HexColor('AAABAB'),

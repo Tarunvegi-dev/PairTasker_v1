@@ -46,7 +46,7 @@ class _OtpVerificationState extends State<OtpVerification> {
     );
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data;
+        error = response.data['message'];
         isLoading = false;
       });
     } else {
@@ -62,19 +62,18 @@ class _OtpVerificationState extends State<OtpVerification> {
     setState(() {
       error = '';
     });
-    var url = Uri.parse('${BaseURL.url}auth/register');
-    var res = await http.post(url, body: {
-      'email': widget.email,
-      'password': widget.password,
-      'tremsAgreed': true.toString()
-    });
-    if (res.statusCode == 200) {
+    final response = await Provider.of<Auth>(context, listen: false).signup(
+      widget.email,
+      widget.password,
+      true,
+    );
+    if (response.statusCode == 200) {
       setState(() {
         isTimerEnded = false;
       });
     } else {
       setState(() {
-        error = res.body;
+        error = response.data['message'];
       });
     }
   }
