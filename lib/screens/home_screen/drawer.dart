@@ -33,6 +33,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         profilePicture = userdata['profilePicture'];
       });
     }
+    _isinit = false;
     super.didChangeDependencies();
   }
 

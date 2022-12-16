@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/helpers/methods.dart';
+import 'package:pairtasker/screens/screens.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class TaskerWidget extends StatelessWidget {
@@ -90,8 +91,18 @@ class TaskerWidget extends StatelessWidget {
                         width: 12,
                       ),
                       InkWell(
-                        onTap: () =>
-                            Navigator.of(context).pushNamed('/taskerprofile'),
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => TaskerProfile(
+                              username: username,
+                              displayName: displayName,
+                              profilePicture: profilePicture,
+                              rating: rating,
+                              tasks: tasks,
+                              id: id,
+                            ),
+                          ),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

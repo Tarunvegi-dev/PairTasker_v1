@@ -5,7 +5,21 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../helpers/methods.dart';
 
 class TaskerProfile extends StatelessWidget {
-  const TaskerProfile({super.key});
+  final username;
+  final id;
+  final displayName;
+  final rating;
+  final tasks;
+  final profilePicture;
+
+  const TaskerProfile(
+      {this.id,
+      this.username,
+      this.displayName,
+      this.profilePicture,
+      this.rating,
+      this.tasks,
+      super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -86,11 +100,15 @@ class TaskerProfile extends StatelessWidget {
                                   margin: const EdgeInsets.symmetric(
                                     vertical: 12,
                                   ),
-                                  child: const CircleAvatar(
+                                  child: CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: NetworkImage(
-                                      'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
-                                    ),
+                                    backgroundImage: profilePicture != null
+                                        ? NetworkImage(
+                                            profilePicture,
+                                          )
+                                        : const AssetImage(
+                                            'assets/images/default_user.png',
+                                          ) as ImageProvider,
                                   ),
                                 ),
                                 const SizedBox(
@@ -99,15 +117,15 @@ class TaskerProfile extends StatelessWidget {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Virat Kohli',
-                                      style: TextStyle(
+                                    Text(
+                                      displayName,
+                                      style: GoogleFonts.lato(
                                         fontSize: 14,
                                       ),
                                     ),
                                     Text(
-                                      '@viratkohli18',
-                                      style: TextStyle(
+                                      '@$username',
+                                      style: GoogleFonts.lato(
                                         fontSize: 12,
                                         color: HexColor('#AAABAB'),
                                       ),
@@ -131,9 +149,9 @@ class TaskerProfile extends StatelessWidget {
                                   ),
                                 ),
                                 onPressed: () {},
-                                child: const Text(
+                                child: Text(
                                   'REQUEST',
-                                  style: TextStyle(
+                                  style: GoogleFonts.lato(
                                     fontSize: 10,
                                   ),
                                 ),
@@ -158,8 +176,8 @@ class TaskerProfile extends StatelessWidget {
                                   width: 5,
                                 ),
                                 Text(
-                                  '4.8',
-                                  style: TextStyle(
+                                  rating.toString(),
+                                  style: GoogleFonts.lato(
                                     color: HexColor('#AAABAB'),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
@@ -179,8 +197,8 @@ class TaskerProfile extends StatelessWidget {
                                   width: 5,
                                 ),
                                 Text(
-                                  '10',
-                                  style: TextStyle(
+                                  tasks.toString(),
+                                  style: GoogleFonts.lato(
                                     color: HexColor('#AAABAB'),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
@@ -200,7 +218,7 @@ class TaskerProfile extends StatelessWidget {
                                 ),
                                 Text(
                                   '2 km',
-                                  style: TextStyle(
+                                  style: GoogleFonts.lato(
                                     color: HexColor('#AAABAB'),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
@@ -216,7 +234,7 @@ class TaskerProfile extends StatelessWidget {
                         Text(
                           'Reviews',
                           textAlign: TextAlign.start,
-                          style: TextStyle(
+                          style: GoogleFonts.lato(
                             color: HexColor('99A4AE'),
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -274,15 +292,15 @@ class TaskerProfile extends StatelessWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          const Text(
+                                          Text(
                                             'Virat Kohli',
-                                            style: TextStyle(
+                                            style: GoogleFonts.lato(
                                               fontSize: 12,
                                             ),
                                           ),
                                           Text(
                                             '@viratkohli18',
-                                            style: TextStyle(
+                                            style: GoogleFonts.lato(
                                               fontSize: 10,
                                               color: HexColor('#AAABAB'),
                                             ),
@@ -293,7 +311,7 @@ class TaskerProfile extends StatelessWidget {
                                   ),
                                   Text(
                                     '3w',
-                                    style: TextStyle(
+                                    style: GoogleFonts.lato(
                                       color: HexColor('99A4AE'),
                                       fontSize: 10,
                                       fontWeight: FontWeight.w500,
@@ -311,7 +329,7 @@ class TaskerProfile extends StatelessWidget {
                                 child: Text(
                                   'You have to be quick',
                                   textAlign: TextAlign.start,
-                                  style: TextStyle(
+                                  style: GoogleFonts.lato(
                                     color: HexColor('99A4AE'),
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -363,15 +381,15 @@ class TaskerProfile extends StatelessWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          const Text(
+                                          Text(
                                             'Virat Kohli',
-                                            style: TextStyle(
+                                            style: GoogleFonts.lato(
                                               fontSize: 12,
                                             ),
                                           ),
                                           Text(
                                             '@viratkohli18',
-                                            style: TextStyle(
+                                            style: GoogleFonts.lato(
                                               fontSize: 10,
                                               color: HexColor('#AAABAB'),
                                             ),
@@ -382,7 +400,7 @@ class TaskerProfile extends StatelessWidget {
                                   ),
                                   Text(
                                     '3w',
-                                    style: TextStyle(
+                                    style: GoogleFonts.lato(
                                       color: HexColor('99A4AE'),
                                       fontSize: 10,
                                       fontWeight: FontWeight.w500,
@@ -400,7 +418,7 @@ class TaskerProfile extends StatelessWidget {
                                 child: Text(
                                   'You have to be quick',
                                   textAlign: TextAlign.start,
-                                  style: TextStyle(
+                                  style: GoogleFonts.lato(
                                     color: HexColor('99A4AE'),
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
