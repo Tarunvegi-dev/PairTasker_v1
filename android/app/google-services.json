@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "557927434341",
+    "project_id": "pairtasker-fcm",
+    "storage_bucket": "pairtasker-fcm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:557927434341:android:e529ca5b8f62c300351e8c",
+        "android_client_info": {
+          "package_name": "com.example.pairtasker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "557927434341-gh8l1sdrtr0td7nm4qqu2qa4um0utk7u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlkICZMMMOUrKyTHZR8SNeXFCo9aDbT40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "557927434341-gh8l1sdrtr0td7nm4qqu2qa4um0utk7u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
