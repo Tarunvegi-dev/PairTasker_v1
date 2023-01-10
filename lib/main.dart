@@ -86,6 +86,7 @@ class _MyAppState extends State<MyApp> {
             '/myprofile': (context) => const MyProfile(),
             '/chatscreen': (context) => const ChatScreen('user'),
             '/searchscreen': (context) => const SearchScreen(),
+            '/mytaskerprofile': (context) => const MyTaskerProfile(),
             '/taskerform': (context) => const TaskerDetails(
                   workingCategories: [],
                   isUpdating: false,

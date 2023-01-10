@@ -18,6 +18,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   var username = '';
   var displayName = '';
   var profilePicture = '';
+  bool isTasker = false;
   var _isinit = true;
 
   @override
@@ -31,6 +32,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         username = userdata['username'] ?? '';
         displayName = userdata['displayName'] ?? '';
         profilePicture = userdata['profilePicture'] ?? '';
+        isTasker = userdata['isTasker'] ?? false;
       });
     }
     _isinit = false;
@@ -146,37 +148,43 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         ),
                       ),
                     ),
-                    Container(
-                      color:
-                          Helper.isDark(context) ? Colors.black : Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 27,
-                      ),
-                      margin: const EdgeInsets.only(
-                        bottom: 5,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/images/icons/drawer/tasker_mode.png',
-                            width: 24,
-                            height: 24,
+                    if (isTasker)
+                      InkWell(
+                        onTap: () =>
+                            Navigator.of(context).pushNamed('/mytaskerprofile'),
+                        child: Container(
+                          color: Helper.isDark(context)
+                              ? Colors.black
+                              : Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 15,
+                            horizontal: 27,
                           ),
-                          const SizedBox(
-                            width: 20,
+                          margin: const EdgeInsets.only(
+                            bottom: 5,
                           ),
-                          Text(
-                            'Tasker Mode',
-                            style: GoogleFonts.lato(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                'assets/images/icons/drawer/tasker_mode.png',
+                                width: 24,
+                                height: 24,
+                              ),
+                              const SizedBox(
+                                width: 20,
+                              ),
+                              Text(
+                                'Tasker Profile',
+                                style: GoogleFonts.lato(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
                     Container(
                       color:
                           Helper.isDark(context) ? Colors.black : Colors.white,
