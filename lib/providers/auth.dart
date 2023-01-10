@@ -33,7 +33,6 @@ class Auth with ChangeNotifier {
     final userPref = prefs.getString('userdata');
     Map<String, dynamic> userdata =
         jsonDecode(userPref!) as Map<String, dynamic>;
-    print(userdata);
     _username = userdata['username'];
     notifyListeners();
     return true;
@@ -183,8 +182,9 @@ class Auth with ChangeNotifier {
           'displayName': responseData['data']['displayName'],
           'mobileNumber': responseData['data']['mobileNumber'],
           'dob': responseData['data']['dob'],
-          'profilePicture': responseData['data']['profilePicture'],
-          'gender': responseData['data']['gender']
+          'gender': responseData['data']['gender'],
+          if (responseData['data']['profilePicture'] != null)
+            'profilePicture': responseData['data']['profilePicture'],
         };
         prefs.setString('userdata', jsonEncode(updatedUserData));
       }
@@ -235,7 +235,6 @@ class Auth with ChangeNotifier {
         },
       ),
     );
-    print(response.data);
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
       final userPref = prefs.getString('userdata');

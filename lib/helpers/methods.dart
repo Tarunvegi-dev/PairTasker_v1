@@ -15,5 +15,5 @@ class Helper {
 
 class BaseURL {
   static const url =
-      'http://node-express-env.eba-p9xtnay4.ap-south-1.elasticbeanstalk.com/api';
+      'http://pairtasker-test.ap-south-1.elasticbeanstalk.com/api';
 }

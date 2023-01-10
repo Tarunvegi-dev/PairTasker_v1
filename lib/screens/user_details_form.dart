@@ -204,7 +204,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
         .updateUserDetails(formData);
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data['message'];
+        error = response.data['error'];
         isLoading = false;
       });
     } else {

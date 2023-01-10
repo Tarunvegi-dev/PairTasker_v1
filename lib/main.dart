@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:pairtasker/providers/taskers.dart';
+import 'package:pairtasker/providers/user.dart';
+import 'package:pairtasker/providers/tasker.dart';
 import 'screens/screens.dart';
 import 'providers/auth.dart';
 import 'screens/splash_screen.dart';
@@ -23,24 +24,24 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
-    final fbm = FirebaseMessaging.instance;
-    fbm.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    FirebaseMessaging.instance.getToken().then((value) => print(value));
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessaging);
+    // final fbm = FirebaseMessaging.instance;
+    // fbm.requestPermission(
+    //   alert: true,
+    //   announcement: false,
+    //   badge: true,
+    //   carPlay: false,
+    //   criticalAlert: false,
+    //   provisional: false,
+    //   sound: true,
+    // );
+    // FirebaseMessaging.instance.getToken().then((value) => print(value));
+    // FirebaseMessaging.onBackgroundMessage(_firebaseMessaging);
     super.initState();
   }
 
-  Future<void> _firebaseMessaging(RemoteMessage message) async {
-    print(message);
-  }
+  // Future<void> _firebaseMessaging(RemoteMessage message) async {
+  //   print(message);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +49,9 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(
           create: (ctx) => Auth(),
+        ),
+        ChangeNotifierProvider(
+          create: (ctx) => User(),
         ),
         ChangeNotifierProvider(
           create: (ctx) => Tasker(),

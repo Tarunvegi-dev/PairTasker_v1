@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pairtasker/providers/taskers.dart';
+import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/home_screen/drawer.dart';
 import 'package:pairtasker/screens/home_screen/Tasker.dart';
 import 'package:pairtasker/theme/widgets.dart';
@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<Tasker>(context).getTaskers().then((_) {
+      Provider.of<User>(context).getTaskers().then((_) {
         setState(() {
           _isLoading = false;
         });
@@ -52,9 +52,87 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _refreshTaskers() async {
+    await Provider.of<User>(context, listen: false).getTaskers();
+  }
+
+  void showRequestModal() {
+    final messageController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 30 / 100,
+            color: Helper.isDark(context) ? Colors.black : Colors.white,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Message',
+                  style: GoogleFonts.lato(fontSize: 20),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TextField(
+                  controller: messageController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(10),
+                        ),
+                        borderSide: BorderSide(
+                          color: Helper.isDark(context)
+                              ? Colors.black
+                              : Colors.white,
+                        ),
+                      ),
+                      hintText: 'Enter your message here..'),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      backgroundColor: HexColor('007FFF'),
+                    ),
+                    onPressed: () => sendNewRequest(messageController.text),
+                    child: const Text(
+                      'Send Request',
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void sendNewRequest(String message) async {
+    final response = await Provider.of<User>(context, listen: false)
+        .sendNewRequest(selectedTaskers, message);
+    print(response);
+    print(selectedTaskers);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final taskersdata = Provider.of<Tasker>(context);
+    final taskersdata = Provider.of<User>(context);
     final loadedTaskers = taskersdata.taskers;
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
@@ -156,53 +234,108 @@ class _HomePageState extends State<HomePage> {
                     Helper.isDark(context) ? '252B30' : '#E4ECF5',
                   ),
                 ),
-                child: Column(
-                  children: [
-                    const Recents(),
-                    if (loadedTaskers.isEmpty)
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        color: Helper.isDark(context)
-                            ? Colors.black
-                            : Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 15,
+                child: RefreshIndicator(
+                  onRefresh: _refreshTaskers,
+                  child: Column(
+                    children: [
+                      const Recents(),
+                      if (loadedTaskers.isEmpty)
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          color: Helper.isDark(context)
+                              ? Colors.black
+                              : Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 15,
+                          ),
+                          child: const Center(
+                            child: Text('No Taskers Found, please try again!'),
+                          ),
                         ),
-                        child: const Center(
-                          child: Text('No Taskers Found, please try again!'),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: loadedTaskers.length,
+                        itemBuilder: (ctx, i) => TaskerWidget(
+                          index: i,
+                          username: loadedTaskers[i]['user']['username'],
+                          availability: loadedTaskers[i]['availability'],
+                          id: loadedTaskers[i]['id'],
+                          displayName: loadedTaskers[i]['user']['displayName'],
+                          rating: loadedTaskers[i]['rating'].toString(),
+                          saves: loadedTaskers[i]['saves'].toString(),
+                          tasks: loadedTaskers[i]['totalTasks'].toString(),
+                          profilePicture: loadedTaskers[i]['user']
+                              ['profilePicture'],
+                          selectedTaskers: selectedTaskers,
+                          isSelected: selectedTaskers
+                                  .contains(loadedTaskers[i]['id']) !=
+                              false,
+                          selectTaskers: selectTaskers,
                         ),
                       ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: loadedTaskers.length,
-                      itemBuilder: (ctx, i) => TaskerWidget(
-                        index: i,
-                        username: loadedTaskers[i]['user']['username'],
-                        availability: loadedTaskers[i]['availability'],
-                        id: loadedTaskers[i]['id'],
-                        displayName: loadedTaskers[i]['user']['displayName'],
-                        rating: loadedTaskers[i]['rating'].toString(),
-                        saves: loadedTaskers[i]['saves'].toString(),
-                        tasks: loadedTaskers[i]['totalTasks'].toString(),
-                        profilePicture: loadedTaskers[i]['user']
-                                ['profilePicture']
-                            .toString(),
-                        selectedTaskers: selectedTaskers,
-                        isSelected:
-                            selectedTaskers.contains(loadedTaskers[i]['id']) !=
-                                false,
-                        selectTaskers: selectTaskers,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               )
             ],
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBarWidget(0),
+      bottomNavigationBar: selectedTaskers.isNotEmpty
+          ? Row(
+              children: [
+                SizedBox(
+                  height: 56,
+                  width: MediaQuery.of(context).size.width * 50 / 100,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: HexColor('F2F2F3'),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        selectedTaskers = [];
+                      });
+                    },
+                    child: Text(
+                      'Cancel',
+                      style: GoogleFonts.lato(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: HexColor('99A4AE'),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 56,
+                  width: MediaQuery.of(context).size.width * 50 / 100,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                      backgroundColor: HexColor('007FFF'),
+                    ),
+                    onPressed: showRequestModal,
+                    child: Text(
+                      'Request',
+                      style: GoogleFonts.lato(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: HexColor('FFFFFF'),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )
+          : const BottomNavBarWidget(0),
     );
   }
 }

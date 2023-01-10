@@ -2,24 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:pairtasker/providers/tasker.dart';
+import 'package:provider/provider.dart';
 import '../helpers/methods.dart';
 
-class TaskerProfile extends StatelessWidget {
-  final username;
+class TaskerProfile extends StatefulWidget {
   final id;
-  final displayName;
-  final rating;
-  final tasks;
-  final profilePicture;
 
-  const TaskerProfile(
-      {this.id,
-      this.username,
-      this.displayName,
-      this.profilePicture,
-      this.rating,
-      this.tasks,
-      super.key});
+  const TaskerProfile({this.id, super.key});
+
+  @override
+  State<TaskerProfile> createState() => _TaskerProfileState();
+}
+
+class _TaskerProfileState extends State<TaskerProfile> {
+  var _isInit = true;
+  var _isLoading = false;
+  String username = '';
+  String displayName = '';
+  String rating = '';
+  String totalTasks = '';
+  String profilePicture = '';
+
+  @override
+  void didChangeDependencies() async {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      final response = await Provider.of<Tasker>(context, listen: false)
+          .getTaskerDetails(widget.id);
+      if (response.data['status'] == true) {
+        var taskerData = response.data['data'];
+        setState(() {
+          profilePicture = taskerData['user']['profilePicture'] ?? '';
+          username = taskerData['user']['username'] ?? '';
+          displayName = taskerData['user']['displayName'] ?? '';
+          rating = taskerData['rating'].toString();
+          totalTasks = taskerData['totalTasks'].toString();
+        });
+      }
+      ;
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +129,7 @@ class TaskerProfile extends StatelessWidget {
                                   ),
                                   child: CircleAvatar(
                                     radius: 30,
-                                    backgroundImage: profilePicture != null
+                                    backgroundImage: profilePicture != ''
                                         ? NetworkImage(
                                             profilePicture,
                                           )
@@ -176,7 +203,7 @@ class TaskerProfile extends StatelessWidget {
                                   width: 5,
                                 ),
                                 Text(
-                                  rating.toString(),
+                                  rating,
                                   style: GoogleFonts.lato(
                                     color: HexColor('#AAABAB'),
                                     fontSize: 14,
@@ -197,7 +224,7 @@ class TaskerProfile extends StatelessWidget {
                                   width: 5,
                                 ),
                                 Text(
-                                  tasks.toString(),
+                                  totalTasks,
                                   style: GoogleFonts.lato(
                                     color: HexColor('#AAABAB'),
                                     fontSize: 14,
@@ -281,7 +308,7 @@ class TaskerProfile extends StatelessWidget {
                                         child: const CircleAvatar(
                                           radius: 30,
                                           backgroundImage: NetworkImage(
-                                            'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
+                                            'https://m.cricbuzz.com/a/img/v1/192x192/i1/c244980/virat-kohli.jpg',
                                           ),
                                         ),
                                       ),
@@ -370,7 +397,7 @@ class TaskerProfile extends StatelessWidget {
                                         child: const CircleAvatar(
                                           radius: 30,
                                           backgroundImage: NetworkImage(
-                                            'https://icustomercareinformation.in/wp-content/uploads/2021/05/virat-kohli.jpg',
+                                            'https://m.cricbuzz.com/a/img/v1/192x192/i1/c244980/virat-kohli.jpg',
                                           ),
                                         ),
                                       ),

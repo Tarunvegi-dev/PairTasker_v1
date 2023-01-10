@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/providers/auth.dart';
-import 'package:pairtasker/providers/taskers.dart';
+import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/screens/screens.dart';
 import 'package:pairtasker/theme/theme.dart';
 import 'package:intl/intl.dart';
@@ -81,11 +81,10 @@ class _MyProfileState extends State<MyProfile> {
     String dob = DateFormat('yyyy-MM-dd').format(_dob);
     FormData formData = FormData.fromMap(
       {
-        'image': _croppedFile != null
-            ? await MultipartFile.fromFile(
-                _croppedFile!.path,
-              )
-            : null,
+        if (_croppedFile != null)
+          'image': await MultipartFile.fromFile(
+            _croppedFile!.path,
+          ),
         'username': username.text,
         'displayName': displayName.text,
         'mobileNumber': mobileNumber.text,
@@ -99,7 +98,7 @@ class _MyProfileState extends State<MyProfile> {
     if (response.statusCode != 200) {
       setState(() {
         isLoading = false;
-        error = response.data['message'];
+        error = response.data['error'];
       });
     } else {
       setState(() {

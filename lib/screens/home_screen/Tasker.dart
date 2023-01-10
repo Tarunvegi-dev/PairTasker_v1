@@ -94,11 +94,6 @@ class TaskerWidget extends StatelessWidget {
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => TaskerProfile(
-                              username: username,
-                              displayName: displayName,
-                              profilePicture: profilePicture,
-                              rating: rating,
-                              tasks: tasks,
                               id: id,
                             ),
                           ),

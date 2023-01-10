@@ -130,9 +130,10 @@ class _OtpVerificationState extends State<OtpVerification> {
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
-                          fontSize: 28,
-                          letterSpacing: 4,
-                          fontWeight: FontWeight.bold),
+                        fontSize: 28,
+                        letterSpacing: 4,
+                        fontWeight: FontWeight.bold,
+                      ),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: const BorderRadius.all(

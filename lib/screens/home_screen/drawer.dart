@@ -30,7 +30,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       setState(() {
         username = userdata['username'] ?? '';
         displayName = userdata['displayName'] ?? '';
-        profilePicture = userdata['profilePicture'];
+        profilePicture = userdata['profilePicture'] ?? '';
       });
     }
     _isinit = false;
