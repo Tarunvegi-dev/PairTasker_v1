@@ -4,7 +4,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/home_screen/drawer.dart';
-import 'package:pairtasker/screens/home_screen/Tasker.dart';
+import 'package:pairtasker/screens/home_screen/tasker_widget.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'package:provider/provider.dart';
 import 'recents.dart';
@@ -54,80 +54,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _refreshTaskers() async {
     await Provider.of<User>(context, listen: false).getTaskers();
-  }
-
-  void showRequestModal() {
-    final messageController = TextEditingController();
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
-            height: MediaQuery.of(context).size.height * 30 / 100,
-            color: Helper.isDark(context) ? Colors.black : Colors.white,
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Message',
-                  style: GoogleFonts.lato(fontSize: 20),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  controller: messageController,
-                  maxLines: 4,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(10),
-                        ),
-                        borderSide: BorderSide(
-                          color: Helper.isDark(context)
-                              ? Colors.black
-                              : Colors.white,
-                        ),
-                      ),
-                      hintText: 'Enter your message here..'),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                      backgroundColor: HexColor('007FFF'),
-                    ),
-                    onPressed: () => sendNewRequest(messageController.text),
-                    child: const Text(
-                      'Send Request',
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void sendNewRequest(String message) async {
-    final response = await Provider.of<User>(context, listen: false)
-        .sendNewRequest(selectedTaskers, message);
-    print(response);
-    print(selectedTaskers);
   }
 
   @override
@@ -322,7 +248,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                       backgroundColor: HexColor('007FFF'),
                     ),
-                    onPressed: showRequestModal,
+                    onPressed: () => Helper.showRequestModal(
+                      context,
+                      selectedTaskers,
+                    ),
                     child: Text(
                       'Request',
                       style: GoogleFonts.lato(

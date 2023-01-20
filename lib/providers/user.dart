@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 class User with ChangeNotifier {
   List<dynamic> _taskers = [];
   List<dynamic> _wishlist = [];
+  List<dynamic> _requests = [];
 
   List<dynamic> get taskers {
     return _taskers;
@@ -15,6 +16,10 @@ class User with ChangeNotifier {
 
   List<dynamic> get wishlist {
     return _wishlist;
+  }
+
+  List<dynamic> get requests {
+    return _requests;
   }
 
   Future<void> getTaskers() async {
@@ -41,6 +46,24 @@ class User with ChangeNotifier {
     }
   }
 
+  Future<void> getMyRequests() async {
+    const url = '${BaseURL.url}/user/get-my-requests';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
+
+    final responseData = response.data;
+    _requests = responseData['data'];
+    notifyListeners();
+  }
 
   Future<Response> sendNewRequest(List<dynamic> taskers, String message) async {
     const url = '${BaseURL.url}/user/send-request';
@@ -86,5 +109,4 @@ class User with ChangeNotifier {
       notifyListeners();
     }
   }
-
 }

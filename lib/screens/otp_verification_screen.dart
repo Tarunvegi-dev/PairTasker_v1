@@ -85,6 +85,14 @@ class _OtpVerificationState extends State<OtpVerification> {
   }
 
   @override
+  void dispose() {
+    setState(() {
+      isTimerEnded = true;
+    });
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,

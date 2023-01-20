@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:pairtasker/screens/home_screen/Tasker.dart';
+import 'package:pairtasker/screens/home_screen/tasker_widget.dart';
 import '../helpers/methods.dart';
 
 class SearchScreen extends StatelessWidget {
