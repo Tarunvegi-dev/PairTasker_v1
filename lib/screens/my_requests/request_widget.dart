@@ -42,9 +42,9 @@ class RequestWidget extends StatelessWidget {
                 children: [
                   Column(
                     children: [
-                      const Text(
-                        'PT00001A',
-                        style: TextStyle(
+                      Text(
+                        requestId,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),

@@ -89,9 +89,9 @@ class Helper {
                             backgroundColor: HexColor('007FFF'),
                           ),
                           onPressed: () async {
-                            if (messageController.text.isEmpty) {
+                            if (messageController.text.length < 50) {
                               setState(() {
-                                errorMessage = 'Message should not be empty';
+                                errorMessage = 'Message should be 50 characters long';
                               });
                               return;
                             }
@@ -117,8 +117,10 @@ class Helper {
                               // ignore: use_build_context_synchronously
                               Navigator.of(context).pop();
                               // ignore: use_build_context_synchronously
-                              Navigator.of(context)
-                                  .pushReplacementNamed('/myrequests');
+                              final navigator = Navigator.of(context);
+                              Future.delayed(const Duration(seconds: 2), () {
+                                navigator.pushReplacementNamed('/myrequests');
+                              });
                             }
                           },
                           child: isLoading

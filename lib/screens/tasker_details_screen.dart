@@ -6,6 +6,7 @@ import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme.dart';
+import 'package:dio/dio.dart';
 
 class TaskerDetails extends StatefulWidget {
   final List<dynamic> workingCategories;
@@ -66,8 +67,11 @@ class _TaskerDetailsState extends State<TaskerDetails> {
       error = '';
       isLoading = true;
     });
-    final response = await Provider.of<Auth>(context, listen: false)
-        .updateTasker(_workingCategories);
+    Map<String, dynamic> taskerdata = {
+      'workingCategories': _workingCategories,
+    };
+    final response =
+        await Provider.of<Auth>(context, listen: false).updateTasker(taskerdata);
     if (response.statusCode != 200) {
       setState(() {
         error = response.data['message'];

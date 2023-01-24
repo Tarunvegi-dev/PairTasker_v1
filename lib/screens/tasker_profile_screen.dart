@@ -3,8 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/providers/tasker.dart';
+import 'package:pairtasker/providers/user.dart';
 import 'package:provider/provider.dart';
 import '../helpers/methods.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class TaskerProfile extends StatefulWidget {
   final id;
@@ -17,21 +20,26 @@ class TaskerProfile extends StatefulWidget {
 
 class _TaskerProfileState extends State<TaskerProfile> {
   var _isInit = true;
-  var _isLoading = false;
   String username = '';
   String displayName = '';
   String rating = '';
   String totalTasks = '';
   String profilePicture = '';
+  bool isWishlisted = false;
 
   @override
   void didChangeDependencies() async {
     if (_isInit) {
-      setState(() {
-        _isLoading = true;
-      });
       final response = await Provider.of<Tasker>(context, listen: false)
           .getTaskerDetails(widget.id);
+      final prefs = await SharedPreferences.getInstance();
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      var wishlist = userdata['wishlist'] as List<dynamic>;
+      setState(() {
+        isWishlisted = wishlist.contains(widget.id) != false;
+      });
       if (response.data['status'] == true) {
         var taskerData = response.data['data'];
         setState(() {
@@ -42,10 +50,19 @@ class _TaskerProfileState extends State<TaskerProfile> {
           totalTasks = taskerData['totalTasks'].toString();
         });
       }
-      ;
     }
     _isInit = false;
     super.didChangeDependencies();
+  }
+
+  Future<void> handleWishlist() async {
+    final response = await Provider.of<User>(context, listen: false)
+        .manageWishlist(widget.id, !isWishlisted);
+    if (response.statusCode == 200) {
+      setState(() {
+        isWishlisted = !isWishlisted;
+      });
+    }
   }
 
   @override
@@ -89,10 +106,13 @@ class _TaskerProfileState extends State<TaskerProfile> {
                       color: HexColor('32DE84'),
                     ),
                   ),
-                  Icon(
-                    Icons.favorite,
-                    color: HexColor('FF033E'),
-                    size: 34,
+                  InkWell(
+                    onTap: handleWishlist,
+                    child: Icon(
+                      isWishlisted ? Icons.favorite : Icons.favorite_border,
+                      color: HexColor(isWishlisted ? 'FF033E' : 'FFFFFF'),
+                      size: 34,
+                    ),
                   )
                 ],
               ),

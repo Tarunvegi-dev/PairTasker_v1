@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/my_requests/request_widget.dart';
+import 'package:provider/provider.dart';
 import '../../theme/widgets.dart';
 import '../../helpers/methods.dart';
-import 'package:provider/provider.dart';
-import 'package:pairtasker/providers/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class MyRequests extends StatefulWidget {
   const MyRequests({super.key});
@@ -16,19 +18,30 @@ class MyRequests extends StatefulWidget {
 
 class _MyRequestsState extends State<MyRequests> {
   var _isInit = true;
-  var _isLoading = false;
+  List<dynamic> loadedRequests = [];
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     if (_isInit) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<User>(context).getMyRequests().then((_) {
+      final prefs = await SharedPreferences.getInstance();
+      final requestPref = prefs.getString('requests');
+      Map<String, dynamic> requestsdata =
+          jsonDecode(requestPref!) as Map<String, dynamic>;
+      if (requestsdata['active'].length > 0) {
+        // ignore: use_build_context_synchronously
+        final response = await Provider.of<User>(context, listen: false)
+            .getMyRequests(active: true);
         setState(() {
-          _isLoading = false;
+          loadedRequests = response['active'];
+          loadedRequests.addAll(response['completed']);
         });
-      });
+        return;
+      } else {
+        setState(() {
+          loadedRequests = requestsdata['active'];
+          loadedRequests.addAll(requestsdata['completed']);
+        });
+      }
     }
     _isInit = false;
     super.didChangeDependencies();
@@ -36,8 +49,6 @@ class _MyRequestsState extends State<MyRequests> {
 
   @override
   Widget build(BuildContext context) {
-    final requestsdata = Provider.of<User>(context);
-    final loadedRequests = requestsdata.requests;
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
@@ -89,6 +100,7 @@ class _MyRequestsState extends State<MyRequests> {
                   shrinkWrap: true,
                   itemCount: loadedRequests.length,
                   itemBuilder: (ctx, i) => RequestWidget(
+                    requestId: loadedRequests[i]['reqId'],
                     message: loadedRequests[i]['message'],
                     status: loadedRequests[i]['status'],
                     currentTasker: loadedRequests[i]['currentTasker'],

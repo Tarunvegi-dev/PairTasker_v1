@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
+import 'package:pairtasker/providers/user.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/methods.dart';
 
@@ -81,7 +83,8 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<Response> signIn(String email, String password) async {
+  Future<Response> signIn(
+      String email, String password, BuildContext context) async {
     const url = '${BaseURL.url}/auth/login';
 
     final response = await Dio().post(
@@ -102,6 +105,10 @@ class Auth with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
       getUserData();
+      // ignore: use_build_context_synchronously
+      Provider.of<User>(context, listen: false).getWishlist();
+      // ignore: use_build_context_synchronously
+      Provider.of<User>(context, listen: false).getMyRequests();
     }
 
     return response;
@@ -221,13 +228,11 @@ class Auth with ChangeNotifier {
     return response;
   }
 
-  Future<Response> updateTasker(List<dynamic> workingCategories) async {
+  Future<Response> updateTasker(Map<String, dynamic> taskerdata) async {
     const url = '${BaseURL.url}/tasker/update-tasker';
     final response = await Dio().patch(
       url,
-      data: {
-        'workingCategories': workingCategories,
-      },
+      data: taskerdata,
       options: Options(
         validateStatus: (_) => true,
         headers: {
@@ -240,7 +245,14 @@ class Auth with ChangeNotifier {
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
-      userdata['tasker']['workingCategories'] = workingCategories;
+      print(taskerdata);
+      if (taskerdata['workingCategories'] != null) {
+        userdata['tasker']['workingCategories'] =
+            taskerdata['workingCategories'];
+      }
+      if (taskerdata['bio'] != null) {
+        userdata['tasker']['bio'] = taskerdata['bio'];
+      }
       prefs.setString('userdata', jsonEncode(userdata));
     }
     return response;

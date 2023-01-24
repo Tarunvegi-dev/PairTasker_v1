@@ -35,6 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final response = await Provider.of<Auth>(context, listen: false).signIn(
       email.text,
       password.text,
+      context,
     );
     if (response.statusCode != 200) {
       setState(() {
