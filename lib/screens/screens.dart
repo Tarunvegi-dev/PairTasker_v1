@@ -4,7 +4,7 @@ export 'login_screen.dart';
 export './register_screen.dart';
 export './user_details_form.dart';
 export './wishlist_screen.dart';
-export './notifications_screen.dart';
+export 'notifications/notifications_screen.dart';
 export 'my_requests/my_requests_screen.dart';
 export './my_tasks_screen.dart';
 export 'tasker_profile_screen.dart';

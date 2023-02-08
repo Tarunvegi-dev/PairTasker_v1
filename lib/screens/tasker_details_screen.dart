@@ -176,7 +176,6 @@ class _TaskerDetailsState extends State<TaskerDetails> {
                     },
                     onSelected: (String selection) {
                       setState(() {
-                        print(_workingCategories);
                         if (!_workingCategories.contains(selection)) {
                           _workingCategories.add(selection);
                         }

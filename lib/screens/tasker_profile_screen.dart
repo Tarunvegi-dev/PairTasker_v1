@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import '../helpers/methods.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:pairtasker/theme/widgets.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class TaskerProfile extends StatefulWidget {
   final id;
@@ -26,23 +28,31 @@ class _TaskerProfileState extends State<TaskerProfile> {
   String totalTasks = '';
   String profilePicture = '';
   bool isWishlisted = false;
+  List<dynamic> reviewsdata = [];
+  List<dynamic> workingCategories = [];
 
   @override
   void didChangeDependencies() async {
     if (_isInit) {
       final response = await Provider.of<Tasker>(context, listen: false)
           .getTaskerDetails(widget.id);
+      final reviews =
+          // ignore: use_build_context_synchronously
+          await Provider.of<Tasker>(context, listen: false)
+              .getTaskerReviews(widget.id);
       final prefs = await SharedPreferences.getInstance();
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
-      var wishlist = userdata['wishlist'] as List<dynamic>;
+      var wishlist = userdata['wishlist'] ?? [];
       setState(() {
         isWishlisted = wishlist.contains(widget.id) != false;
       });
       if (response.data['status'] == true) {
         var taskerData = response.data['data'];
         setState(() {
+          reviewsdata = reviews;
+          workingCategories = taskerData['workingCategories'];
           profilePicture = taskerData['user']['profilePicture'] ?? '';
           username = taskerData['user']['username'] ?? '';
           displayName = taskerData['user']['displayName'] ?? '';
@@ -65,239 +75,463 @@ class _TaskerProfileState extends State<TaskerProfile> {
     }
   }
 
+  void showAddReviewModal(BuildContext context, String taskerId) {
+    final messageController = TextEditingController();
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) {
+          return BottomSheet(
+              onClosing: () {},
+              builder: (context) {
+                var errorMessage = '';
+                var isLoading = false;
+                double rating = 2.5;
+                return StatefulBuilder(
+                  builder: (context, updateState) => Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Container(
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RatingBar(
+                            initialRating: rating,
+                            direction: Axis.horizontal,
+                            allowHalfRating: true,
+                            itemCount: 5,
+                            ratingWidget: RatingWidget(
+                              full: Icon(
+                                Icons.star,
+                                color: HexColor('FFC72C'),
+                              ),
+                              half: Icon(
+                                Icons.star_half,
+                                color: HexColor('FFC72C'),
+                              ),
+                              empty: const Icon(Icons.star_border),
+                            ),
+                            onRatingUpdate: (r) {
+                              updateState(() {
+                                rating = r;
+                              });
+                            },
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            'Message',
+                            style: GoogleFonts.lato(fontSize: 20),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextField(
+                            controller: messageController,
+                            maxLines: 4,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Helper.isDark(context)
+                                      ? Colors.black
+                                      : Colors.white,
+                                ),
+                              ),
+                              hintText: 'Enter your message here..',
+                            ),
+                          ),
+                          if (errorMessage != '')
+                            Column(
+                              children: [
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                ErrorMessage(errorMessage)
+                              ],
+                            ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(0),
+                                ),
+                                backgroundColor: HexColor('007FFF'),
+                              ),
+                              onPressed: () async {
+                                if (messageController.text.isEmpty) {
+                                  updateState(() {
+                                    errorMessage =
+                                        'Message should not be empty';
+                                  });
+                                  return;
+                                }
+                                updateState(() {
+                                  errorMessage = '';
+                                  isLoading = true;
+                                });
+                                final response = await Provider.of<User>(
+                                  context,
+                                  listen: false,
+                                ).addReview(
+                                  taskerId,
+                                  messageController.text,
+                                  rating,
+                                );
+                                if (response.statusCode != 200) {
+                                  updateState(() {
+                                    errorMessage = response.data['message'];
+                                    isLoading = false;
+                                  });
+                                } else {
+                                  updateState(() {
+                                    isLoading = false;
+                                  });
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.of(context).pop();
+                                  setState(() {
+                                    reviewsdata.insert(
+                                      0,
+                                      response.data['data'],
+                                    );
+                                  });
+                                }
+                              },
+                              child: isLoading
+                                  ? const LoadingSpinner()
+                                  : const Text(
+                                      'Submit',
+                                    ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Helper.isDark(context) ? Colors.white : Colors.black,
-                    width: 0.2,
+        child: SingleChildScrollView(
+          physics: const ScrollPhysics(),
+          child: Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color:
+                          Helper.isDark(context) ? Colors.white : Colors.black,
+                      width: 0.2,
+                    ),
                   ),
                 ),
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 15,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Icon(
-                      Icons.close,
-                      size: 34,
-                      color: HexColor('99A4AE'),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Icon(
+                        Icons.close,
+                        size: 34,
+                        color: HexColor('99A4AE'),
+                      ),
                     ),
-                  ),
-                  Text(
-                    'ACTIVE',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: HexColor('32DE84'),
+                    Text(
+                      'ACTIVE',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: HexColor('32DE84'),
+                      ),
                     ),
-                  ),
-                  InkWell(
-                    onTap: handleWishlist,
-                    child: Icon(
-                      isWishlisted ? Icons.favorite : Icons.favorite_border,
-                      color: HexColor(isWishlisted ? 'FF033E' : 'FFFFFF'),
-                      size: 34,
-                    ),
-                  )
-                ],
+                    InkWell(
+                      onTap: handleWishlist,
+                      child: Icon(
+                        isWishlisted ? Icons.favorite : Icons.favorite_border,
+                        color: HexColor(isWishlisted ? 'FF033E' : 'FFFFFF'),
+                        size: 34,
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Helper.isDark(context)
-                    ? HexColor('252B30')
-                    : HexColor('DEE0E0'),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    color: Helper.isDark(context) ? Colors.black : Colors.white,
-                    padding: const EdgeInsets.only(
-                      top: 28,
-                      left: 26,
-                      right: 20,
-                      bottom: 10,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  height: 37,
-                                  width: 37,
-                                  margin: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: profilePicture != ''
-                                        ? NetworkImage(
-                                            profilePicture,
-                                          )
-                                        : const AssetImage(
-                                            'assets/images/default_user.png',
-                                          ) as ImageProvider,
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      displayName,
-                                      style: GoogleFonts.lato(
-                                        fontSize: 14,
-                                      ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Helper.isDark(context)
+                      ? HexColor('252B30')
+                      : HexColor('DEE0E0'),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      color:
+                          Helper.isDark(context) ? Colors.black : Colors.white,
+                      padding: const EdgeInsets.only(
+                        top: 28,
+                        left: 26,
+                        right: 20,
+                        bottom: 10,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    height: 37,
+                                    width: 37,
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 12,
                                     ),
-                                    Text(
-                                      '@$username',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 12,
-                                        color: HexColor('#AAABAB'),
-                                      ),
+                                    child: CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: profilePicture != ''
+                                          ? NetworkImage(
+                                              profilePicture,
+                                            )
+                                          : const AssetImage(
+                                              'assets/images/default_user.png',
+                                            ) as ImageProvider,
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 30,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(0),
                                   ),
-                                  backgroundColor: HexColor('007FFF'),
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 0,
-                                    horizontal: 25,
+                                  const SizedBox(
+                                    width: 10,
                                   ),
-                                ),
-                                onPressed: () {},
-                                child: Text(
-                                  'REQUEST',
-                                  style: GoogleFonts.lato(
-                                    fontSize: 10,
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        displayName,
+                                        style: GoogleFonts.lato(
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      Text(
+                                        '@$username',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 12,
+                                          color: HexColor('#AAABAB'),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
+                                ],
                               ),
-                            )
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 25,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.star,
-                                  color: HexColor('#FFC72C'),
-                                  size: 20,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  rating,
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('#AAABAB'),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
+                              SizedBox(
+                                height: 30,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0),
+                                    ),
+                                    backgroundColor: HexColor('007FFF'),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 0,
+                                      horizontal: 25,
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  child: SvgPicture.asset(
-                                    'assets/images/icons/task.svg',
-                                    height: 20,
+                                  onPressed: () {},
+                                  child: Text(
+                                    'REQUEST',
+                                    style: GoogleFonts.lato(
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  totalTasks,
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('#AAABAB'),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                )
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.location_on_rounded,
-                                  color: HexColor('#007FFF'),
-                                  size: 20,
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  '2 km',
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('#AAABAB'),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 35,
-                        ),
-                        Text(
-                          'Reviews',
-                          textAlign: TextAlign.start,
-                          style: GoogleFonts.lato(
-                            color: HexColor('99A4AE'),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                              )
+                            ],
                           ),
-                        )
-                      ],
+                          const SizedBox(
+                            height: 25,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    color: HexColor('#FFC72C'),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    rating,
+                                    style: GoogleFonts.lato(
+                                      color: HexColor('#AAABAB'),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    child: SvgPicture.asset(
+                                      'assets/images/icons/task.svg',
+                                      height: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    totalTasks,
+                                    style: GoogleFonts.lato(
+                                      color: HexColor('#AAABAB'),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.location_on_rounded,
+                                    color: HexColor('#007FFF'),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    '2 km',
+                                    style: GoogleFonts.lato(
+                                      color: HexColor('#AAABAB'),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 48,
+                          ),
+                          Text(
+                            'Working Categories',
+                            textAlign: TextAlign.start,
+                            style: GoogleFonts.lato(
+                              color: HexColor('99A4AE'),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Wrap(
+                            spacing: 5.0,
+                            runSpacing: 15.0,
+                            children: workingCategories
+                                .map((category) => Container(
+                                      width: 100,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 10,
+                                      ),
+                                      margin: const EdgeInsets.only(right: 5),
+                                      decoration: BoxDecoration(
+                                        color: Helper.isDark(context)
+                                            ? const Color.fromRGBO(
+                                                255,
+                                                255,
+                                                255,
+                                                0.1,
+                                              )
+                                            : const Color.fromRGBO(
+                                                0,
+                                                0,
+                                                0,
+                                                0.1,
+                                              ),
+                                        borderRadius: BorderRadius.circular(50),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          category,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                          const SizedBox(
+                            height: 35,
+                          ),
+                          Text(
+                            'Reviews',
+                            textAlign: TextAlign.start,
+                            style: GoogleFonts.lato(
+                              color: HexColor('99A4AE'),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(
-                      top: 3,
-                    ),
-                    child: ListView(
-                      shrinkWrap: true,
-                      children: [
-                        Container(
+                    if (reviewsdata.isEmpty)
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                        child: const Center(
+                          child: Text('NO REVIEWS YET!'),
+                        ),
+                      ),
+                    Container(
+                      margin: const EdgeInsets.only(
+                        top: 4,
+                      ),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: reviewsdata.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (BuildContext context, int i) => Container(
                           color: Helper.isDark(context)
                               ? Colors.black
                               : Colors.white,
@@ -325,11 +559,19 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                         margin: const EdgeInsets.symmetric(
                                           vertical: 12,
                                         ),
-                                        child: const CircleAvatar(
+                                        child: CircleAvatar(
                                           radius: 30,
-                                          backgroundImage: NetworkImage(
-                                            'https://m.cricbuzz.com/a/img/v1/192x192/i1/c244980/virat-kohli.jpg',
-                                          ),
+                                          backgroundImage: reviewsdata[i]
+                                                          ['user']
+                                                      ['profilePicture'] ==
+                                                  null
+                                              ? const AssetImage(
+                                                  'assets/images/default_user.png',
+                                                )
+                                              : NetworkImage(
+                                                  reviewsdata[i]['user']
+                                                      ['profilePicture'],
+                                                ) as ImageProvider,
                                         ),
                                       ),
                                       const SizedBox(
@@ -340,13 +582,14 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            'Virat Kohli',
+                                            reviewsdata[i]['user']
+                                                ['displayName'],
                                             style: GoogleFonts.lato(
                                               fontSize: 12,
                                             ),
                                           ),
                                           Text(
-                                            '@viratkohli18',
+                                            '@${reviewsdata[i]['user']['username']}',
                                             style: GoogleFonts.lato(
                                               fontSize: 10,
                                               color: HexColor('#AAABAB'),
@@ -357,7 +600,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     ],
                                   ),
                                   Text(
-                                    '3w',
+                                    Helper.timeAgo(reviewsdata[i]['createdAt']),
                                     style: GoogleFonts.lato(
                                       color: HexColor('99A4AE'),
                                       fontSize: 10,
@@ -374,7 +617,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                   left: 10,
                                 ),
                                 child: Text(
-                                  'You have to be quick',
+                                  reviewsdata[i]['message'],
                                   textAlign: TextAlign.start,
                                   style: GoogleFonts.lato(
                                     color: HexColor('99A4AE'),
@@ -386,106 +629,17 @@ class _TaskerProfileState extends State<TaskerProfile> {
                             ],
                           ),
                         ),
-                        Container(
-                          color: Helper.isDark(context)
-                              ? Colors.black
-                              : Colors.white,
-                          padding: const EdgeInsets.only(
-                            left: 20,
-                            right: 30,
-                            top: 5,
-                            bottom: 20,
-                          ),
-                          margin: const EdgeInsets.only(
-                            bottom: 4,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        height: 32,
-                                        width: 32,
-                                        margin: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
-                                        child: const CircleAvatar(
-                                          radius: 30,
-                                          backgroundImage: NetworkImage(
-                                            'https://m.cricbuzz.com/a/img/v1/192x192/i1/c244980/virat-kohli.jpg',
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Virat Kohli',
-                                            style: GoogleFonts.lato(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          Text(
-                                            '@viratkohli18',
-                                            style: GoogleFonts.lato(
-                                              fontSize: 10,
-                                              color: HexColor('#AAABAB'),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    '3w',
-                                    style: GoogleFonts.lato(
-                                      color: HexColor('99A4AE'),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(
-                                  left: 10,
-                                ),
-                                child: Text(
-                                  'You have to be quick',
-                                  textAlign: TextAlign.start,
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('99A4AE'),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            )
-          ],
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
       floatingActionButton: ElevatedButton(
-        onPressed: () {},
+        onPressed: () => showAddReviewModal(context, widget.id),
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(
             vertical: 10,
