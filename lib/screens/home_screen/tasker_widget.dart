@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/helpers/methods.dart';
 import 'package:pairtasker/screens/screens.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class TaskerWidget extends StatelessWidget {
   final index;
@@ -18,6 +19,7 @@ class TaskerWidget extends StatelessWidget {
   final profilePicture;
   final isSelected;
   final availability;
+  final workingCategories;
   final List<dynamic> selectedTaskers;
   final Function selectTaskers;
 
@@ -32,12 +34,14 @@ class TaskerWidget extends StatelessWidget {
       this.profilePicture,
       this.isSelected,
       this.availability,
+      this.workingCategories = 'deliveryboy, photographer, rider',
       required this.selectedTaskers,
       required this.selectTaskers,
       super.key});
 
   @override
   Widget build(BuildContext context) {
+    final _workingCategories = workingCategories.toString().split(' ');
     return InkWell(
       onLongPress: () => isSelected ? null : selectTaskers(id),
       onTap: () =>
@@ -120,20 +124,21 @@ class TaskerWidget extends StatelessWidget {
                     ],
                   ),
                   !isSelected
-                      ? LinearPercentIndicator(
-                          backgroundColor: HexColor('FF0303'),
-                          progressColor: HexColor('00CE15'),
-                          percent: availability / 100,
-                          width: 100.0,
-                          lineHeight: 8.0,
-                          trailing: Text(
-                            '$availability%',
-                            style: GoogleFonts.lato(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
-                          barRadius: const Radius.circular(25),
+                      ? AnimatedTextKit(
+                          animatedTexts: _workingCategories
+                              .map(
+                                (category) => TyperAnimatedText(
+                                  category.toUpperCase().replaceAll(',', ''),
+                                  textStyle: GoogleFonts.lato(
+                                    color: HexColor('#AAABAB'),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                          repeatForever: true,
+                          isRepeatingAnimation: true,
                         )
                       : Text(
                           'SELECTED',
@@ -216,15 +221,23 @@ class TaskerWidget extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          Icons.location_on_rounded,
-                          color: HexColor('#007FFF'),
+                          availability < 33.3
+                              ? Icons.battery_1_bar
+                              : availability > 33.33 && availability < 66.66
+                                  ? Icons.battery_3_bar
+                                  : Icons.battery_6_bar,
+                          color: availability < 33.3
+                              ? HexColor('FF033E')
+                              : availability > 33.33 && availability < 66.66
+                                  ? HexColor('FFC72C')
+                                  : HexColor('#00CE15'),
                           size: 18,
                         ),
                         const SizedBox(
                           width: 4,
                         ),
                         Text(
-                          '2 km',
+                          '$availability%',
                           style: GoogleFonts.lato(
                             color: HexColor('#AAABAB'),
                             fontSize: 14,
@@ -232,6 +245,21 @@ class TaskerWidget extends StatelessWidget {
                         )
                       ],
                     ),
+                    //   LinearPercentIndicator(
+                    //   backgroundColor: HexColor('FF0303'),
+                    //   progressColor: HexColor('00CE15'),
+                    //   percent: availability / 100,
+                    //   width: 100.0,
+                    //   lineHeight: 8.0,
+                    //   trailing: Text(
+                    //     '$availability%',
+                    //     style: GoogleFonts.lato(
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 10,
+                    //     ),
+                    //   ),
+                    //   barRadius: const Radius.circular(25),
+                    // )
                   ],
                 ),
               )

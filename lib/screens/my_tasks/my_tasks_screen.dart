@@ -1,45 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:pairtasker/providers/user.dart';
-import 'package:pairtasker/screens/my_requests/request_widget.dart';
-import 'package:provider/provider.dart';
+import 'package:pairtasker/screens/my_tasks/task_widget.dart';
 import '../../theme/widgets.dart';
 import '../../helpers/methods.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:pairtasker/providers/tasker.dart';
 import 'dart:convert';
 
-class MyRequests extends StatefulWidget {
-  const MyRequests({super.key});
+class MyTasks extends StatefulWidget {
+  const MyTasks({super.key});
 
   @override
-  State<MyRequests> createState() => _MyRequestsState();
+  State<MyTasks> createState() => _MyTasksState();
 }
 
-class _MyRequestsState extends State<MyRequests> {
+class _MyTasksState extends State<MyTasks> {
   var _isInit = true;
-  List<dynamic> loadedRequests = [];
+  List<dynamic> loadedTasks = [];
 
   @override
   void didChangeDependencies() async {
     if (_isInit) {
       final prefs = await SharedPreferences.getInstance();
-      final requestPref = prefs.getString('requests');
-      Map<String, dynamic> requestsdata =
-          jsonDecode(requestPref!) as Map<String, dynamic>;
-      if (requestsdata['active'].length > 0) {
+      final tasksPref = prefs.getString('tasks');
+      Map<String, dynamic> tasksData =
+          jsonDecode(tasksPref!) as Map<String, dynamic>;
+      if (tasksData['active'].length > 0) {
         // ignore: use_build_context_synchronously
-        final response = await Provider.of<User>(context, listen: false)
-            .getMyRequests(active: true);
+        final response = await Provider.of<Tasker>(context, listen: false)
+            .getMyTasks(active: true);
         setState(() {
-          loadedRequests = response['active'];
-          loadedRequests.addAll(response['completed']);
+          loadedTasks = response['active'];
+          loadedTasks.addAll(response['completed']);
         });
         return;
       } else {
         setState(() {
-          loadedRequests = requestsdata['active'];
-          loadedRequests.addAll(requestsdata['completed']);
+          loadedTasks = tasksData['active'];
+          loadedTasks.addAll(tasksData['completed']);
         });
       }
     }
@@ -72,14 +72,14 @@ class _MyRequestsState extends State<MyRequests> {
                   vertical: 20,
                 ),
                 child: Text(
-                  'My Requests',
+                  'My Tasks',
                   style: GoogleFonts.poppins(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              if (loadedRequests.isEmpty)
+              if (loadedTasks.isEmpty)
                 Container(
                   width: MediaQuery.of(context).size.width,
                   color: Helper.isDark(context) ? Colors.black : Colors.white,
@@ -88,7 +88,7 @@ class _MyRequestsState extends State<MyRequests> {
                     vertical: 15,
                   ),
                   child: const Center(
-                    child: Text('No Requests Found!'),
+                    child: Text('No Tasks Found!'),
                   ),
                 ),
               Container(
@@ -97,22 +97,21 @@ class _MyRequestsState extends State<MyRequests> {
                       HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
                 ),
                 child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: loadedRequests.length,
-                    itemBuilder: (ctx, i) {
-                      return RequestWidget(
-                        requestId: loadedRequests[i]['reqId'],
-                        message: loadedRequests[i]['message'],
-                        status: loadedRequests[i]['status'],
-                        currentTasker: loadedRequests[i]['tasker'] != null ? loadedRequests[i]['tasker']['user']['username'] :  '',
-                      );
-                    }),
+                  shrinkWrap: true,
+                  itemCount: loadedTasks.length,
+                  itemBuilder: (BuildContext context, int i) => TaskWidget(
+                    username: loadedTasks[i]['user']['username'],
+                    displayName: loadedTasks[i]['user']['displayName'],
+                    status: loadedTasks[i]['status'],
+                    message: loadedTasks[i]['message'],
+                  ),
+                ),
               )
             ],
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBarWidget(2),
+      bottomNavigationBar: const BottomNavBarWidget(4),
     );
   }
 }

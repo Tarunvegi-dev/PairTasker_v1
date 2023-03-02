@@ -52,6 +52,8 @@ dependencies:
   firebase_core: ^2.4.0
   firebase_messaging: ^14.2.0
   flutter_rating_bar: ^4.0.1
+  animated_text_kit: ^4.2.2
+  socket_io_client: ^2.0.1
 
 dev_dependencies:
   flutter_native_splash: ^2.2.0
@@ -89,6 +91,8 @@ flutter:
     - assets/images/icons/task.svg
     - assets/images/icons/warning.png
     - assets/images/icons/announcement.png
+    - assets/images/icons/filter.png
+    - assets/images/icons/filter.svg
     - assets/images/icons/navbar/home.svg
     - assets/images/icons/navbar/wishlist.svg
     - assets/images/icons/navbar/my_requests.svg

@@ -2,12 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../helpers/methods.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables
   final screenType;
 
   const ChatScreen(this.screenType, {super.key});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  late IO.Socket socket;
+
+  @override
+  void initState() {
+    socket = IO.io(
+        BaseURL.socketURL,
+        IO.OptionBuilder()
+            .setTransports(['websocket']) // for Flutter or Dart VM
+            .disableAutoConnect() // disable auto-connection
+            .setExtraHeaders({'foo': 'bar'}) // optional
+            .build());
+    socket.connect();
+    socket.emit('join-room', 'id');
+    socket.on('online', (data) => print('online'));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +70,7 @@ class ChatScreen extends StatelessWidget {
                       const SizedBox(
                         width: 10,
                       ),
-                      if (screenType == 'user')
+                      if (widget.screenType == 'user')
                         Text(
                           'PT000001A',
                           style: GoogleFonts.poppins(
@@ -55,7 +78,7 @@ class ChatScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      if (screenType == 'tasker')
+                      if (widget.screenType == 'tasker')
                         Row(
                           children: [
                             const SizedBox(
@@ -63,9 +86,8 @@ class ChatScreen extends StatelessWidget {
                               height: 42,
                               child: CircleAvatar(
                                 radius: 30,
-                                backgroundImage: NetworkImage(
-                                  'https://img.freepik.com/premium-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg?w=2000ś',
-                                ),
+                                backgroundImage: AssetImage(
+                                    'assets/images/default_user.png'),
                               ),
                             ),
                             const SizedBox(
@@ -101,7 +123,7 @@ class ChatScreen extends StatelessWidget {
                 ],
               ),
             ),
-            if (screenType == 'user')
+            if (widget.screenType == 'user')
               Container(
                 margin: const EdgeInsets.only(
                   top: 6,
@@ -122,17 +144,15 @@ class ChatScreen extends StatelessWidget {
                         children: const [
                           CircleAvatar(
                             radius: 13,
-                            backgroundImage: NetworkImage(
-                              'https://img.freepik.com/premium-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg?w=2000ś',
-                            ),
+                            backgroundImage:
+                                AssetImage('assets/images/default_user.png'),
                           ),
                           Positioned(
                             left: 18.0,
                             child: CircleAvatar(
                               radius: 13,
-                              backgroundImage: NetworkImage(
-                                'https://img.freepik.com/premium-photo/young-handsome-man-with-beard-isolated-keeping-arms-crossed-frontal-position_1368-132662.jpg?w=2000',
-                              ),
+                              backgroundImage:
+                                  AssetImage('assets/images/default_user.png'),
                             ),
                           ),
                           Positioned(
@@ -199,7 +219,7 @@ class ChatScreen extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  if (screenType == 'user')
+                  if (widget.screenType == 'user')
                     Center(
                       child: Container(
                         margin: const EdgeInsets.only(

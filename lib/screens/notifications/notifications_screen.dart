@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/notifications/notification_widgets.dart';
@@ -24,7 +25,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<User>(context, listen: false).getNotifications().then((_) {
+      Provider.of<Tasker>(context, listen: false).getNotifications().then((_) {
         setState(() {
           _isLoading = false;
         });
@@ -38,9 +39,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final response = await Provider.of<Tasker>(context, listen: false)
         .acceptRequest(taskId, accept);
     if (response.statusCode == 200) {
-      SnackBar(
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         // ignore: use_build_context_synchronously
-        backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
+        backgroundColor: HexColor('007FFF'),
         content: Text(
           response.data['message'],
           style: GoogleFonts.poppins(
@@ -48,13 +50,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
             color: Helper.isDark(context) ? Colors.white : Colors.black,
           ),
         ),
-      );
+      ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifications = Provider.of<User>(context).notifications;
+    final notifications = Provider.of<Tasker>(context).notifications;
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(

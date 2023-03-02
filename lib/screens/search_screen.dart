@@ -50,7 +50,8 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     } else {
       setState(() {
-        _workingCategories.add(category);
+        print(category.toString().replaceAll(' ', ''));
+        _workingCategories.add(category.toString().trim());
       });
     }
     searchTaskers();
@@ -146,7 +147,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () => manageWorkingCategories('Delivery Boy'),
+                    onTap: () => manageWorkingCategories('deliveryboy'),
                     child: Container(
                       width: 100,
                       padding: const EdgeInsets.symmetric(
@@ -155,7 +156,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       margin: const EdgeInsets.only(right: 5),
                       decoration: BoxDecoration(
-                        color: _workingCategories.contains('Delivery Boy')
+                        color: _workingCategories.contains('deliveryboy')
                             ? HexColor('007FFF')
                             : Helper.isDark(context)
                                 ? const Color.fromRGBO(255, 255, 255, 0.1)
@@ -173,7 +174,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () => manageWorkingCategories('Cameraman'),
+                    onTap: () => manageWorkingCategories('Photographer'),
                     child: Container(
                       width: 100,
                       padding: const EdgeInsets.symmetric(
@@ -182,7 +183,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       margin: const EdgeInsets.only(right: 5),
                       decoration: BoxDecoration(
-                        color: _workingCategories.contains('Cameraman')
+                        color: _workingCategories.contains('Photographer')
                             ? HexColor('007FFF')
                             : Helper.isDark(context)
                                 ? const Color.fromRGBO(255, 255, 255, 0.1)
@@ -191,7 +192,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       child: const Center(
                         child: Text(
-                          'Cameraman',
+                          'Photographer',
                           style: TextStyle(
                             fontSize: 10,
                           ),
@@ -200,7 +201,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                   InkWell(
-                    onTap: () => manageWorkingCategories('Cook'),
+                    onTap: () => manageWorkingCategories('Rider'),
                     child: Container(
                       width: 100,
                       padding: const EdgeInsets.symmetric(
@@ -209,7 +210,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       margin: const EdgeInsets.only(right: 5),
                       decoration: BoxDecoration(
-                        color: _workingCategories.contains('Cook')
+                        color: _workingCategories.contains('Rider')
                             ? HexColor('007FFF')
                             : Helper.isDark(context)
                                 ? const Color.fromRGBO(255, 255, 255, 0.1)
@@ -218,7 +219,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       child: const Center(
                         child: Text(
-                          'Cook',
+                          'Rider',
                           style: TextStyle(
                             fontSize: 10,
                           ),

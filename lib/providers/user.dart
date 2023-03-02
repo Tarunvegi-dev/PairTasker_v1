@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:dio/dio.dart';
 import '../helpers/methods.dart';
@@ -9,34 +8,30 @@ import 'package:flutter/material.dart';
 
 class User with ChangeNotifier {
   List<dynamic> _taskers = [];
-  List<dynamic> _notifications = [];
 
   List<dynamic> get taskers {
     return _taskers;
   }
 
-  List<dynamic> get notifications {
-    return _notifications;
-  }
-
-  Future<List<dynamic>> getTaskers({
-    bool search = false,
-    String keyword = '',
-    String workingCategories = '',
-  }) async {
+  Future<List<dynamic>> getTaskers(
+      {bool search = false,
+      bool sort = false,
+      String keyword = '',
+      String workingCategories = '',
+      String sortBy = 'rating'}) async {
     var url = '${BaseURL.url}/user/get-taskers';
-    if (search) {
+    if (search && keyword.isNotEmpty) {
       url += '?keyword=$keyword';
     }
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(
       url,
-      data: !search
-          ? {}
-          : FormData.fromMap({
-              "workingCategories": workingCategories.split(' '),
-            }),
+      data: {
+        "workingCategories":
+            workingCategories.isEmpty ? [] : workingCategories.split(' '),
+        "sortBy": sortBy
+      },
       options: Options(
         validateStatus: (_) => true,
         headers: {
@@ -46,8 +41,8 @@ class User with ChangeNotifier {
     );
 
     final responsedata = response.data;
-    if (!search) {
-      if (responsedata['message'] != 'No taskers found') {
+    if (!search || sort) {
+      if (response.statusCode == 200) {
         _taskers = responsedata['data'];
         notifyListeners();
       } else {
@@ -55,11 +50,11 @@ class User with ChangeNotifier {
         notifyListeners();
       }
     }
-    return responsedata['data'];
+    return responsedata['data'] ?? [];
   }
 
-  Future<void> getNotifications() async {
-    const url = '${BaseURL.url}/user/get-notifications';
+  Future<Response> getRecentTaskers() async {
+    var url = '${BaseURL.url}/user/get-recent-taskers';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().get(
@@ -71,10 +66,7 @@ class User with ChangeNotifier {
         },
       ),
     );
-    if (response.statusCode == 200) {
-      _notifications = response.data['data'];
-      notifyListeners();
-    }
+    return response;
   }
 
   Future<Map<String, dynamic>> getMyRequests({bool active = false}) async {

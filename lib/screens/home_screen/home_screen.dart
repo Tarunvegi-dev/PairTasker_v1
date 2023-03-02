@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> key = GlobalKey();
   var _isInit = true;
   var _isLoading = false;
+  String sortCategory = 'rating';
 
   @override
   void didChangeDependencies() {
@@ -52,8 +53,128 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> sortTaskers() async {
+    Provider.of<User>(context, listen: false).getTaskers(
+      sortBy: sortCategory,
+      sort: true,
+    );
+  }
+
   Future<void> _refreshTaskers() async {
     await Provider.of<User>(context, listen: false).getTaskers();
+  }
+
+  void showSort() {
+    showMenu(
+      position: const RelativeRect.fromLTRB(100, 0, 0, 0),
+      items: [
+        PopupMenuItem<int>(
+          value: 0,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                sortCategory = 'rating';
+              });
+              sortTaskers();
+              Navigator.of(context).pop();
+            },
+            child: Row(children: [
+              Radio(
+                activeColor: HexColor('007fff'),
+                value: 'rating',
+                groupValue: sortCategory,
+                onChanged: (value) {},
+              ),
+              Text(
+                'Rating',
+                style: GoogleFonts.lato(
+                  fontSize: 14,
+                ),
+              )
+            ]),
+          ),
+        ),
+        PopupMenuItem<int>(
+          value: 0,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                sortCategory = 'saves';
+              });
+              sortTaskers();
+              Navigator.of(context).pop();
+            },
+            child: Row(children: [
+              Radio(
+                activeColor: HexColor('007fff'),
+                value: 'saves',
+                groupValue: sortCategory,
+                onChanged: (value) {},
+              ),
+              Text(
+                'Wishlist',
+                style: GoogleFonts.lato(
+                  fontSize: 14,
+                ),
+              )
+            ]),
+          ),
+        ),
+        PopupMenuItem<int>(
+          value: 0,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                sortCategory = 'totalTasks';
+              });
+              sortTaskers();
+              Navigator.of(context).pop();
+            },
+            child: Row(children: [
+              Radio(
+                activeColor: HexColor('007fff'),
+                value: 'totalTasks',
+                groupValue: sortCategory,
+                onChanged: (value) {},
+              ),
+              Text(
+                'Total tasks',
+                style: GoogleFonts.lato(
+                  fontSize: 14,
+                ),
+              )
+            ]),
+          ),
+        ),
+        PopupMenuItem<int>(
+          value: 0,
+          child: InkWell(
+            onTap: () {
+              setState(() {
+                sortCategory = 'availability';
+              });
+              sortTaskers();
+              Navigator.of(context).pop();
+            },
+            child: Row(children: [
+              Radio(
+                activeColor: HexColor('007fff'),
+                value: 'availability',
+                groupValue: sortCategory,
+                onChanged: (value) {},
+              ),
+              Text(
+                'Availability',
+                style: GoogleFonts.lato(
+                  fontSize: 14,
+                ),
+              )
+            ]),
+          ),
+        ),
+      ],
+      context: context,
+    );
   }
 
   @override
@@ -130,26 +251,54 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      child: InkWell(
-                        onTap: () =>
-                            Navigator.of(context).pushNamed('/searchscreen'),
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(125),
+                    Row(
+                      children: [
+                        SizedBox(
+                          child: InkWell(
+                            onTap: () => Navigator.of(context)
+                                .pushNamed('/searchscreen'),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(125),
+                                ),
+                                color: HexColor('007FFF'),
+                              ),
+                              child: const Icon(
+                                Icons.search_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
-                            color: HexColor('007FFF'),
-                          ),
-                          child: const Icon(
-                            Icons.search_rounded,
-                            color: Colors.white,
-                            size: 20,
                           ),
                         ),
-                      ),
+                        const SizedBox(
+                          width: 15,
+                        ),
+                        SizedBox(
+                          child: InkWell(
+                            onTap: () => showSort(),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(125),
+                                ),
+                                color: Helper.isDark(context)
+                                    ? const Color.fromRGBO(242, 242, 243, 0.35)
+                                    : const Color.fromRGBO(0, 0, 0, 0.1),
+                              ),
+                              child: SvgPicture.asset(
+                                "assets/images/icons/filter.svg",
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 ),

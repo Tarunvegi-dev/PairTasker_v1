@@ -170,4 +170,8 @@ class Helper {
 class BaseURL {
   static const url =
       'http://pairtasker-test.ap-south-1.elasticbeanstalk.com/api';
+
+  static const socketURL =
+      // 'http://pairtasker-test.ap-south-1.elasticbeanstalk.com';
+      'http://192.168.184.47:3000';
 }

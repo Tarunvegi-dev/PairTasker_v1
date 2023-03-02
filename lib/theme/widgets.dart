@@ -31,7 +31,7 @@ class BottomNavBarWidget extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        height: MediaQuery.of(context).size.height * 7 / 100,
+        height: MediaQuery.of(context).size.height * 8 / 100,
         width: MediaQuery.of(context).size.width,
         child: BottomNavigationBar(
           currentIndex: 0,

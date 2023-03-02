@@ -39,6 +39,7 @@ class RequestWidget extends StatelessWidget {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Column(
                     children: [
@@ -49,12 +50,15 @@ class RequestWidget extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if (currentTasker != null)
-                        Text(
-                          currentTasker,
-                          style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: HexColor('AAABAB'),
+                      if (currentTasker != '')
+                        Padding(
+                          padding: const EdgeInsets.only(right: 20),
+                          child: Text(
+                            '@$currentTasker',
+                            style: GoogleFonts.poppins(
+                              fontSize: 10,
+                              color: HexColor('AAABAB'),
+                            ),
                           ),
                         )
                     ],

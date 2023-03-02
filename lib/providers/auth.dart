@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
+import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/methods.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Auth with ChangeNotifier {
   String _token = '';
@@ -61,7 +63,7 @@ class Auth with ChangeNotifier {
     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
-  Future<void> getUserData() async {
+  Future<Response> getUserData() async {
     const url = '${BaseURL.url}/user/get-user';
 
     final response = await Dio().get(
@@ -81,6 +83,7 @@ class Auth with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('userdata', jsonEncode(responseData));
     }
+    return response;
   }
 
   Future<Response> signIn(
@@ -104,11 +107,14 @@ class Auth with ChangeNotifier {
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
+      updateFcmToken();
       getUserData();
       // ignore: use_build_context_synchronously
       Provider.of<User>(context, listen: false).getWishlist();
       // ignore: use_build_context_synchronously
       Provider.of<User>(context, listen: false).getMyRequests();
+      // ignore: use_build_context_synchronously
+      Provider.of<Tasker>(context, listen: false).getMyTasks();
     }
 
     return response;
@@ -135,7 +141,8 @@ class Auth with ChangeNotifier {
     return response;
   }
 
-  Future<Response> verifyotp(String email, String otp) async {
+  Future<Response> verifyotp(
+      String email, String otp, BuildContext context) async {
     const url = '${BaseURL.url}/auth/verify-otp';
 
     final response = await Dio().post(
@@ -152,6 +159,15 @@ class Auth with ChangeNotifier {
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
+      prefs.setString('token', responseData['token']);
+      updateFcmToken();
+      getUserData();
+      // ignore: use_build_context_synchronously
+      Provider.of<User>(context, listen: false).getWishlist();
+      // ignore: use_build_context_synchronously
+      Provider.of<User>(context, listen: false).getMyRequests();
+      // ignore: use_build_context_synchronously
+      Provider.of<Tasker>(context, listen: false).getMyTasks();
     }
     return response;
   }
@@ -197,6 +213,35 @@ class Auth with ChangeNotifier {
       }
     }
 
+    return response;
+  }
+
+  Future<Response> updateFcmToken() async {
+    final fbm = FirebaseMessaging.instance;
+    fbm.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    final deviceId = await FirebaseMessaging.instance.getToken();
+    FormData formData = FormData.fromMap({"deviceId": deviceId});
+    const url = '${BaseURL.url}/user/update-user';
+    final response = await Dio().patch(
+      url,
+      data: formData,
+      options: Options(
+        validateStatus: (_) => true,
+        contentType: "multipart/form-data",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          'token': _token,
+        },
+      ),
+    );
     return response;
   }
 

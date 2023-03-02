@@ -43,6 +43,7 @@ class _OtpVerificationState extends State<OtpVerification> {
     final response = await Provider.of<Auth>(context, listen: false).verifyotp(
       widget.email,
       otp.text,
+      context,
     );
     if (response.statusCode != 200) {
       setState(() {

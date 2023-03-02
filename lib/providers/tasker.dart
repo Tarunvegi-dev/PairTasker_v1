@@ -7,6 +7,66 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 class Tasker extends ChangeNotifier {
+  List<dynamic> _notifications = [];
+
+  List<dynamic> get notifications {
+    return _notifications;
+  }
+
+  Future<void> getNotifications() async {
+    const url = '${BaseURL.url}/user/get-notifications';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      _notifications = response.data['data'];
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, dynamic>> getMyTasks({bool active = false}) async {
+    var url = '${BaseURL.url}/tasker/get-my-tasks';
+    if (active) {
+      url += '/active';
+    }
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
+
+    final responsedata = response.data;
+
+    if (active) {
+      final tasksPref = prefs.getString('tasks');
+      Map<String, dynamic> tasksData =
+          jsonDecode(tasksPref!) as Map<String, dynamic>;
+      tasksData['active'] = responsedata['data'];
+      prefs.setString('tasks', jsonEncode(tasksData));
+      return tasksData;
+    }
+
+    if (response.statusCode == 200 && responsedata['status'] != false) {
+      prefs.setString('tasks', jsonEncode(responsedata['data']));
+    }
+
+    return responsedata;
+  }
+
   Future<Response> getTaskerDetails(id) async {
     var url = '${BaseURL.url}/tasker/get-tasker-details/$id';
     final prefs = await SharedPreferences.getInstance();
@@ -91,6 +151,14 @@ class Tasker extends ChangeNotifier {
         },
       ),
     );
+
+    if (response.statusCode == 200) {
+      _notifications
+          .removeWhere((notification) => notification['taskId'] == taskId);
+      notifyListeners();
+    }
+
+    getMyTasks(active: true);
 
     return response;
   }
