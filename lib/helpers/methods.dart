@@ -523,10 +523,10 @@ class Helper {
 
 class BaseURL {
   static const url =
-      // 'http://pairtasker-test.ap-south-1.elasticbeanstalk.com/api';
-      'http://192.168.219.47:3000/api';
+      'http://pairtasker-test.ap-south-1.elasticbeanstalk.com/api';
+      // 'http://192.168.219.47:3000/api';
 
   static const socketURL =
-      // 'http://pairtasker-test.ap-south-1.elasticbeanstalk.com';
-      'http://192.168.219.47:3000';
+      'http://pairtasker-test.ap-south-1.elasticbeanstalk.com';
+      // 'http://192.168.219.47:3000';
 }
