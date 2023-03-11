@@ -5,30 +5,44 @@ import 'package:pairtasker/helpers/methods.dart';
 import 'package:pairtasker/screens/screens.dart';
 
 class RequestWidget extends StatelessWidget {
+  final id;
   final requestId;
   final message;
   final status;
   final currentTasker;
+  final fetchRequests;
 
   const RequestWidget(
       {this.message,
-      this.status,
+      this.id,
+      this.status = 0,
       this.currentTasker,
       this.requestId,
+      this.fetchRequests,
       super.key});
 
   @override
   Widget build(BuildContext context) {
+    final page = ChatScreen(
+      screenType: 'user',
+      taskId: id.toString(),
+    );
     return InkWell(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const ChatScreen('user'),
-        ),
-      ),
+      onTap: int.parse(status) != 0
+          ? () => Navigator.of(context)
+                  .push(
+                MaterialPageRoute(
+                  builder: (context) => page,
+                ),
+              )
+                  .then((value) {
+                fetchRequests();
+              })
+          : () {},
       child: Container(
         color: Helper.isDark(context) ? Colors.black : Colors.white,
         margin: const EdgeInsets.only(bottom: 5),
-        height: 120,
+        // height: 120,
         child: Container(
           margin: const EdgeInsets.symmetric(
             vertical: 20,

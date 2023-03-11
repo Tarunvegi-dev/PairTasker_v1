@@ -50,85 +50,6 @@ class _UserFormScreenState extends State<UserFormScreen> {
     super.initState();
   }
 
-  void _selectSource() {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      isDismissible: true,
-      context: context,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 26 / 100,
-        color: Helper.isDark(context) ? Colors.black : Colors.white,
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 40,
-            horizontal: 20,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Choose Image Source',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(
-                height: 25,
-              ),
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () => _takePicture(ImageSource.camera),
-                    child: Column(
-                      children: [
-                        const Icon(
-                          Icons.camera,
-                          size: 40,
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Camera',
-                          style: GoogleFonts.poppins(),
-                        )
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  InkWell(
-                    onTap: () => _takePicture(ImageSource.gallery),
-                    child: Column(
-                      children: [
-                        const Icon(
-                          Icons.file_open,
-                          size: 40,
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        Text(
-                          'Browse',
-                          style: GoogleFonts.poppins(),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<void> _cropImage() async {
     if (_storedImage != null) {
       final croppedFile = await ImageCropper().cropImage(
@@ -249,7 +170,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                             height: 80,
                             width: 80,
                             child: InkWell(
-                              onTap: _selectSource,
+                              onTap: () => Helper.selectSource(
+                                _takePicture,
+                                context,
+                              ),
                               child: CircleAvatar(
                                 // ignore: unnecessary_null_comparison
                                 backgroundImage: _croppedFile != null
@@ -434,7 +358,6 @@ class _UserFormScreenState extends State<UserFormScreen> {
                                       onChanged: (value) {
                                         setState(
                                             () => gender = value.toString());
-                                        // print(value.toString());
                                       },
                                     ),
                                     Text(

@@ -51,6 +51,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
         ),
       ));
+      // ignore: use_build_context_synchronously
+      final navigator = Navigator.of(context);
+      Future.delayed(const Duration(seconds: 2), () {
+        navigator.pushReplacementNamed('/mytasks');
+      });
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        // ignore: use_build_context_synchronously
+        backgroundColor: HexColor('FF033E'),
+        content: Text(
+          response.data['message'],
+          style: GoogleFonts.poppins(
+            // ignore: use_build_context_synchronously
+            color: Helper.isDark(context) ? Colors.white : Colors.black,
+          ),
+        ),
+      ));
     }
   }
 
@@ -88,7 +106,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             const SizedBox(
               height: 20,
             ),
-            if (notifications.isEmpty)
+            if (notifications.isEmpty && !_isLoading)
               Container(
                 width: MediaQuery.of(context).size.width,
                 color: Helper.isDark(context) ? Colors.black : Colors.white,
@@ -98,6 +116,16 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 ),
                 child: const Center(
                   child: Text('No Notifications!'),
+                ),
+              ),
+            if (_isLoading)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 15,
+                ),
+                child: const CircularProgressIndicator(
+                  backgroundColor: Colors.white,
                 ),
               ),
             SizedBox(

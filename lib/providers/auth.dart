@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/methods.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+
+import 'chat.dart';
 
 class Auth with ChangeNotifier {
   String _token = '';
@@ -100,15 +103,15 @@ class Auth with ChangeNotifier {
         validateStatus: (_) => true,
       ),
     );
-
+    
     final responseData = response.data;
     if (response.statusCode == 200) {
       _token = responseData['token'];
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
-      updateFcmToken();
       getUserData();
+      updateFcmToken();
       // ignore: use_build_context_synchronously
       Provider.of<User>(context, listen: false).getWishlist();
       // ignore: use_build_context_synchronously
@@ -117,6 +120,20 @@ class Auth with ChangeNotifier {
       Provider.of<Tasker>(context, listen: false).getMyTasks();
     }
 
+    return response;
+  }
+
+  Future<Response> forgotPassword(String email) async {
+    const url = '${BaseURL.url}/auth/forgot-password';
+    final response = await Dio().post(
+      url,
+      data: {
+        'email': email.trim().toLowerCase(),
+      },
+      options: Options(
+        validateStatus: (_) => true,
+      ),
+    );
     return response;
   }
 
@@ -160,8 +177,8 @@ class Auth with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
       prefs.setString('token', responseData['token']);
-      updateFcmToken();
       getUserData();
+      updateFcmToken();
       // ignore: use_build_context_synchronously
       Provider.of<User>(context, listen: false).getWishlist();
       // ignore: use_build_context_synchronously
@@ -290,7 +307,6 @@ class Auth with ChangeNotifier {
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
-      print(taskerdata);
       if (taskerdata['workingCategories'] != null) {
         userdata['tasker']['workingCategories'] =
             taskerdata['workingCategories'];
@@ -301,5 +317,31 @@ class Auth with ChangeNotifier {
       prefs.setString('userdata', jsonEncode(userdata));
     }
     return response;
+  }
+
+  Future<String> uploadImage(File imageFile) async {
+    const url = '${BaseURL.url}/upload-chat-images';
+    FormData formData = FormData.fromMap({
+      "file": await MultipartFile.fromFile(
+        imageFile.path,
+      )
+    });
+    final response = await Dio().post(
+      url,
+      data: formData,
+      options: Options(
+        validateStatus: (_) => true,
+        contentType: "multipart/form-data",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          'token': _token,
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      return response.data['url'];
+    }
+    return '';
   }
 }

@@ -314,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     children: [
                       const Recents(),
-                      if (loadedTaskers.isEmpty)
+                      if (loadedTaskers.isEmpty && !_isLoading)
                         Container(
                           width: MediaQuery.of(context).size.width,
                           color: Helper.isDark(context)
@@ -337,6 +337,8 @@ class _HomePageState extends State<HomePage> {
                           availability: loadedTaskers[i]['availability'],
                           id: loadedTaskers[i]['id'],
                           displayName: loadedTaskers[i]['user']['displayName'],
+                          workingCategories: loadedTaskers[i]
+                              ['workingCategories'],
                           rating: loadedTaskers[i]['rating'].toString(),
                           saves: loadedTaskers[i]['saves'].toString(),
                           tasks: loadedTaskers[i]['totalTasks'].toString(),

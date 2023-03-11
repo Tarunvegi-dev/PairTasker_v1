@@ -17,34 +17,40 @@ class MyTasks extends StatefulWidget {
 }
 
 class _MyTasksState extends State<MyTasks> {
-  var _isInit = true;
   List<dynamic> loadedTasks = [];
+  bool isLoading = false;
+
+  Future<void> fetchTasks() async {
+    setState(() {
+      isLoading = true;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final tasksPref = prefs.getString('tasks');
+    Map<String, dynamic> tasksData =
+        jsonDecode(tasksPref!) as Map<String, dynamic>;
+    if (tasksData['active'].length > 0) {
+      // ignore: use_build_context_synchronously
+      final response = await Provider.of<Tasker>(context, listen: false)
+          .getMyTasks(active: true);
+      setState(() {
+        loadedTasks = response['active'];
+        loadedTasks.addAll(response['completed']);
+        isLoading = false;
+      });
+      return;
+    } else {
+      setState(() {
+        loadedTasks = tasksData['active'];
+        loadedTasks.addAll(tasksData['completed']);
+        isLoading = false;
+      });
+    }
+  }
 
   @override
-  void didChangeDependencies() async {
-    if (_isInit) {
-      final prefs = await SharedPreferences.getInstance();
-      final tasksPref = prefs.getString('tasks');
-      Map<String, dynamic> tasksData =
-          jsonDecode(tasksPref!) as Map<String, dynamic>;
-      if (tasksData['active'].length > 0) {
-        // ignore: use_build_context_synchronously
-        final response = await Provider.of<Tasker>(context, listen: false)
-            .getMyTasks(active: true);
-        setState(() {
-          loadedTasks = response['active'];
-          loadedTasks.addAll(response['completed']);
-        });
-        return;
-      } else {
-        setState(() {
-          loadedTasks = tasksData['active'];
-          loadedTasks.addAll(tasksData['completed']);
-        });
-      }
-    }
-    _isInit = false;
-    super.didChangeDependencies();
+  void initState() {
+    fetchTasks();
+    super.initState();
   }
 
   @override
@@ -79,7 +85,7 @@ class _MyTasksState extends State<MyTasks> {
                   ),
                 ),
               ),
-              if (loadedTasks.isEmpty)
+              if (loadedTasks.isEmpty && !isLoading)
                 Container(
                   width: MediaQuery.of(context).size.width,
                   color: Helper.isDark(context) ? Colors.black : Colors.white,
@@ -91,22 +97,41 @@ class _MyTasksState extends State<MyTasks> {
                     child: Text('No Tasks Found!'),
                   ),
                 ),
-              Container(
-                decoration: BoxDecoration(
-                  color:
-                      HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
-                ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: loadedTasks.length,
-                  itemBuilder: (BuildContext context, int i) => TaskWidget(
-                    username: loadedTasks[i]['user']['username'],
-                    displayName: loadedTasks[i]['user']['displayName'],
-                    status: loadedTasks[i]['status'],
-                    message: loadedTasks[i]['message'],
+              if (isLoading)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
+                  child: const CircularProgressIndicator(
+                    backgroundColor: Colors.white,
                   ),
                 ),
-              )
+                RefreshIndicator(
+                  onRefresh: () {
+                    return fetchTasks();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: HexColor(
+                          Helper.isDark(context) ? '252B30' : '#E4ECF5'),
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: loadedTasks.length,
+                      itemBuilder: (BuildContext context, int i) => TaskWidget(
+                        id: loadedTasks[i]['id'],
+                        fetchTasks: fetchTasks,
+                        username: loadedTasks[i]['user']['username'],
+                        displayName: loadedTasks[i]['user']['displayName'],
+                        profilePicture: loadedTasks[i]['user']
+                            ['profilePicture'],
+                        status: loadedTasks[i]['status'],
+                        message: loadedTasks[i]['message'],
+                      ),
+                    ),
+                  ),
+                )
             ],
           ),
         ),

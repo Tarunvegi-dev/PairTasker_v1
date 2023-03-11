@@ -34,7 +34,6 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
-      print(userdata['tasker']);
       if (userdata['isTasker'] != null && userdata['isTasker'] != false) {
         setState(() {
           taskerMode = userdata['tasker']['isOnline'];
@@ -81,7 +80,6 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
     };
     final response = await Provider.of<Auth>(context, listen: false)
         .updateTasker(taskerdata);
-    print(response.data);
     if (response.statusCode != 200) {
       setState(() {
         error = response.data['message'];

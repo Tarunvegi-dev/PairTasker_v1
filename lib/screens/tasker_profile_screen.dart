@@ -28,6 +28,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
   String totalTasks = '';
   String profilePicture = '';
   bool isWishlisted = false;
+  int availability = 100;
   List<dynamic> reviewsdata = [];
   List<dynamic> workingCategories = [];
 
@@ -52,6 +53,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
         var taskerData = response.data['data'];
         setState(() {
           reviewsdata = reviews;
+          availability = taskerData['availability'];
           workingCategories = taskerData['workingCategories'];
           profilePicture = taskerData['user']['profilePicture'] ?? '';
           username = taskerData['user']['username'] ?? '';
@@ -232,7 +234,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: const ScrollPhysics(),
+          physics: ScrollPhysics(),
           child: Column(
             children: [
               Container(
@@ -361,7 +363,10 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                       horizontal: 25,
                                     ),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () => Helper.showRequestModal(
+                                    context,
+                                    [widget.id],
+                                  ),
                                   child: Text(
                                     'REQUEST',
                                     style: GoogleFonts.lato(
@@ -422,19 +427,28 @@ class _TaskerProfileState extends State<TaskerProfile> {
                               Row(
                                 children: [
                                   Icon(
-                                    Icons.location_on_rounded,
-                                    color: HexColor('#007FFF'),
-                                    size: 20,
+                                    availability < 33.3
+                                        ? Icons.battery_1_bar
+                                        : availability > 33.33 &&
+                                                availability < 66.66
+                                            ? Icons.battery_3_bar
+                                            : Icons.battery_6_bar,
+                                    color: availability < 33.3
+                                        ? HexColor('FF033E')
+                                        : availability > 33.33 &&
+                                                availability < 66.66
+                                            ? HexColor('FFC72C')
+                                            : HexColor('#00CE15'),
+                                    size: 18,
                                   ),
                                   const SizedBox(
-                                    width: 5,
+                                    width: 4,
                                   ),
                                   Text(
-                                    '2 km',
+                                    '$availability%',
                                     style: GoogleFonts.lato(
                                       color: HexColor('#AAABAB'),
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w700,
                                     ),
                                   )
                                 ],

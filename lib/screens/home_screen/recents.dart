@@ -23,6 +23,7 @@ class _RecentsState extends State<Recents> {
         _isLoading = true;
       });
       final response = await Provider.of<User>(context).getRecentTaskers();
+      print(response.data);
       if (response.statusCode == 200) {
         setState(() {
           recentTaskers = response.data['data'];
@@ -89,18 +90,19 @@ class _RecentsState extends State<Recents> {
                                 : NetworkImage(recentTaskers[i]['user']
                                     ['profilePicture']) as ImageProvider,
                           ),
-                          Positioned(
-                            right: 0,
-                            left: 35,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: HexColor('#32DE84'),
+                          if (recentTaskers[i]['isOnline'] == true)
+                            Positioned(
+                              right: 0,
+                              left: 35,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: HexColor('#32DE84'),
+                                ),
+                                width: 10,
+                                height: 10,
                               ),
-                              width: 10,
-                              height: 10,
-                            ),
-                          )
+                            )
                         ]),
                         const SizedBox(
                           height: 7,

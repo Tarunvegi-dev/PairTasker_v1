@@ -39,7 +39,7 @@ class User with ChangeNotifier {
         },
       ),
     );
-
+  
     final responsedata = response.data;
     if (!search || sort) {
       if (response.statusCode == 200) {
@@ -87,7 +87,6 @@ class User with ChangeNotifier {
     );
 
     final responsedata = response.data;
-
     if (active) {
       final requestsPref = prefs.getString('requests');
       Map<String, dynamic> requestsdata =
@@ -181,6 +180,44 @@ class User with ChangeNotifier {
       getWishlist();
     }
 
+    return response;
+  }
+
+  Future<Response> confirmTask(String taskId) async {
+    const url = '${BaseURL.url}/user/confirm-task';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().post(
+      url,
+      data: {
+        "taskId": taskId,
+      },
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
+    return response;
+  }
+
+  Future<Response> withdrawRequest(String taskId) async {
+    const url = '${BaseURL.url}/user/withdraw-request';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().post(
+      url,
+      data: {
+        "taskId": taskId,
+      },
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
     return response;
   }
 

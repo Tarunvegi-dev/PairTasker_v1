@@ -22,12 +22,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
   @override
   void didChangeDependencies() async {
     if (_isInit) {
-      final prefs = await SharedPreferences.getInstance();
-      final wishlistPref = prefs.getString('wishlist');
-      List<dynamic> wishlistdata = jsonDecode(wishlistPref!) as List<dynamic>;
-      setState(() {
-        loadedTaskers = wishlistdata;
-      });
+      fetchWishlist();
     }
     _isInit = false;
     super.didChangeDependencies();
@@ -41,6 +36,17 @@ class _WishlistScreenState extends State<WishlistScreen> {
     } else {
       setState(() {
         selectedTaskers.add(id);
+      });
+    }
+  }
+
+  Future<void> fetchWishlist() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('wishlist')) {
+      final wishlistPref = prefs.getString('wishlist');
+      List<dynamic> wishlistdata = jsonDecode(wishlistPref!) as List<dynamic>;
+      setState(() {
+        loadedTaskers = wishlistdata;
       });
     }
   }
@@ -89,29 +95,37 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     child: Text('No Taskers Found in your wishlist!'),
                   ),
                 ),
-              Container(
-                decoration: BoxDecoration(
-                  color:
-                      HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
-                ),
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: loadedTaskers.length,
-                  itemBuilder: (ctx, i) => TaskerWidget(
-                    index: i,
-                    username: loadedTaskers[i]['user']['username'],
-                    availability: loadedTaskers[i]['availability'],
-                    id: loadedTaskers[i]['id'],
-                    displayName: loadedTaskers[i]['user']['displayName'],
-                    rating: loadedTaskers[i]['rating'].toString(),
-                    saves: loadedTaskers[i]['saves'].toString(),
-                    tasks: loadedTaskers[i]['totalTasks'].toString(),
-                    profilePicture: loadedTaskers[i]['user']['profilePicture'],
-                    selectedTaskers: selectedTaskers,
-                    isSelected:
-                        selectedTaskers.contains(loadedTaskers[i]['id']) !=
-                            false,
-                    selectTaskers: selectTaskers,
+              RefreshIndicator(
+                onRefresh: () {
+                  return fetchWishlist();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: HexColor(
+                      Helper.isDark(context) ? '252B30' : '#E4ECF5',
+                    ),
+                  ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: loadedTaskers.length,
+                    itemBuilder: (ctx, i) => TaskerWidget(
+                      index: i,
+                      username: loadedTaskers[i]['user']['username'],
+                      availability: loadedTaskers[i]['availability'],
+                      workingCategories: loadedTaskers[i]['workingCategories'],
+                      id: loadedTaskers[i]['id'],
+                      displayName: loadedTaskers[i]['user']['displayName'],
+                      rating: loadedTaskers[i]['rating'].toString(),
+                      saves: loadedTaskers[i]['saves'].toString(),
+                      tasks: loadedTaskers[i]['totalTasks'].toString(),
+                      profilePicture: loadedTaskers[i]['user']
+                          ['profilePicture'],
+                      selectedTaskers: selectedTaskers,
+                      isSelected:
+                          selectedTaskers.contains(loadedTaskers[i]['id']) !=
+                              false,
+                      selectTaskers: selectTaskers,
+                    ),
                   ),
                 ),
               ),

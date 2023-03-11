@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/theme/widgets.dart';
@@ -48,6 +49,47 @@ class _LoginScreenState extends State<LoginScreen> {
       });
       // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacementNamed('/home');
+    }
+  }
+
+  Future<void> forgotPassword() async {
+    setState(() {
+      error = '';
+    });
+    if (email.text.isEmpty) {
+      setState(() {
+        error = 'Email should not be empty';
+      });
+      return;
+    }
+    final response =
+        await Provider.of<Auth>(context, listen: false).forgotPassword(
+      email.text,
+    );
+    if (response.statusCode == 200) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: HexColor('007FFF'),
+        content: Text(
+          response.data['message'],
+          style: GoogleFonts.poppins(
+            // ignore: use_build_context_synchronously
+            color: Helper.isDark(context) ? Colors.white : Colors.black,
+          ),
+        ),
+      ));
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: HexColor('FF033E'),
+        content: Text(
+          response.data['message'],
+          style: GoogleFonts.poppins(
+            // ignore: use_build_context_synchronously
+            color: Helper.isDark(context) ? Colors.white : Colors.black,
+          ),
+        ),
+      ));
     }
   }
 
@@ -147,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: forgotPassword,
                         style: TextButton.styleFrom(
                           splashFactory: NoSplash.splashFactory,
                         ),

@@ -17,34 +17,43 @@ class MyRequests extends StatefulWidget {
 }
 
 class _MyRequestsState extends State<MyRequests> {
-  var _isInit = true;
   List<dynamic> loadedRequests = [];
+  bool isLoading = false;
+
+  Future<void> fetchRequests() async {
+    setState(() {
+      isLoading = true;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final requestPref = prefs.getString('requests');
+    Map<String, dynamic> requestsdata =
+        jsonDecode(requestPref!) as Map<String, dynamic>;
+    if (requestsdata['active'].length > 0) {
+      // ignore: use_build_context_synchronously
+      final response = await Provider.of<User>(
+        context,
+        listen: false,
+      ).getMyRequests(active: true);
+      setState(() {
+        loadedRequests = response['active'];
+        loadedRequests.addAll(requestsdata['completed']);
+        isLoading = false;
+      });
+      return;
+    } else {
+      setState(() {
+        loadedRequests = requestsdata['active'];
+        loadedRequests.addAll(requestsdata['completed']);
+        isLoading = false;
+      });
+    }
+  }
 
   @override
-  void didChangeDependencies() async {
-    if (_isInit) {
-      final prefs = await SharedPreferences.getInstance();
-      final requestPref = prefs.getString('requests');
-      Map<String, dynamic> requestsdata =
-          jsonDecode(requestPref!) as Map<String, dynamic>;
-      if (requestsdata['active'].length > 0) {
-        // ignore: use_build_context_synchronously
-        final response = await Provider.of<User>(context, listen: false)
-            .getMyRequests(active: true);
-        setState(() {
-          loadedRequests = response['active'];
-          loadedRequests.addAll(response['completed']);
-        });
-        return;
-      } else {
-        setState(() {
-          loadedRequests = requestsdata['active'];
-          loadedRequests.addAll(requestsdata['completed']);
-        });
-      }
-    }
-    _isInit = false;
-    super.didChangeDependencies();
+  void initState() {
+    fetchRequests();
+    super.initState();
   }
 
   @override
@@ -79,7 +88,7 @@ class _MyRequestsState extends State<MyRequests> {
                   ),
                 ),
               ),
-              if (loadedRequests.isEmpty)
+              if (loadedRequests.isEmpty && !isLoading)
                 Container(
                   width: MediaQuery.of(context).size.width,
                   color: Helper.isDark(context) ? Colors.black : Colors.white,
@@ -91,23 +100,41 @@ class _MyRequestsState extends State<MyRequests> {
                     child: Text('No Requests Found!'),
                   ),
                 ),
-              Container(
-                decoration: BoxDecoration(
-                  color:
-                      HexColor(Helper.isDark(context) ? '252B30' : '#E4ECF5'),
+              if (isLoading)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
+                  child: const CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  ),
                 ),
-                child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: loadedRequests.length,
-                    itemBuilder: (ctx, i) {
-                      return RequestWidget(
-                        requestId: loadedRequests[i]['reqId'],
-                        message: loadedRequests[i]['message'],
-                        status: loadedRequests[i]['status'],
-                        currentTasker: loadedRequests[i]['tasker'] != null ? loadedRequests[i]['tasker']['user']['username'] :  '',
-                      );
-                    }),
-              )
+              RefreshIndicator(
+                onRefresh: fetchRequests,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: HexColor(
+                      Helper.isDark(context) ? '252B30' : '#E4ECF5',
+                    ),
+                  ),
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: loadedRequests.length,
+                      itemBuilder: (ctx, i) {
+                        return RequestWidget(
+                          requestId: loadedRequests[i]['reqId'],
+                          id: loadedRequests[i]['id'],
+                          fetchRequests: fetchRequests,
+                          message: loadedRequests[i]['message'],
+                          status: loadedRequests[i]['status'],
+                          currentTasker: loadedRequests[i]['tasker'] != null
+                              ? loadedRequests[i]['tasker']['user']['username']
+                              : '',
+                        );
+                      }),
+                ),
+              ),
             ],
           ),
         ),

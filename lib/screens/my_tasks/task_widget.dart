@@ -5,10 +5,12 @@ import 'package:hexcolor/hexcolor.dart';
 
 class TaskWidget extends StatelessWidget {
   final username;
+  final id;
   final displayName;
   final profilePicture;
   final status;
   final message;
+  final fetchTasks;
 
   const TaskWidget(
       {this.username,
@@ -16,20 +18,29 @@ class TaskWidget extends StatelessWidget {
       this.profilePicture,
       this.message,
       this.status,
+      this.id,
+      this.fetchTasks,
       super.key});
 
   @override
   Widget build(BuildContext context) {
+    final page = ChatScreen(
+      screenType: 'tasker',
+      taskId: id,
+    );
     return InkWell(
-      onTap: () => Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const ChatScreen('tasker'),
-        ),
+      onTap: () => Navigator.of(context)
+          .push(
+        MaterialPageRoute(builder: (context) => page),
+      )
+          .then(
+        (value) {
+          fetchTasks();
+        },
       ),
       child: Container(
         color: Helper.isDark(context) ? Colors.black : Colors.white,
         margin: const EdgeInsets.only(bottom: 5),
-        height: 130,
         child: Container(
           margin: const EdgeInsets.symmetric(
             vertical: 20,

@@ -34,14 +34,18 @@ class TaskerWidget extends StatelessWidget {
       this.profilePicture,
       this.isSelected,
       this.availability,
-      this.workingCategories = 'deliveryboy, photographer, rider',
+      this.workingCategories,
       required this.selectedTaskers,
       required this.selectTaskers,
       super.key});
 
   @override
   Widget build(BuildContext context) {
-    final _workingCategories = workingCategories.toString().split(' ');
+    final _workingCategories = workingCategories
+        .toString()
+        .replaceAll('[', '')
+        .replaceAll(']', '')
+        .split(' ');
     return InkWell(
       onLongPress: () => isSelected ? null : selectTaskers(id),
       onTap: () =>

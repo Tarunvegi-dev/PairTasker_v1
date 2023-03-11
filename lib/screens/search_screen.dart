@@ -50,7 +50,6 @@ class _SearchScreenState extends State<SearchScreen> {
       });
     } else {
       setState(() {
-        print(category.toString().replaceAll(' ', ''));
         _workingCategories.add(category.toString().trim());
       });
     }
@@ -258,6 +257,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   availability: filteredTaskers[i]['availability'],
                   id: filteredTaskers[i]['id'],
                   displayName: filteredTaskers[i]['user']['displayName'],
+                  workingCategories: filteredTaskers[i]['workingCategories'],
                   rating: filteredTaskers[i]['rating'].toString(),
                   saves: filteredTaskers[i]['saves'].toString(),
                   tasks: filteredTaskers[i]['totalTasks'].toString(),
