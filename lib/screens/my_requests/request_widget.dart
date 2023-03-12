@@ -28,17 +28,15 @@ class RequestWidget extends StatelessWidget {
       taskId: id.toString(),
     );
     return InkWell(
-      onTap: int.parse(status) != 0
-          ? () => Navigator.of(context)
-                  .push(
-                MaterialPageRoute(
-                  builder: (context) => page,
-                ),
-              )
-                  .then((value) {
-                fetchRequests();
-              })
-          : () {},
+      onTap: () => Navigator.of(context)
+          .push(
+        MaterialPageRoute(
+          builder: (context) => page,
+        ),
+      )
+          .then((value) {
+        fetchRequests();
+      }),
       child: Container(
         color: Helper.isDark(context) ? Colors.black : Colors.white,
         margin: const EdgeInsets.only(bottom: 5),

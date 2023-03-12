@@ -141,11 +141,6 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                       ),
                     ],
                   ),
-                  Icon(
-                    Icons.more_vert,
-                    size: 28,
-                    color: HexColor('99A4AE'),
-                  )
                 ],
               ),
             ),
@@ -155,28 +150,19 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        border: Border.all(
-                          color: Colors.black,
-                          width: 1.0,
+                    TextField(
+                      readOnly: !_isEditing,
+                      maxLines: 3,
+                      controller: bio,
+                      decoration: InputDecoration(
+                        hintText: 'Describe yourself',
+                        hintStyle: GoogleFonts.lato(
+                          fontSize: 12,
                         ),
-                      ),
-                      child: TextField(
-                        readOnly: !_isEditing,
-                        maxLines: 3,
-                        controller: bio,
-                        decoration: InputDecoration(
-                          hintText: 'Describe yourself',
-                          hintStyle: GoogleFonts.lato(
-                            fontSize: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: HexColor(
-                                '99A4AE',
-                              ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: HexColor(
+                              '99A4AE',
                             ),
                           ),
                         ),

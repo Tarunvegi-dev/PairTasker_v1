@@ -117,10 +117,10 @@ class Helper {
                             backgroundColor: HexColor('007FFF'),
                           ),
                           onPressed: () async {
-                            if (messageController.text.length < 50) {
+                            if (messageController.text.length < 10) {
                               setState(() {
                                 errorMessage =
-                                    'Message should be 50 characters long';
+                                    'Message should be 10 characters long';
                               });
                               return;
                             }
@@ -523,10 +523,12 @@ class Helper {
 
 class BaseURL {
   static const url =
-      'http://pairtasker-test.ap-south-1.elasticbeanstalk.com/api';
-      // 'http://192.168.219.47:3000/api';
+      // 'http://pairtasker-test.ap-south-1.elasticbeanstalk.com/api';
+      // 'http://192.168.103.47:3000/api';
+      'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
   static const socketURL =
-      'http://pairtasker-test.ap-south-1.elasticbeanstalk.com';
-      // 'http://192.168.219.47:3000';
+      // 'http://pairtasker-test.ap-south-1.elasticbeanstalk.com';
+      // 'http://192.168.103.47:3000';
+      'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

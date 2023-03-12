@@ -57,7 +57,6 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isLoading = false;
   bool isTimerEnded = false;
   bool isMessageEmpty = true;
-  bool viewStatus = false;
 
   _scrollToEnd() async {
     if (_needsScroll) {
@@ -243,6 +242,7 @@ class _ChatScreenState extends State<ChatScreen> {
       "image": imageURL,
       "sentBy": {"username": userdata['username']}.toString(),
       "taskId": widget.taskId,
+      "screenType": widget.screenType
     };
     if (type == 'prompt') {
       data = {...data, "text": '${userdata['username']} ${data['text']}'};
@@ -323,7 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void cancelTaskRequest({bool ack = false}) async {
     if (!ack) {
-      sendMessage('Task request cancelled', 'info');
+      sendMessage('Task confirmation cancelled', 'info');
     }
   }
 
@@ -373,6 +373,107 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       taskStatus = -1;
     });
+  }
+
+  GlobalKey<ScaffoldState> key = GlobalKey();
+
+  void showStatus() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        color: Helper.isDark(context) ? Colors.black : Colors.white,
+        child: Wrap(
+          children: [
+            if (pendingTaskers.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(15),
+                color: Helper.isDark(context)
+                    ? HexColor('252B30')
+                    : HexColor('E4ECF5'),
+                child: ListView.builder(
+                  itemCount: pendingTaskers.length,
+                  shrinkWrap: true,
+                  itemBuilder: ((context, i) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 15,
+                            backgroundImage:
+                                pendingTaskers[i]['profilePicture'] != null
+                                    ? NetworkImage(
+                                        pendingTaskers[i]['profilePicture'],
+                                      )
+                                    : const AssetImage(
+                                        'assets/images/default_user.png',
+                                      ) as ImageProvider,
+                          ),
+                          Text(
+                            '@${pendingTaskers[i]['username']}',
+                            style: GoogleFonts.lato(
+                              color: HexColor('AAABAB'),
+                            ),
+                          ),
+                          Text(
+                            'pending',
+                            style: GoogleFonts.lato(
+                              color: HexColor('007FFF'),
+                            ),
+                          )
+                        ],
+                      )),
+                ),
+              ),
+            if (terminatedTaskers.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(15),
+                color: Helper.isDark(context)
+                    ? HexColor('252B30')
+                    : HexColor('E4ECF5'),
+                child: ListView.builder(
+                  itemCount: terminatedTaskers.length,
+                  shrinkWrap: true,
+                  itemBuilder: ((context, i) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 15,
+                                backgroundImage: terminatedTaskers[i]
+                                            ['profilePicture'] !=
+                                        null
+                                    ? NetworkImage(
+                                        terminatedTaskers[i]['profilePicture'],
+                                      )
+                                    : const AssetImage(
+                                        'assets/images/default_user.png',
+                                      ) as ImageProvider,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                '@${terminatedTaskers[i]['username']}',
+                                style: GoogleFonts.lato(),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            'terminated',
+                            style: GoogleFonts.lato(
+                              color: HexColor('FF033E'),
+                            ),
+                          )
+                        ],
+                      )),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -588,141 +689,39 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: viewStatus
-                          ? MainAxisAlignment.end
-                          : MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (!viewStatus)
-                          SizedBox(
-                            width: 80,
-                            child: Row(
-                              children:
-                                  [...pendingTaskers, ...terminatedTaskers]
-                                      .map(
-                                        (tasker) => CircleAvatar(
-                                          radius: 13,
-                                          backgroundImage:
-                                              tasker['profilePicture'] != null
-                                                  ? NetworkImage(
-                                                      tasker['profilePicture'])
-                                                  : const AssetImage(
-                                                      'assets/images/default_user.png',
-                                                    ) as ImageProvider,
-                                        ),
-                                      )
-                                      .toList(),
-                            ),
-                          ),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              viewStatus = !viewStatus;
-                            });
-                          },
-                          child: Icon(
-                            viewStatus
-                                ? Icons.arrow_drop_up
-                                : Icons.arrow_drop_down,
-                            // style: GoogleFonts.poppins(
-                            //   color: HexColor('007FFF'),
-                            //   fontSize: 12,
-                            //   fontWeight: FontWeight.w500,
-                            // ),
+                        SizedBox(
+                          width: 80,
+                          child: Row(
+                            children: [...pendingTaskers, ...terminatedTaskers]
+                                .map(
+                                  (tasker) => CircleAvatar(
+                                    radius: 13,
+                                    backgroundImage: tasker['profilePicture'] !=
+                                            null
+                                        ? NetworkImage(tasker['profilePicture'])
+                                        : const AssetImage(
+                                            'assets/images/default_user.png',
+                                          ) as ImageProvider,
+                                  ),
+                                )
+                                .toList(),
                           ),
                         ),
+                        InkWell(
+                            onTap: () {
+                              showStatus();
+                            },
+                            child: Text(
+                              'view status',
+                              style: GoogleFonts.poppins(
+                                color: HexColor('007FFF'),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )),
                       ],
-                    ),
-                  ],
-                ),
-              ),
-            if (viewStatus && widget.screenType == 'user')
-              AnimatedContainer(
-                duration: const Duration(
-                  seconds: 3,
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 25,
-                        vertical: 10,
-                      ),
-                      color:
-                          Helper.isDark(context) ? Colors.black : Colors.white,
-                      child: ListView.builder(
-                        itemCount: pendingTaskers.length,
-                        shrinkWrap: true,
-                        itemBuilder: ((context, i) => Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CircleAvatar(
-                                  radius: 12,
-                                  backgroundImage: pendingTaskers[i]
-                                              ['profilePicture'] !=
-                                          null
-                                      ? NetworkImage(
-                                          pendingTaskers[i]['profilePicture'],
-                                        )
-                                      : const AssetImage(
-                                          'assets/images/default_user.png',
-                                        ) as ImageProvider,
-                                ),
-                                Text(
-                                  '@${pendingTaskers[i]['username']}',
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('AAABAB'),
-                                  ),
-                                ),
-                                Text(
-                                  'pending',
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('007FFF'),
-                                  ),
-                                )
-                              ],
-                            )),
-                      ),
-                    ),
-                    Container(
-                      color: Helper.isDark(context)
-                          ? HexColor('252B30')
-                          : HexColor('E4ECF5'),
-                      child: ListView.builder(
-                        itemCount: terminatedTaskers.length,
-                        shrinkWrap: true,
-                        itemBuilder: ((context, i) => Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CircleAvatar(
-                                  radius: 12,
-                                  backgroundImage: terminatedTaskers[i]
-                                              ['profilePicture'] !=
-                                          null
-                                      ? NetworkImage(
-                                          terminatedTaskers[i]
-                                              ['profilePicture'],
-                                        )
-                                      : const AssetImage(
-                                          'assets/images/default_user.png',
-                                        ) as ImageProvider,
-                                ),
-                                Text(
-                                  '@${terminatedTaskers[i]['username']}',
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('AAABAB'),
-                                  ),
-                                ),
-                                Text(
-                                  'terminated',
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('FF033E'),
-                                  ),
-                                )
-                              ],
-                            )),
-                      ),
                     ),
                   ],
                 ),
@@ -770,43 +769,49 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: loadedMessages.length,
                 itemBuilder: (BuildContext context, int i) => loadedMessages[i]
                                 ['type'] ==
-                            'info' ||
-                        loadedMessages[i]['type'] == 'task-completion' ||
+                            'task-completion' ||
                         loadedMessages[i]['type'] == 'task-confirmation' ||
                         loadedMessages[i]['type'] == 'task-cancellation'
-                    ? InfoMessage(
+                    ? TaskMessage(
                         message: '${loadedMessages[i]['text']}',
+                        type: loadedMessages[i]['type'],
                       )
-                    : loadedMessages[i]['sender'] == userId
-                        ? OutgoingMessage(
-                            message: loadedMessages[i]['text'],
-                            timestamp: loadedMessages[i]['timestamp'],
-                            msgStatus: messageStatus,
-                            showMsgStatus: messageStatus.isNotEmpty &&
-                                loadedMessages.last['sender'] == userId &&
-                                loadedMessages.last['type'] == 'message' &&
-                                i == loadedMessages.length - 1,
-                            image:
-                                loadedMessages[i]['image'].toString().isNotEmpty
-                                    ? loadedMessages[i]['image']
-                                    : '',
+                    : loadedMessages[i]['type'] == 'info'
+                        ? InfoMessage(
+                            message: '${loadedMessages[i]['text']}',
                           )
-                        : IncomingMessage(
-                            message: loadedMessages[i]['text'],
-                            screenType: widget.screenType,
-                            timestamp: loadedMessages[i]['timestamp'],
-                            sender: loadedMessages[i]['sentBy']
-                                .toString()
-                                .substring(10)
-                                .replaceAll(
-                                  '}',
-                                  '',
-                                ),
-                            image:
-                                loadedMessages[i]['image'].toString().isNotEmpty
+                        : loadedMessages[i]['sender'] == userId
+                            ? OutgoingMessage(
+                                message: loadedMessages[i]['text'],
+                                timestamp: loadedMessages[i]['timestamp'],
+                                msgStatus: messageStatus,
+                                showMsgStatus: messageStatus.isNotEmpty &&
+                                    loadedMessages.last['sender'] == userId &&
+                                    loadedMessages.last['type'] == 'message' &&
+                                    i == loadedMessages.length - 1,
+                                image: loadedMessages[i]['image']
+                                        .toString()
+                                        .isNotEmpty
                                     ? loadedMessages[i]['image']
                                     : '',
-                          ),
+                              )
+                            : IncomingMessage(
+                                message: loadedMessages[i]['text'],
+                                screenType: widget.screenType,
+                                timestamp: loadedMessages[i]['timestamp'],
+                                sender: loadedMessages[i]['sentBy']
+                                    .toString()
+                                    .substring(10)
+                                    .replaceAll(
+                                      '}',
+                                      '',
+                                    ),
+                                image: loadedMessages[i]['image']
+                                        .toString()
+                                        .isNotEmpty
+                                    ? loadedMessages[i]['image']
+                                    : '',
+                              ),
               ),
             ),
             if (showKeyBoard())
@@ -837,7 +842,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               : HexColor('E4ECF5'),
                           borderRadius: BorderRadius.circular(25),
                         ),
-                        padding: const EdgeInsets.only(left: 25, top: 10),
+                        padding: const EdgeInsets.only(
+                          left: 25,
+                          top: 10,
+                        ),
                         child: TextField(
                           maxLines: 8,
                           style: GoogleFonts.lato(
@@ -878,13 +886,17 @@ class _ChatScreenState extends State<ChatScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: HexColor('AAABAB'),
+                                    color: Helper.isDark(context)
+                                        ? HexColor('FFFFFF')
+                                        : HexColor('E4ECF5'),
                                     borderRadius: BorderRadius.circular(25),
                                   ),
                                   child: Icon(
                                     Icons.camera_alt,
-                                    color: HexColor('000000'),
-                                    size: 28,
+                                    color: Helper.isDark(context)
+                                        ? HexColor('252B30')
+                                        : HexColor('AAABAB'),
+                                    size: 30,
                                   ),
                                 ),
                               ),
@@ -904,7 +916,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                     margin: const EdgeInsets.only(left: 3),
                                     child: const Icon(
                                       Icons.send,
-                                      size: 28,
+                                      size: 30,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ),
@@ -935,7 +948,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                       margin: const EdgeInsets.only(left: 3),
                                       child: const Icon(
                                         Icons.send,
-                                        size: 28,
+                                        size: 30,
+                                        color: Colors.white,
                                       ),
                                     ),
                                   ),
@@ -949,14 +963,18 @@ class _ChatScreenState extends State<ChatScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          color: HexColor('AAABAB'),
+                                          color: Helper.isDark(context)
+                                              ? HexColor('FFFFFF')
+                                              : HexColor('E4ECF5'),
                                           borderRadius:
                                               BorderRadius.circular(25),
                                         ),
                                         child: Icon(
                                           Icons.camera_alt,
-                                          color: HexColor('000000'),
-                                          size: 28,
+                                          color: Helper.isDark(context)
+                                              ? HexColor('252B30')
+                                              : HexColor('AAABAB'),
+                                          size: 30,
                                         ),
                                       ),
                                     ),
@@ -964,16 +982,21 @@ class _ChatScreenState extends State<ChatScreen> {
                                       child: Container(
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
-                                          color: HexColor('AAABAB'),
+                                          color: Helper.isDark(context)
+                                              ? HexColor('FFFFFF')
+                                              : HexColor('E4ECF5'),
                                           borderRadius:
                                               BorderRadius.circular(25),
                                         ),
                                         margin: const EdgeInsets.only(
                                           left: 5,
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.more_horiz,
-                                          size: 28,
+                                          size: 30,
+                                          color: Helper.isDark(context)
+                                              ? HexColor('252B30')
+                                              : HexColor('AAABAB'),
                                         ),
                                       ),
                                       itemBuilder: (BuildContext context) => [
@@ -984,7 +1007,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                           ),
                                           child: Row(
                                             children: const [
-                                              Icon(Icons.add),
                                               Text(
                                                 'Request confirmation',
                                               ),

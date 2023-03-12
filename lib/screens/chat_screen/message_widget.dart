@@ -102,8 +102,7 @@ class OutgoingMessage extends StatelessWidget {
                         : Text(
                             message,
                             style: GoogleFonts.lato(
-                              fontSize: 14,
-                            ),
+                                fontSize: 14, color: Colors.white),
                           ),
                   ],
                 ),
@@ -271,7 +270,7 @@ class InfoMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: const EdgeInsets.only(top: 15, bottom: 15),
+        margin: const EdgeInsets.only(top: 10),
         padding: const EdgeInsets.symmetric(
           vertical: 5,
           horizontal: 12,
@@ -287,6 +286,40 @@ class InfoMessage extends StatelessWidget {
             color: HexColor('99A4AE'),
             fontSize: 12,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class TaskMessage extends StatelessWidget {
+  final message;
+  final type;
+  const TaskMessage({this.message, this.type, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.symmetric(
+        vertical: 10,
+        horizontal: 12,
+      ),
+      decoration: BoxDecoration(
+        color: Helper.isDark(context) ? HexColor('252B30') : HexColor('E4ECF5'),
+      ),
+      child: Text(
+        message,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.lato(
+          fontSize: 14,
+          fontWeight: FontWeight.w800,
+          color: type == 'task-confirmation'
+              ? HexColor('007FFF')
+              : type == 'task-completion'
+                  ? HexColor('32DE84')
+                  : HexColor('FF033E'),
         ),
       ),
     );

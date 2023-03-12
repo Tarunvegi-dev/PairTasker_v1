@@ -21,7 +21,6 @@ class TaskerDetails extends StatefulWidget {
 
 class _TaskerDetailsState extends State<TaskerDetails> {
   final List<String> kOptions = <String>[
-    'mechanic',
     'delivery boy',
     'photographer',
   ];
@@ -70,8 +69,8 @@ class _TaskerDetailsState extends State<TaskerDetails> {
     Map<String, dynamic> taskerdata = {
       'workingCategories': _workingCategories,
     };
-    final response =
-        await Provider.of<Auth>(context, listen: false).updateTasker(taskerdata);
+    final response = await Provider.of<Auth>(context, listen: false)
+        .updateTasker(taskerdata);
     if (response.statusCode != 200) {
       setState(() {
         error = response.data['message'];

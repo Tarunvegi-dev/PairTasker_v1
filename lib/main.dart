@@ -139,6 +139,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
   @override
   void initState() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
@@ -159,14 +161,23 @@ class _MyAppState extends State<MyApp> {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       RemoteNotification notification = message.notification!;
       AndroidNotification? android = message.notification?.android;
-      // WidgetsBinding.instance.addPostFrameCallback((_) async {
-      //   await Navigator.of(context).push(MaterialPageRoute(
-      //     builder: (context) => ChatScreen(
-      //       screenType: message.data['screenType'],
-      //       taskId: message.data['taskId'],
-      //     ),
-      //   ));
-      // });
+      if (message.data['type'] == 'task') {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await navigatorKey.currentState!.push(MaterialPageRoute(
+            builder: (context) => const NotificationScreen(),
+          ));
+        });
+      } else {
+        final page = ChatScreen(
+          screenType: message.data['screenType'] == 'user' ? 'tasker' : 'user',
+          taskId: message.data['taskId'],
+        );
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await navigatorKey.currentState!.push(MaterialPageRoute(
+            builder: (context) => page,
+          ));
+        });
+      }
     });
     super.initState();
   }
@@ -190,6 +201,7 @@ class _MyAppState extends State<MyApp> {
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'PairTasker',
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
@@ -218,6 +230,8 @@ class _MyAppState extends State<MyApp> {
             '/chatscreen': (context) => const ChatScreen(),
             '/searchscreen': (context) => const SearchScreen(),
             '/mytaskerprofile': (context) => const MyTaskerProfile(),
+            '/terms-and-conditions': (context) => const TermsAndConditions(),
+            '/faq': (context) => const FAQ(),
             '/taskerform': (context) => const TaskerDetails(
                   workingCategories: [],
                   isUpdating: false,

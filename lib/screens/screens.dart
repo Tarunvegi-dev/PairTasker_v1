@@ -13,3 +13,5 @@ export 'chat_screen/chat_screen.dart';
 export './search_screen.dart';
 export './tasker_details_screen.dart';
 export './my_tasker_profile_screen.dart';
+export './terms_and_conditions.dart';
+export './FAQ.dart';

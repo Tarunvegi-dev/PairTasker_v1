@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../helpers/methods.dart';
 import '../../providers/auth.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -185,97 +186,116 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           ),
                         ),
                       ),
-                    Container(
-                      color:
-                          Helper.isDark(context) ? Colors.black : Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 23,
+                    InkWell(
+                      onTap: () => Navigator.of(context).pushNamed(
+                        '/terms-and-conditions',
                       ),
-                      margin: const EdgeInsets.only(
-                        bottom: 5,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/images/icons/drawer/terms-and-conditions.png',
-                            width: 24,
-                            height: 24,
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            'Terms & Conditions',
-                            style: GoogleFonts.lato(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                      child: Container(
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 23,
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/images/icons/drawer/terms-and-conditions.png',
+                              width: 24,
+                              height: 24,
                             ),
-                          ),
-                        ],
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              'Terms & Conditions',
+                              style: GoogleFonts.lato(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    Container(
-                      color:
-                          Helper.isDark(context) ? Colors.black : Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 23,
+                    InkWell(
+                      onTap: () => Navigator.of(context).pushNamed(
+                        '/faq',
                       ),
-                      margin: const EdgeInsets.only(
-                        bottom: 5,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/images/icons/drawer/faq.png',
-                            width: 24,
-                            height: 24,
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            "FAQ's",
-                            style: GoogleFonts.lato(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                      child: Container(
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 23,
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/images/icons/drawer/faq.png',
+                              width: 24,
+                              height: 24,
                             ),
-                          ),
-                        ],
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              "FAQ's",
+                              style: GoogleFonts.lato(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    Container(
-                      color:
-                          Helper.isDark(context) ? Colors.black : Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 15,
-                        horizontal: 23,
-                      ),
-                      margin: const EdgeInsets.only(
-                        bottom: 5,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            'assets/images/icons/drawer/share.png',
-                            width: 24,
-                            height: 24,
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          Text(
-                            'Share the app',
-                            style: GoogleFonts.lato(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                    InkWell(
+                      onTap: () {
+                        final uri = Uri.parse('https://pairtaskerapp.web.app/');
+                        launchUrl(uri);
+                      },
+                      child: Container(
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 23,
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/images/icons/drawer/share.png',
+                              width: 24,
+                              height: 24,
                             ),
-                          ),
-                        ],
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              'Share the app',
+                              style: GoogleFonts.lato(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
