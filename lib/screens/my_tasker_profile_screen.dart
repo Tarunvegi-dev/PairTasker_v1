@@ -34,7 +34,7 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
-      if (userdata['isTasker'] != null && userdata['isTasker'] != false) {
+      if (userdata['isTasker'] != null) {
         setState(() {
           taskerMode = userdata['tasker']['isOnline'];
           workingCategories = userdata['tasker']['workingCategories'];
@@ -300,21 +300,6 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                         ),
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(
-                        bottom: 20,
-                      ),
-                      child: TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          'Delete tasker account',
-                          style: GoogleFonts.lato(
-                            fontSize: 14,
-                            color: HexColor('FF033E'),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -359,6 +344,7 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
           ],
         ),
       ),
+      bottomNavigationBar: const TaskerBottomNavBarWidget(3),
     );
   }
 }

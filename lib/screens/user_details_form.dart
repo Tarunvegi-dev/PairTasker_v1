@@ -456,7 +456,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
                                     ),
                                   ),
                                   Text(
-                                    'Policy and Terms for Tasker',
+                                    'Continue as Tasker',
                                     style: GoogleFonts.nunito(
                                       color: HexColor('#007FFF'),
                                       fontSize: 14,

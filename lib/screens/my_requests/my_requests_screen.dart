@@ -139,7 +139,7 @@ class _MyRequestsState extends State<MyRequests> {
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBarWidget(2),
+      bottomNavigationBar: const BottomNavBarWidget(1),
     );
   }
 }

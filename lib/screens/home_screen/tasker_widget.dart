@@ -20,6 +20,7 @@ class TaskerWidget extends StatelessWidget {
   final isSelected;
   final availability;
   final workingCategories;
+  final isWishlist;
   final List<dynamic> selectedTaskers;
   final Function selectTaskers;
 
@@ -37,6 +38,7 @@ class TaskerWidget extends StatelessWidget {
       this.workingCategories,
       required this.selectedTaskers,
       required this.selectTaskers,
+      this.isWishlist = false,
       super.key});
 
   @override
@@ -47,9 +49,10 @@ class TaskerWidget extends StatelessWidget {
         .replaceAll(']', '')
         .split(' ');
     return InkWell(
-      onLongPress: () => isSelected ? null : selectTaskers(id),
-      onTap: () =>
-          isSelected || selectedTaskers.isNotEmpty ? selectTaskers(id) : null,
+      onLongPress: () => isSelected || isWishlist ? null : selectTaskers(id),
+      onTap: () => isSelected || selectedTaskers.isNotEmpty || !isWishlist
+          ? selectTaskers(id)
+          : null,
       child: Container(
         color: Helper.isDark(context) ? Colors.black : Colors.white,
         margin: const EdgeInsets.only(
@@ -226,10 +229,10 @@ class TaskerWidget extends StatelessWidget {
                       children: [
                         Icon(
                           availability < 33.3
-                              ? Icons.battery_1_bar
+                              ? Icons.wifi_1_bar
                               : availability > 33.33 && availability < 66.66
-                                  ? Icons.battery_3_bar
-                                  : Icons.battery_6_bar,
+                                  ? Icons.wifi_2_bar
+                                  : Icons.wifi,
                           color: availability < 33.3
                               ? HexColor('FF033E')
                               : availability > 33.33 && availability < 66.66

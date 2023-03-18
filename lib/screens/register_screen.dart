@@ -230,11 +230,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ),
-                      Text(
-                        'Policy and Terms',
-                        style: GoogleFonts.nunito(
-                          color: HexColor('#007FFF'),
-                          fontSize: 14,
+                      InkWell(
+                        onTap: () => Navigator.of(context).pushNamed('/terms-and-conditions'),
+                        child: Text(
+                          'Terms and conditions',
+                          style: GoogleFonts.nunito(
+                            color: HexColor('#007FFF'),
+                            fontSize: 14,
+                          ),
                         ),
                       )
                     ],

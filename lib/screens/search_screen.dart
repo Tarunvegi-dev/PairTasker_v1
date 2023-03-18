@@ -44,15 +44,10 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void manageWorkingCategories(category) {
-    if (_workingCategories.contains(category)) {
-      setState(() {
-        _workingCategories.remove(category);
-      });
-    } else {
-      setState(() {
-        _workingCategories.add(category.toString().trim());
-      });
-    }
+    setState(() {
+      _workingCategories.removeRange(0, _workingCategories.length);
+      _workingCategories.add(category.toString().trim());
+    });
     searchTaskers();
   }
 
@@ -314,9 +309,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       backgroundColor: HexColor('007FFF'),
                     ),
                     onPressed: () => Helper.showRequestModal(
-                      context,
-                      selectedTaskers,
-                    ),
+                        context, selectedTaskers, _workingCategories.join('')),
                     child: Text(
                       'Request',
                       style: GoogleFonts.lato(

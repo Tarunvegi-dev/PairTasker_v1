@@ -11,10 +11,9 @@ class BottomNavBarWidget extends StatelessWidget {
   final selectedScreen;
   final List<Widget> screens = const [
     HomePage(),
-    WishlistScreen(),
     MyRequests(),
     NotificationScreen(),
-    MyTasks(),
+    WishlistScreen(),
   ];
 
   const BottomNavBarWidget(this.selectedScreen, {super.key});
@@ -65,19 +64,9 @@ class BottomNavBarWidget extends StatelessWidget {
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset(
-                "assets/images/icons/navbar/wishlist.svg",
-                width: 23,
-                color: selectedScreen == 1
-                    ? HexColor('007FFF')
-                    : HexColor('99A4AE'),
-              ),
-              label: 'Wishlist',
-            ),
-            BottomNavigationBarItem(
-              icon: SvgPicture.asset(
                 "assets/images/icons/navbar/my_requests.svg",
                 width: 25,
-                color: selectedScreen == 2
+                color: selectedScreen == 1
                     ? HexColor('007FFF')
                     : HexColor('99A4AE'),
               ),
@@ -87,7 +76,7 @@ class BottomNavBarWidget extends StatelessWidget {
               icon: SvgPicture.asset(
                 "assets/images/icons/navbar/notifications.svg",
                 width: 25,
-                color: selectedScreen == 3
+                color: selectedScreen == 2
                     ? HexColor('007FFF')
                     : HexColor('99A4AE'),
               ),
@@ -95,13 +84,106 @@ class BottomNavBarWidget extends StatelessWidget {
             ),
             BottomNavigationBarItem(
               icon: SvgPicture.asset(
+                "assets/images/icons/navbar/wishlist.svg",
+                width: 23,
+                color: selectedScreen == 3
+                    ? HexColor('007FFF')
+                    : HexColor('99A4AE'),
+              ),
+              label: 'Wishlist',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class TaskerBottomNavBarWidget extends StatelessWidget {
+  // ignore: prefer_typing_uninitialized_variables
+  final selectedScreen;
+  final List<Widget> screens = const [
+    TaskerDashboard(),
+    MyTasks(),
+    NotificationScreen(),
+    MyTaskerProfile()
+  ];
+
+  const TaskerBottomNavBarWidget(this.selectedScreen, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Helper.isDark(context) ? Colors.white : Colors.black,
+            width: 0.2,
+          ),
+        ),
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 8 / 100,
+        width: MediaQuery.of(context).size.width,
+        child: BottomNavigationBar(
+          currentIndex: 0,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          elevation: 3,
+          backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
+          type: BottomNavigationBarType.fixed,
+          onTap: (value) {
+            if (value != selectedScreen) {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation1, animation2) =>
+                      screens[value],
+                  transitionDuration: Duration.zero,
+                ),
+              );
+            }
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                "assets/images/icons/navbar/dashboard.svg",
+                width: 25,
+                color: selectedScreen == 0
+                    ? HexColor('007FFF')
+                    : HexColor('99A4AE'),
+              ),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
                 "assets/images/icons/navbar/my_tasks.svg",
                 width: 25,
-                color: selectedScreen == 4
+                color: selectedScreen == 1
                     ? HexColor('007FFF')
                     : HexColor('99A4AE'),
               ),
               label: "mytasks",
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                "assets/images/icons/navbar/notifications.svg",
+                width: 25,
+                color: selectedScreen == 2
+                    ? HexColor('007FFF')
+                    : HexColor('99A4AE'),
+              ),
+              label: "notifications",
+            ),
+            BottomNavigationBarItem(
+              icon: SvgPicture.asset(
+                "assets/images/icons/navbar/profile.svg",
+                width: 25,
+                color: selectedScreen == 3
+                    ? HexColor('007FFF')
+                    : HexColor('99A4AE'),
+              ),
+              label: "tasker profile",
             ),
           ],
         ),

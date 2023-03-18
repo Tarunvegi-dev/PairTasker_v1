@@ -47,12 +47,14 @@ class Helper {
   }
 
   static void showRequestModal(
-      BuildContext context, List<dynamic> selectedTaskers) {
+      BuildContext context, List<dynamic> selectedTaskers, String category,
+      {workingCategories = ''}) {
     final messageController = TextEditingController();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
+        String dropdownvalue = workingCategories.toString().split(' ')[0];
         return BottomSheet(
           onClosing: () {},
           builder: (context) {
@@ -94,6 +96,30 @@ class Helper {
                           hintText: 'Enter your message here..',
                         ),
                       ),
+                      if (category.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: DropdownButton(
+                            style: GoogleFonts.lato(fontSize: 16),
+                            value: dropdownvalue,
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            items: workingCategories
+                                .toString()
+                                .split(' ')
+                                .map((String items) {
+                              return DropdownMenuItem(
+                                value: items,
+                                child: Text(
+                                    '${items[0].toUpperCase()}${items.substring(1)}'),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                dropdownvalue = newValue!;
+                              });
+                            },
+                          ),
+                        ),
                       if (errorMessage != '')
                         Column(
                           children: [
@@ -133,6 +159,7 @@ class Helper {
                                     .sendNewRequest(
                               selectedTaskers,
                               messageController.text,
+                              category.isEmpty ? dropdownvalue : category,
                             );
                             if (response.statusCode != 200) {
                               setState(() {
@@ -172,7 +199,7 @@ class Helper {
 
   static void showReportModal(BuildContext context, on, by) {
     final messageController = TextEditingController();
-      showModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) {
@@ -522,13 +549,11 @@ class Helper {
 }
 
 class BaseURL {
-  static const url =
-      // 'http://pairtasker-test.ap-south-1.elasticbeanstalk.com/api';
-      // 'http://192.168.103.47:3000/api';
-      'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
+  static const url = 'http://65.0.31.100/api';
+  // 'http://192.168.97.47:3000/api';
+  // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
-  static const socketURL =
-      // 'http://pairtasker-test.ap-south-1.elasticbeanstalk.com';
-      // 'http://192.168.103.47:3000';
-      'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
+  static const socketURL = 'http://65.0.31.100/';
+  // 'http://192.168.97.47:3000';
+  // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

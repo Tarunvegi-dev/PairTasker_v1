@@ -1,10 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/providers/tasker.dart';
-import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/notifications/notification_widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/widgets.dart';
 import '../../helpers/methods.dart';
 
@@ -18,13 +20,22 @@ class NotificationScreen extends StatefulWidget {
 class _NotificationScreenState extends State<NotificationScreen> {
   var _isInit = true;
   var _isLoading = false;
+  var isTasker = false;
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     if (_isInit) {
       setState(() {
         _isLoading = true;
       });
+      final prefs = await SharedPreferences.getInstance();
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      setState(() {
+        isTasker = userdata['isTasker'] ?? false;
+      });
+      // ignore: use_build_context_synchronously
       Provider.of<Tasker>(context, listen: false).getNotifications().then((_) {
         setState(() {
           _isLoading = false;
@@ -152,7 +163,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const BottomNavBarWidget(3),
+      bottomNavigationBar: isTasker
+          ? const TaskerBottomNavBarWidget(2)
+          : const BottomNavBarWidget(2),
     );
   }
 }

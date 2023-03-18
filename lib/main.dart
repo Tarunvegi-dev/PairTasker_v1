@@ -2,9 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:pairtasker/providers/chat.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/providers/tasker.dart';
+import 'package:pairtasker/screens/privacy_policy.dart';
 import 'helpers/methods.dart';
 import 'screens/screens.dart';
 import 'providers/auth.dart';
@@ -112,6 +115,32 @@ void updateMessages(Map<String, dynamic> message, String taskId) async {
   }
 }
 
+Future<void> updateGeoLocation() async {
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+  }
+
+  Position position = await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
+  final prefs = await SharedPreferences.getInstance();
+  final location = {
+    "latitude": position.latitude,
+    "longitude": position.longitude
+  };
+  prefs.setString('location', jsonEncode(location));
+  final address = await getAddressFromLatLong(position);
+  prefs.setString('address', address);
+}
+
+Future<String> getAddressFromLatLong(Position position) async {
+  List<Placemark> placemarks =
+      await placemarkFromCoordinates(position.latitude, position.longitude);
+  Placemark place = placemarks[0];
+  return '${place.locality}, ${place.administrativeArea}';
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -127,7 +156,7 @@ Future<void> main() async {
     badge: true,
     sound: true,
   );
-
+  updateGeoLocation();
   runApp(const MyApp());
 }
 
@@ -206,7 +235,9 @@ class _MyAppState extends State<MyApp> {
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
           home: auth.isAuth && auth.isSignUpCompleted
-              ? const HomePage()
+              ? auth.isTasker
+                  ? const TaskerDashboard()
+                  : const HomePage()
               : auth.isAuth && !auth.isSignUpCompleted
                   ? const UserFormScreen()
                   : FutureBuilder(
@@ -231,7 +262,9 @@ class _MyAppState extends State<MyApp> {
             '/searchscreen': (context) => const SearchScreen(),
             '/mytaskerprofile': (context) => const MyTaskerProfile(),
             '/terms-and-conditions': (context) => const TermsAndConditions(),
+            '/privacy-policy':(context) => const PrivacyPolicy(),
             '/faq': (context) => const FAQ(),
+            '/loading':(context) => const LoadingScreen(),
             '/taskerform': (context) => const TaskerDetails(
                   workingCategories: [],
                   isUpdating: false,

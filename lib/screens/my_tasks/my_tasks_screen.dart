@@ -136,7 +136,7 @@ class _MyTasksState extends State<MyTasks> {
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBarWidget(4),
+      bottomNavigationBar: const TaskerBottomNavBarWidget(1),
     );
   }
 }

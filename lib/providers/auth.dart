@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,7 @@ import 'chat.dart';
 class Auth with ChangeNotifier {
   String _token = '';
   String _username = '';
+  bool _isTasker = false;
 
   bool get isAuth {
     return _token != '';
@@ -25,11 +28,50 @@ class Auth with ChangeNotifier {
     return _username != '';
   }
 
+  bool get isTasker {
+    return _isTasker;
+  }
+
   String get token {
     if (_token != '') {
       return _token;
     }
     return '';
+  }
+
+  Future<bool> checkIsTasker() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userPref = prefs.getString('userdata');
+    Map<String, dynamic> userdata =
+        jsonDecode(userPref!) as Map<String, dynamic>;
+    _isTasker = userdata['isTasker'] ?? false;
+    notifyListeners();
+    return _isTasker;
+  }
+
+  Future<Response> updateIsTasker() async {
+    const url = '${BaseURL.url}/user/switch-mode';
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': _token,
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      final prefs = await SharedPreferences.getInstance();
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      userdata['isTasker'] = !userdata['isTasker'];
+      _isTasker = !_isTasker;
+      prefs.setString('userdata', jsonEncode(userdata));
+      notifyListeners();
+    }
+
+    return response;
   }
 
   Future<bool> checkisSignUpCompleted() async {
@@ -54,11 +96,14 @@ class Auth with ChangeNotifier {
     _token = token!;
     notifyListeners();
     checkisSignUpCompleted();
+    checkIsTasker();
     return true;
   }
 
   Future<void> logout(BuildContext context) async {
     _token = '';
+    _username = '';
+    _isTasker = false;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -103,7 +148,7 @@ class Auth with ChangeNotifier {
         validateStatus: (_) => true,
       ),
     );
-    
+
     final responseData = response.data;
     if (response.statusCode == 200) {
       _token = responseData['token'];
@@ -112,6 +157,7 @@ class Auth with ChangeNotifier {
       prefs.setString('token', responseData['token']);
       getUserData();
       updateFcmToken();
+      updateGeoLocation();
       // ignore: use_build_context_synchronously
       Provider.of<User>(context, listen: false).getWishlist();
       // ignore: use_build_context_synchronously
@@ -179,6 +225,7 @@ class Auth with ChangeNotifier {
       prefs.setString('token', responseData['token']);
       getUserData();
       updateFcmToken();
+      updateGeoLocation();
       // ignore: use_build_context_synchronously
       Provider.of<User>(context, listen: false).getWishlist();
       // ignore: use_build_context_synchronously
@@ -260,6 +307,32 @@ class Auth with ChangeNotifier {
       ),
     );
     return response;
+  }
+
+  Future<void> updateGeoLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    final prefs = await SharedPreferences.getInstance();
+    final location = {
+      "latitude": position.latitude,
+      "longitude": position.longitude
+    };
+    prefs.setString('location', jsonEncode(location));
+    final address = await getAddressFromLatLong(position);
+    prefs.setString('address', address);
+  }
+
+  Future<String> getAddressFromLatLong(Position position) async {
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemarks[0];
+    return '${place.locality}, ${place.administrativeArea}';
   }
 
   Future<Response> createTasker(List<dynamic> workingCategories) async {

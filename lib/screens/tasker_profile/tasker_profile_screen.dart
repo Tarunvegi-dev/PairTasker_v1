@@ -4,8 +4,9 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/providers/user.dart';
+import 'package:pairtasker/screens/tasker_profile/review_widget.dart';
 import 'package:provider/provider.dart';
-import '../helpers/methods.dart';
+import '../../helpers/methods.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:pairtasker/theme/widgets.dart';
@@ -233,57 +234,55 @@ class _TaskerProfileState extends State<TaskerProfile> {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: ScrollPhysics(),
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color:
-                          Helper.isDark(context) ? Colors.white : Colors.black,
-                      width: 0.2,
-                    ),
+        child: Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Helper.isDark(context) ? Colors.white : Colors.black,
+                    width: 0.2,
                   ),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Icon(
-                        Icons.close,
-                        size: 34,
-                        color: HexColor('99A4AE'),
-                      ),
-                    ),
-                    Text(
-                      'ACTIVE',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: HexColor('32DE84'),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: handleWishlist,
-                      child: Icon(
-                        isWishlisted ? Icons.favorite : Icons.favorite_border,
-                        color: HexColor(isWishlisted ? 'FF033E' : 'FFFFFF'),
-                        size: 34,
-                      ),
-                    )
-                  ],
-                ),
               ),
-              Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 15,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Icon(
+                      Icons.close,
+                      size: 34,
+                      color: HexColor('99A4AE'),
+                    ),
+                  ),
+                  Text(
+                    'ACTIVE',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: HexColor('32DE84'),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: handleWishlist,
+                    child: Icon(
+                      isWishlisted ? Icons.favorite : Icons.favorite_border,
+                      color: HexColor(isWishlisted ? 'FF033E' : 'FFFFFF'),
+                      size: 34,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Expanded(
+              child: Container(
                 decoration: BoxDecoration(
                   color: Helper.isDark(context)
                       ? HexColor('252B30')
@@ -364,9 +363,9 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     ),
                                   ),
                                   onPressed: () => Helper.showRequestModal(
-                                    context,
-                                    [widget.id],
-                                  ),
+                                      context, [widget.id], '',
+                                      workingCategories:
+                                          workingCategories.join(' ')),
                                   child: Text(
                                     'REQUEST',
                                     style: GoogleFonts.lato(
@@ -428,11 +427,11 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                 children: [
                                   Icon(
                                     availability < 33.3
-                                        ? Icons.battery_1_bar
+                                        ? Icons.wifi_1_bar
                                         : availability > 33.33 &&
                                                 availability < 66.66
-                                            ? Icons.battery_3_bar
-                                            : Icons.battery_6_bar,
+                                            ? Icons.wifi_2_bar
+                                            : Icons.wifi,
                                     color: availability < 33.3
                                         ? HexColor('FF033E')
                                         : availability > 33.33 &&
@@ -524,132 +523,49 @@ class _TaskerProfileState extends State<TaskerProfile> {
                       ),
                     ),
                     if (reviewsdata.isEmpty)
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        color: Helper.isDark(context)
-                            ? Colors.black
-                            : Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 15,
-                        ),
-                        child: const Center(
-                          child: Text('NO REVIEWS YET!'),
-                        ),
-                      ),
-                    Container(
-                      margin: const EdgeInsets.only(
-                        top: 4,
-                      ),
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: reviewsdata.length,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (BuildContext context, int i) => Container(
+                      Expanded(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
                           color: Helper.isDark(context)
                               ? Colors.black
                               : Colors.white,
-                          padding: const EdgeInsets.only(
-                            left: 20,
-                            right: 30,
-                            top: 5,
-                            bottom: 20,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 15,
                           ),
-                          margin: const EdgeInsets.only(
-                            bottom: 4,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        height: 32,
-                                        width: 32,
-                                        margin: const EdgeInsets.symmetric(
-                                          vertical: 12,
-                                        ),
-                                        child: CircleAvatar(
-                                          radius: 30,
-                                          backgroundImage: reviewsdata[i]
-                                                          ['user']
-                                                      ['profilePicture'] ==
-                                                  null
-                                              ? const AssetImage(
-                                                  'assets/images/default_user.png',
-                                                )
-                                              : NetworkImage(
-                                                  reviewsdata[i]['user']
-                                                      ['profilePicture'],
-                                                ) as ImageProvider,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            reviewsdata[i]['user']
-                                                ['displayName'],
-                                            style: GoogleFonts.lato(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                          Text(
-                                            '@${reviewsdata[i]['user']['username']}',
-                                            style: GoogleFonts.lato(
-                                              fontSize: 10,
-                                              color: HexColor('#AAABAB'),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    Helper.timeAgo(reviewsdata[i]['createdAt']),
-                                    style: GoogleFonts.lato(
-                                      color: HexColor('99A4AE'),
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(
-                                  left: 10,
-                                ),
-                                child: Text(
-                                  reviewsdata[i]['message'],
-                                  textAlign: TextAlign.start,
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('99A4AE'),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              )
-                            ],
+                          child: const Center(
+                            child: Text('NO REVIEWS YET!'),
                           ),
                         ),
                       ),
-                    )
+                    if (reviewsdata.isNotEmpty)
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.only(
+                            top: 4,
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: reviewsdata.length,
+                            itemBuilder: (BuildContext context, int i) =>
+                                Review(
+                              profilePicture: reviewsdata[i]['user']
+                                  ['profilePicture'],
+                              displayName: reviewsdata[i]['user']
+                                  ['displayName'],
+                              username: reviewsdata[i]['user']['username'],
+                              message: reviewsdata[i]['message'],
+                              createdAt:
+                                  Helper.timeAgo(reviewsdata[i]['createdAt']),
+                            ),
+                          ),
+                        ),
+                      )
                   ],
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
       floatingActionButton: ElevatedButton(

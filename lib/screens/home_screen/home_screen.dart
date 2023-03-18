@@ -7,6 +7,8 @@ import 'package:pairtasker/screens/home_screen/drawer.dart';
 import 'package:pairtasker/screens/home_screen/tasker_widget.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../providers/auth.dart';
 import 'recents.dart';
 import '../../helpers/methods.dart';
 
@@ -19,19 +21,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> key = GlobalKey();
+  final List<dynamic> _workingCategories = ['deliveryboy'];
+  List<dynamic> filteredTaskers = [];
   var _isInit = true;
   var _isLoading = false;
   String sortCategory = 'rating';
+  String address = '';
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
+    final prefs = await SharedPreferences.getInstance();
+    final a = prefs.getString('address');
+    setState(() {
+      address = a.toString();
+    });
     if (_isInit) {
       setState(() {
         _isLoading = true;
       });
-      Provider.of<User>(context).getTaskers().then((_) {
+      // ignore: use_build_context_synchronously
+      Provider.of<Auth>(context, listen: false).updateGeoLocation();
+      searchTaskers().then((_) {
         setState(() {
           _isLoading = false;
+          address = a.toString();
         });
       });
     }
@@ -62,6 +75,25 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _refreshTaskers() async {
     await Provider.of<User>(context, listen: false).getTaskers();
+  }
+
+  Future<void> searchTaskers() async {
+    final response = await Provider.of<User>(context, listen: false).getTaskers(
+      search: true,
+      keyword: '',
+      workingCategories: _workingCategories.join(" "),
+    );
+    setState(() {
+      filteredTaskers = response;
+    });
+  }
+
+  void manageWorkingCategories(category) {
+    setState(() {
+      _workingCategories.removeRange(0, _workingCategories.length);
+      _workingCategories.add(category.toString().trim());
+    });
+    searchTaskers();
   }
 
   void showSort() {
@@ -179,8 +211,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final taskersdata = Provider.of<User>(context);
-    final loadedTaskers = taskersdata.taskers;
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       drawer: const DrawerWidget(),
@@ -240,8 +270,11 @@ class _HomePageState extends State<HomePage> {
                               color: HexColor('#007FFF'),
                               size: 20,
                             ),
+                            const SizedBox(
+                              width: 3,
+                            ),
                             Text(
-                              'Guntur, AP',
+                              address,
                               style: GoogleFonts.lato(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -313,8 +346,137 @@ class _HomePageState extends State<HomePage> {
                   onRefresh: _refreshTaskers,
                   child: Column(
                     children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                        width: MediaQuery.of(context).size.width,
+                        height: 60,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            InkWell(
+                              onTap: () => manageWorkingCategories('Mechanic'),
+                              child: Container(
+                                width: 100,
+                                margin: const EdgeInsets.only(right: 5),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 1,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _workingCategories.contains('Mechanic')
+                                      ? HexColor('007FFF')
+                                      : Helper.isDark(context)
+                                          ? const Color.fromRGBO(
+                                              255, 255, 255, 0.1)
+                                          : const Color.fromRGBO(0, 0, 0, 0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'Mechanic',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () =>
+                                  manageWorkingCategories('deliveryboy'),
+                              child: Container(
+                                width: 100,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 1,
+                                ),
+                                margin: const EdgeInsets.only(right: 5),
+                                decoration: BoxDecoration(
+                                  color: _workingCategories
+                                          .contains('deliveryboy')
+                                      ? HexColor('007FFF')
+                                      : Helper.isDark(context)
+                                          ? const Color.fromRGBO(
+                                              255, 255, 255, 0.1)
+                                          : const Color.fromRGBO(0, 0, 0, 0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'Delivery Boy',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () =>
+                                  manageWorkingCategories('Photographer'),
+                              child: Container(
+                                width: 100,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 1,
+                                ),
+                                margin: const EdgeInsets.only(right: 5),
+                                decoration: BoxDecoration(
+                                  color: _workingCategories
+                                          .contains('Photographer')
+                                      ? HexColor('007FFF')
+                                      : Helper.isDark(context)
+                                          ? const Color.fromRGBO(
+                                              255, 255, 255, 0.1)
+                                          : const Color.fromRGBO(0, 0, 0, 0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'Photographer',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () => manageWorkingCategories('Rider'),
+                              child: Container(
+                                width: 100,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 1,
+                                ),
+                                margin: const EdgeInsets.only(right: 5),
+                                decoration: BoxDecoration(
+                                  color: _workingCategories.contains('Rider')
+                                      ? HexColor('007FFF')
+                                      : Helper.isDark(context)
+                                          ? const Color.fromRGBO(
+                                              255, 255, 255, 0.1)
+                                          : const Color.fromRGBO(0, 0, 0, 0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'Rider',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       const Recents(),
-                      if (loadedTaskers.isEmpty && !_isLoading)
+                      if (filteredTaskers.isEmpty && !_isLoading)
                         Container(
                           width: MediaQuery.of(context).size.width,
                           color: Helper.isDark(context)
@@ -330,23 +492,24 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ListView.builder(
                         shrinkWrap: true,
-                        itemCount: loadedTaskers.length,
+                        itemCount: filteredTaskers.length,
                         itemBuilder: (ctx, i) => TaskerWidget(
                           index: i,
-                          username: loadedTaskers[i]['user']['username'],
-                          availability: loadedTaskers[i]['availability'],
-                          id: loadedTaskers[i]['id'],
-                          displayName: loadedTaskers[i]['user']['displayName'],
-                          workingCategories: loadedTaskers[i]
+                          username: filteredTaskers[i]['user']['username'],
+                          availability: filteredTaskers[i]['availability'],
+                          id: filteredTaskers[i]['id'],
+                          displayName: filteredTaskers[i]['user']
+                              ['displayName'],
+                          workingCategories: filteredTaskers[i]
                               ['workingCategories'],
-                          rating: loadedTaskers[i]['rating'].toString(),
-                          saves: loadedTaskers[i]['saves'].toString(),
-                          tasks: loadedTaskers[i]['totalTasks'].toString(),
-                          profilePicture: loadedTaskers[i]['user']
+                          rating: filteredTaskers[i]['rating'].toString(),
+                          saves: filteredTaskers[i]['saves'].toString(),
+                          tasks: filteredTaskers[i]['totalTasks'].toString(),
+                          profilePicture: filteredTaskers[i]['user']
                               ['profilePicture'],
                           selectedTaskers: selectedTaskers,
                           isSelected: selectedTaskers
-                                  .contains(loadedTaskers[i]['id']) !=
+                                  .contains(filteredTaskers[i]['id']) !=
                               false,
                           selectTaskers: selectTaskers,
                         ),
@@ -400,9 +563,7 @@ class _HomePageState extends State<HomePage> {
                       backgroundColor: HexColor('007FFF'),
                     ),
                     onPressed: () => Helper.showRequestModal(
-                      context,
-                      selectedTaskers,
-                    ),
+                        context, selectedTaskers, _workingCategories.join('')),
                     child: Text(
                       'Request',
                       style: GoogleFonts.lato(

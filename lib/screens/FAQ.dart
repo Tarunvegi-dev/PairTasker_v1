@@ -11,57 +11,55 @@ class FAQ extends StatelessWidget {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
-          child: SingleChildScrollView(
-        physics: const ScrollPhysics(),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Helper.isDark(context) ? Colors.white : Colors.black,
-                    width: 0.2,
-                  ),
+          child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 8 / 100,
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Helper.isDark(context) ? Colors.white : Colors.black,
+                  width: 0.2,
                 ),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 20,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Icon(
-                          Icons.arrow_back,
-                          size: 30,
-                          color: HexColor('99A4AE'),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Text(
-                        'Frequently Asked Questions',
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
             ),
-            Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 20,
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 30,
+                        color: HexColor('99A4AE'),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Frequently Asked Questions',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Container(
               padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: ListView(
                 children: [
                   Align(
                     alignment: Alignment.topLeft,
@@ -404,9 +402,9 @@ class FAQ extends StatelessWidget {
                   ),
                 ],
               ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       )),
     );
   }

@@ -34,7 +34,7 @@ class _MyProfileState extends State<MyProfile> {
 
   bool _isTasker = false;
   bool _isEditing = false;
-  Map<String, dynamic> _userdata = {};  
+  Map<String, dynamic> _userdata = {};
   bool isLoading = false;
   var error = '';
   var _isinit = true;
@@ -220,7 +220,6 @@ class _MyProfileState extends State<MyProfile> {
     });
     _cropImage();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -587,7 +586,23 @@ class _MyProfileState extends State<MyProfile> {
                                 color: HexColor('007FFF'),
                               ),
                             ),
-                          ),                          
+                          ),
+                        if (_isTasker)
+                          Container(
+                            margin: const EdgeInsets.only(
+                              bottom: 20,
+                            ),
+                            child: TextButton(
+                              onPressed: () {},
+                              child: Text(
+                                'Delete tasker account',
+                                style: GoogleFonts.lato(
+                                  fontSize: 14,
+                                  color: HexColor('FF033E'),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

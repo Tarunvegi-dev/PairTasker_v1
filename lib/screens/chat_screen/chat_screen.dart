@@ -831,7 +831,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     children: [
                       Container(
                         width: widget.screenType == 'user'
-                            ? MediaQuery.of(context).size.width * 68 / 100
+                            ? MediaQuery.of(context).size.width * 66 / 100
                             : isMessageEmpty
                                 ? MediaQuery.of(context).size.width * 64 / 100
                                 : MediaQuery.of(context).size.width * 74 / 100,
@@ -1075,7 +1075,10 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             if (taskStatus == 3 && widget.screenType == 'user')
               Container(
-                margin: const EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(
+                  bottom: 10,
+                  top: 15,
+                ),
                 width: MediaQuery.of(context).size.width * 90 / 100,
                 height: 43,
                 child: ElevatedButton(
@@ -1359,6 +1362,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop();
+                                                              } else {
+                                                                setState(() {
+                                                                  errorMessage =
+                                                                      res.data[
+                                                                          'message'];
+                                                                  isVerifying =
+                                                                      false;
+                                                                });
                                                               }
                                                             },
                                                       style: ElevatedButton

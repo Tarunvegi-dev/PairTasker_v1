@@ -103,7 +103,7 @@ class User with ChangeNotifier {
     return responsedata;
   }
 
-  Future<Response> sendNewRequest(List<dynamic> taskers, String message) async {
+  Future<Response> sendNewRequest(List<dynamic> taskers, String message, String category) async {
     const url = '${BaseURL.url}/user/send-request';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -112,6 +112,7 @@ class User with ChangeNotifier {
       data: {
         'taskers': taskers,
         'message': message,
+        'category': category,
       },
       options: Options(
         validateStatus: (_) => true,
@@ -120,6 +121,8 @@ class User with ChangeNotifier {
         },
       ),
     );
+    print(response.data);
+    print(category);
     getMyRequests(active: true);
 
     return response;

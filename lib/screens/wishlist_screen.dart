@@ -109,6 +109,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     shrinkWrap: true,
                     itemCount: loadedTaskers.length,
                     itemBuilder: (ctx, i) => TaskerWidget(
+                      isWishlist: true,
                       index: i,
                       username: loadedTaskers[i]['user']['username'],
                       availability: loadedTaskers[i]['availability'],
@@ -133,63 +134,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: selectedTaskers.isNotEmpty
-          ? Row(
-              children: [
-                SizedBox(
-                  height: 56,
-                  width: MediaQuery.of(context).size.width * 50 / 100,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: HexColor('F2F2F3'),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        selectedTaskers = [];
-                      });
-                    },
-                    child: Text(
-                      'Cancel',
-                      style: GoogleFonts.lato(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: HexColor('99A4AE'),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 56,
-                  width: MediaQuery.of(context).size.width * 50 / 100,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
-                      ),
-                      backgroundColor: HexColor('007FFF'),
-                    ),
-                    onPressed: () => Helper.showRequestModal(
-                      context,
-                      selectedTaskers,
-                    ),
-                    child: Text(
-                      'Request',
-                      style: GoogleFonts.lato(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: HexColor('FFFFFF'),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            )
-          : const BottomNavBarWidget(1),
+      bottomNavigationBar: const BottomNavBarWidget(3),
     );
   }
 }

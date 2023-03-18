@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pairtasker/screens/tasker_profile/tasker_profile_screen.dart';
+import 'package:pairtasker/screens/chat_screen/chat_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:pairtasker/providers/user.dart';
+import 'package:pairtasker/providers/tasker.dart';
 
-class Recents extends StatefulWidget {
-  const Recents({super.key});
+class ActiveTasks extends StatefulWidget {
+  const ActiveTasks({super.key});
 
   @override
-  State<Recents> createState() => _RecentsState();
+  State<ActiveTasks> createState() => _ActiveTasksState();
 }
 
-class _RecentsState extends State<Recents> {
+class _ActiveTasksState extends State<ActiveTasks> {
   var _isInit = true;
   var _isLoading = false;
-  List<dynamic> recentTaskers = [];
+  List<dynamic> activeTasks = [];
 
   @override
   void didChangeDependencies() async {
@@ -23,13 +23,10 @@ class _RecentsState extends State<Recents> {
       setState(() {
         _isLoading = true;
       });
-      final response = await Provider.of<User>(context).getRecentTaskers();
-      if (response.statusCode == 200) {
-        setState(() {
-          recentTaskers = response.data['data'];
-        });
-      }
+      final response =
+          await Provider.of<Tasker>(context).getMyTasks(active: true);
       setState(() {
+        activeTasks = response['active'];
         _isLoading = false;
       });
     }
@@ -39,7 +36,7 @@ class _RecentsState extends State<Recents> {
 
   @override
   Widget build(BuildContext context) {
-    if (recentTaskers.isNotEmpty) {
+    if (activeTasks.isNotEmpty) {
       return SizedBox(
         width: MediaQuery.of(context).size.width * 100,
         height: MediaQuery.of(context).size.height * 16 / 100,
@@ -52,7 +49,7 @@ class _RecentsState extends State<Recents> {
                 vertical: 15,
               ),
               child: Text(
-                'Recents',
+                'Active Tasks',
                 style: GoogleFonts.lato(
                   color: HexColor('#AAABAB'),
                   fontSize: 14,
@@ -71,12 +68,13 @@ class _RecentsState extends State<Recents> {
                     const MaterialScrollBehavior().copyWith(overscroll: false),
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: recentTaskers.length,
+                  itemCount: activeTasks.length,
                   itemBuilder: (BuildContext context, int i) => InkWell(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => TaskerProfile(
-                          id: recentTaskers[i]['id'],
+                        builder: (context) => ChatScreen(
+                          screenType: 'tasker',
+                          taskId: activeTasks[i]['id'],
                         ),
                       ),
                     ),
@@ -89,13 +87,13 @@ class _RecentsState extends State<Recents> {
                           Stack(children: [
                             CircleAvatar(
                               radius: 25,
-                              backgroundImage: recentTaskers[i]['user']
+                              backgroundImage: activeTasks[i]['user']
                                           ['profilePicture'] ==
                                       null
                                   ? const AssetImage(
                                       'assets/images/default_user.png',
                                     )
-                                  : NetworkImage(recentTaskers[i]['user']
+                                  : NetworkImage(activeTasks[i]['user']
                                       ['profilePicture']) as ImageProvider,
                             ),
                             Positioned(
@@ -105,9 +103,9 @@ class _RecentsState extends State<Recents> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: HexColor(
-                                    recentTaskers[i]['isOnline'] == true
-                                        ? '#32DE84'
-                                        : 'FF033E',
+                                    activeTasks[i]['status'] == "1"
+                                        ? '#FFC72C'
+                                        : '007FFF',
                                   ),
                                 ),
                                 width: 10,
@@ -119,7 +117,7 @@ class _RecentsState extends State<Recents> {
                             height: 7,
                           ),
                           Text(
-                            recentTaskers[i]['user']['displayName'],
+                            activeTasks[i]['user']['displayName'],
                             style: const TextStyle(
                               fontSize: 10,
                             ),

@@ -33,11 +33,41 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         username = userdata['username'] ?? '';
         displayName = userdata['displayName'] ?? '';
         profilePicture = userdata['profilePicture'] ?? '';
-        isTasker = userdata['isTasker'] ?? false;
+        isTasker = Provider.of<Auth>(context, listen: false).isTasker;
       });
     }
     _isinit = false;
     super.didChangeDependencies();
+  }
+
+  void switchMode() {
+    Navigator.of(context).pushNamed('/loading');
+    Future.delayed(const Duration(seconds: 5), () async {
+      final response =
+          await Provider.of<Auth>(context, listen: false).updateIsTasker();
+      if (response.statusCode == 200) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pop();
+        // ignore: use_build_conteFxt_synchronously, use_build_context_synchronously
+        Navigator.of(context).pushNamed('/');
+      } else {
+        if (response.data['hasAccount'] == false) {
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: HexColor('FF033E'),
+            content: Text(
+              'You are currently not a tasker, please create a tasker account to continue',
+              style: GoogleFonts.poppins(
+                // ignore: use_build_context_synchronously
+                color: Helper.isDark(context) ? Colors.white : Colors.black,
+              ),
+            ),
+          ));
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pushNamed('/taskerform');
+        }
+      }
+    });
   }
 
   @override
@@ -149,46 +179,44 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         ),
                       ),
                     ),
-                    if (isTasker)
-                      InkWell(
-                        onTap: () =>
-                            Navigator.of(context).pushNamed('/mytaskerprofile'),
-                        child: Container(
-                          color: Helper.isDark(context)
-                              ? Colors.black
-                              : Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 15,
-                            horizontal: 27,
-                          ),
-                          margin: const EdgeInsets.only(
-                            bottom: 5,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Image.asset(
-                                'assets/images/icons/drawer/tasker_mode.png',
-                                width: 24,
-                                height: 24,
+                    InkWell(
+                      onTap: switchMode,
+                      child: Container(
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 27,
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/images/icons/drawer/switch.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              'Switch to ${isTasker ? 'User' : 'Tasker'}',
+                              style: GoogleFonts.lato(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              Text(
-                                'Tasker Profile',
-                                style: GoogleFonts.lato(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
+                    ),
                     InkWell(
                       onTap: () => Navigator.of(context).pushNamed(
-                        '/terms-and-conditions',
+                        '/privacy-policy',
                       ),
                       child: Container(
                         color: Helper.isDark(context)
@@ -205,7 +233,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Image.asset(
-                              'assets/images/icons/drawer/terms-and-conditions.png',
+                              'assets/images/icons/drawer/privacy-policy.png',
                               width: 24,
                               height: 24,
                             ),
@@ -213,7 +241,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               width: 20,
                             ),
                             Text(
-                              'Terms & Conditions',
+                              'Privacy Policy',
                               style: GoogleFonts.lato(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

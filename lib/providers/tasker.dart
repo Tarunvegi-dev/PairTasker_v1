@@ -58,7 +58,7 @@ class Tasker extends ChangeNotifier {
       prefs.setString('tasks', jsonEncode(tasksData));
       return tasksData;
     }
-  
+
     if (response.statusCode == 200 && responsedata['status'] != false) {
       prefs.setString('tasks', jsonEncode(responsedata['data']));
     }
@@ -68,6 +68,23 @@ class Tasker extends ChangeNotifier {
 
   Future<Response> getTaskerDetails(id) async {
     var url = '${BaseURL.url}/tasker/get-tasker-details/$id';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
+
+    return response;
+  }
+
+  Future<Response> getTaskerMetrics() async {
+    var url = '${BaseURL.url}/tasker/get-metrics';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().get(
