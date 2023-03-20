@@ -57,7 +57,7 @@ class _TaskerDetailsState extends State<TaskerDetails> {
         isLoading = false;
       });
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/home');
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 

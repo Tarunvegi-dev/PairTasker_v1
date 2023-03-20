@@ -48,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/home');
+      Navigator.of(context).pushReplacementNamed('/');
     }
   }
 

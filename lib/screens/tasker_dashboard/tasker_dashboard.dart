@@ -183,7 +183,9 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                                     width: 3,
                                   ),
                                   Text(
-                                    address,
+                                    address != 'null'
+                                        ? address
+                                        : 'Andhra Pradesh',
                                     style: GoogleFonts.lato(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,

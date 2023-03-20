@@ -549,11 +549,13 @@ class Helper {
 }
 
 class BaseURL {
-  static const url = 'http://65.0.31.100/api';
-  // 'http://192.168.97.47:3000/api';
+  static const url = 
+  'http://65.0.31.100/api';
+  // 'http://192.168.248.47:3000/api';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
-  static const socketURL = 'http://65.0.31.100/';
-  // 'http://192.168.97.47:3000';
+  static const socketURL = 
+  'http://65.0.31.100/';
+  // 'http://192.168.248.47:3000';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

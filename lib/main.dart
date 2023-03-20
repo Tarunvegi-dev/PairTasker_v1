@@ -28,6 +28,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
+@pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   if (message.data['type'] == 'task-completion') {
@@ -88,6 +89,31 @@ Future<Map<String, dynamic>> getMyTasks() async {
   return responsedata;
 }
 
+Future<void> updateChats(String taskId, String type) async {
+  var url = '${BaseURL.url}/$type/get-task-details';
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  final response = await Dio().post(
+    url,
+    data: {
+      "taskId": taskId,
+      "chats": true,
+    },
+    options: Options(
+      validateStatus: (_) => true,
+      headers: {
+        'token': token,
+      },
+    ),
+  );
+
+  if (response.statusCode == 200) {
+    List<dynamic> chatsData = [];
+    chatsData = response.data['data']['chats'];
+    prefs.setString(taskId, jsonEncode(chatsData));
+  }
+}
+
 void updateMessages(Map<String, dynamic> message, String taskId) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.reload();
@@ -98,9 +124,11 @@ void updateMessages(Map<String, dynamic> message, String taskId) async {
     await prefs.remove(taskId);
     prefs.setString(taskId, jsonEncode(chatsData));
   } else {
-    List<dynamic> chatsData = [];
-    chatsData.add(message);
-    prefs.setString(taskId, jsonEncode(chatsData));
+    if (message['screenType'] == 'user') {
+      updateChats(taskId, 'tasker');
+    } else {
+      updateChats(taskId, 'user');
+    }
   }
   if (prefs.containsKey('unread-messages')) {
     final pendingPref = prefs.getString('unread-messages');
@@ -208,6 +236,31 @@ class _MyAppState extends State<MyApp> {
         });
       }
     });
+
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        RemoteNotification? notification = message.notification;
+        AndroidNotification? android = message.notification?.android;
+        if (message.data['type'] == 'task') {
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await navigatorKey.currentState!.push(MaterialPageRoute(
+              builder: (context) => const NotificationScreen(),
+            ));
+          });
+        } else {
+          final page = ChatScreen(
+            screenType:
+                message.data['screenType'] == 'user' ? 'tasker' : 'user',
+            taskId: message.data['taskId'],
+          );
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            await navigatorKey.currentState!.push(MaterialPageRoute(
+              builder: (context) => page,
+            ));
+          });
+        }
+      }
+    });
     super.initState();
   }
 
@@ -262,9 +315,9 @@ class _MyAppState extends State<MyApp> {
             '/searchscreen': (context) => const SearchScreen(),
             '/mytaskerprofile': (context) => const MyTaskerProfile(),
             '/terms-and-conditions': (context) => const TermsAndConditions(),
-            '/privacy-policy':(context) => const PrivacyPolicy(),
+            '/privacy-policy': (context) => const PrivacyPolicy(),
             '/faq': (context) => const FAQ(),
-            '/loading':(context) => const LoadingScreen(),
+            '/loading': (context) => const LoadingScreen(),
             '/taskerform': (context) => const TaskerDetails(
                   workingCategories: [],
                   isUpdating: false,

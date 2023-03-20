@@ -46,7 +46,7 @@ class Auth with ChangeNotifier {
         jsonDecode(userPref!) as Map<String, dynamic>;
     _isTasker = userdata['isTasker'] ?? false;
     notifyListeners();
-    return _isTasker;
+    return userdata['isTasker'];
   }
 
   Future<Response> updateIsTasker() async {

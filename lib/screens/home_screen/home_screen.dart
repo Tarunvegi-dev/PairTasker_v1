@@ -73,10 +73,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future<void> _refreshTaskers() async {
-    await Provider.of<User>(context, listen: false).getTaskers();
-  }
-
   Future<void> searchTaskers() async {
     final response = await Provider.of<User>(context, listen: false).getTaskers(
       search: true,
@@ -274,7 +270,7 @@ class _HomePageState extends State<HomePage> {
                               width: 3,
                             ),
                             Text(
-                              address,
+                              address != 'null' ? address : 'Andhra Pradesh',
                               style: GoogleFonts.lato(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -343,7 +339,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 child: RefreshIndicator(
-                  onRefresh: _refreshTaskers,
+                  onRefresh: searchTaskers,
                   child: Column(
                     children: [
                       Container(
