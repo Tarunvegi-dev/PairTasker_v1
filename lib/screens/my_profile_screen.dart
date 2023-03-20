@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/providers/auth.dart';
+import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/theme/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:pairtasker/theme/widgets.dart';
@@ -219,6 +220,84 @@ class _MyProfileState extends State<MyProfile> {
       _storedImage = File(imageFile.path);
     });
     _cropImage();
+  }
+
+  void deleteTaskerAccount() async {
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            height: 200,
+            color: Helper.isDark(context)
+                ? HexColor('252B30')
+                : HexColor('DEE0E0'),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Text(
+                  'Are you sure want to delete your tasker account?',
+                  style: GoogleFonts.lato(
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'confirming this action will make you lose your tasker profile, your tasks, every data related to your tasker account.',
+                  style: GoogleFonts.lato(
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: const Text('Yes'),
+                      onPressed: () async {
+                        final response = await Provider.of<Auth>(
+                          context,
+                          listen: false,
+                        ).deleteTaskerAccount();
+                        if (response.statusCode == 200) {
+                          _isTasker = false;
+                          // ignore: use_build_context_synchronously
+                          Navigator.of(context).pushNamed('/home');
+                          // ignore: use_build_context_synchronously
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            backgroundColor: HexColor('FF033E'),
+                            content: Text(
+                              response.data['message'],
+                              style: GoogleFonts.poppins(
+                                color:
+                                    // ignore: use_build_context_synchronously
+                                    Helper.isDark(context)
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
+                            ),
+                          ));
+                        }
+                      },
+                    ),
+                    TextButton(
+                      child: const Text('No'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -593,7 +672,7 @@ class _MyProfileState extends State<MyProfile> {
                               bottom: 20,
                             ),
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: deleteTaskerAccount,
                               child: Text(
                                 'Delete tasker account',
                                 style: GoogleFonts.lato(

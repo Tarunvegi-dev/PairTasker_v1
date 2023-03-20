@@ -24,20 +24,13 @@ class TaskWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final page = ChatScreen(
-      screenType: 'tasker',
-      taskId: id,
-    );
     return InkWell(
-      onTap: () => Navigator.of(context)
-          .push(
-        MaterialPageRoute(builder: (context) => page),
-      )
-          .then(
-        (value) {
-          fetchTasks();
-        },
-      ),
+      onTap: () => Navigator.of(context).pushNamed('/chatscreen', arguments: {
+        "screenType": 'tasker',
+        "taskId": id.toString(),
+      }).then((value) {
+        fetchTasks();
+      }),
       child: Container(
         color: Helper.isDark(context) ? Colors.black : Colors.white,
         margin: const EdgeInsets.only(bottom: 5),

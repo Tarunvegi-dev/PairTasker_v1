@@ -203,6 +203,24 @@ class _MyAppState extends State<MyApp> {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification notification = message.notification!;
       AndroidNotification? android = message.notification?.android;
+      String? currentPath;
+      navigatorKey.currentState?.popUntil((route) {
+        currentPath = route.settings.name;
+        return true;
+      });
+      if (currentPath != '/chatscreen') {
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name,
+                channelDescription: channel.description,
+                playSound: true,
+                icon: '@drawable/notification_icon'),
+          ),
+        );
+      }
       if (message.data['type'] == 'task-completion') {
         getMyRequests();
       }
@@ -225,14 +243,12 @@ class _MyAppState extends State<MyApp> {
           ));
         });
       } else {
-        final page = ChatScreen(
-          screenType: message.data['screenType'] == 'user' ? 'tasker' : 'user',
-          taskId: message.data['taskId'],
-        );
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          await navigatorKey.currentState!.push(MaterialPageRoute(
-            builder: (context) => page,
-          ));
+          await navigatorKey.currentState!.pushNamed('/chatscreen', arguments: {
+            "screenType":
+                message.data['screenType'] == 'user' ? 'tasker' : 'user',
+            "taskId": message.data['taskId'],
+          });
         });
       }
     });
@@ -248,15 +264,13 @@ class _MyAppState extends State<MyApp> {
             ));
           });
         } else {
-          final page = ChatScreen(
-            screenType:
-                message.data['screenType'] == 'user' ? 'tasker' : 'user',
-            taskId: message.data['taskId'],
-          );
           WidgetsBinding.instance.addPostFrameCallback((_) async {
-            await navigatorKey.currentState!.push(MaterialPageRoute(
-              builder: (context) => page,
-            ));
+            await navigatorKey.currentState!
+                .pushNamed('/chatscreen', arguments: {
+              "screenType":
+                  message.data['screenType'] == 'user' ? 'tasker' : 'user',
+              "taskId": message.data['taskId'],
+            });
           });
         }
       }
@@ -304,6 +318,7 @@ class _MyAppState extends State<MyApp> {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),
             '/home': (context) => const HomePage(),
+            '/tasker-dashboard': (context) => const TaskerDashboard(),
             '/userform': (context) => const UserFormScreen(),
             '/wishlist': (context) => const WishlistScreen(),
             '/notifications': (context) => const NotificationScreen(),

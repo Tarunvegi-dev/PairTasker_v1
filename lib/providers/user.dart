@@ -18,7 +18,8 @@ class User with ChangeNotifier {
       bool sort = false,
       String keyword = '',
       String workingCategories = '',
-      String sortBy = 'rating'}) async {
+      String sortBy = 'rating',
+      String page = "1"}) async {
     var url = '${BaseURL.url}/user/get-taskers';
     if (search && keyword.isNotEmpty) {
       url += '?keyword=$keyword';
@@ -30,7 +31,8 @@ class User with ChangeNotifier {
       data: {
         "workingCategories":
             workingCategories.isEmpty ? [] : workingCategories.split(' '),
-        "sortBy": sortBy
+        "sortBy": sortBy,
+        "page": page,
       },
       options: Options(
         validateStatus: (_) => true,
@@ -39,7 +41,7 @@ class User with ChangeNotifier {
         },
       ),
     );
-  
+
     final responsedata = response.data;
     if (!search || sort) {
       if (response.statusCode == 200) {
@@ -103,7 +105,8 @@ class User with ChangeNotifier {
     return responsedata;
   }
 
-  Future<Response> sendNewRequest(List<dynamic> taskers, String message, String category) async {
+  Future<Response> sendNewRequest(
+      List<dynamic> taskers, String message, String category) async {
     const url = '${BaseURL.url}/user/send-request';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -121,8 +124,6 @@ class User with ChangeNotifier {
         },
       ),
     );
-    print(response.data);
-    print(category);
     getMyRequests(active: true);
 
     return response;

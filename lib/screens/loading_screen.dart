@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -6,6 +8,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/helpers/methods.dart';
 import 'package:pairtasker/providers/auth.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -16,14 +19,20 @@ class LoadingScreen extends StatefulWidget {
 
 class _LoadingScreenState extends State<LoadingScreen> {
   var newMode;
+  String gender = 'male';
   double userModeHeight = 0;
   double taskerModeHeight = 0;
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     final mode =
         Provider.of<Auth>(context, listen: false).isTasker ? 'User' : 'Tasker';
+    final prefs = await SharedPreferences.getInstance();
+    final userPref = prefs.getString('userdata');
+    Map<String, dynamic> userdata =
+        jsonDecode(userPref!) as Map<String, dynamic>;
     setState(() {
+      gender = userdata['gender'];
       newMode = mode;
       userModeHeight = mode == 'Tasker' ? 300.0 : 0;
       taskerModeHeight = mode == 'User' ? 300.0 : 0;
@@ -56,7 +65,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   ),
                   height: userModeHeight,
                   child: Image.asset(
-                    'assets/images/icons/User.png',
+                    'assets/images/icons/user_$gender.png',
                     width: 230,
                     height: 230,
                   ),

@@ -50,7 +50,7 @@ class TaskerWidget extends StatelessWidget {
         .split(' ');
     return InkWell(
       onLongPress: () => isSelected || isWishlist ? null : selectTaskers(id),
-      onTap: () => isSelected || selectedTaskers.isNotEmpty || !isWishlist
+      onTap: () => (isSelected || selectedTaskers.isNotEmpty) && !isWishlist
           ? selectTaskers(id)
           : null,
       child: Container(

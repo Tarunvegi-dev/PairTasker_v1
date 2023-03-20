@@ -97,12 +97,12 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
     setState(() {
       taskerMode = status;
     });
-    final response = await Provider.of<Tasker>(context, listen: false)
+    final response = await Provider.of<Tasker>(context, listen: false)  
         .setTaskerOnline(status);
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
+          backgroundColor: taskerMode ? HexColor('00CE15') : HexColor('FF033E'),
           content: Text(
             response.data['message'],
             style: GoogleFonts.poppins(

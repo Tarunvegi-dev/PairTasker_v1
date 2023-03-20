@@ -70,14 +70,11 @@ class _ActiveTasksState extends State<ActiveTasks> {
                   scrollDirection: Axis.horizontal,
                   itemCount: activeTasks.length,
                   itemBuilder: (BuildContext context, int i) => InkWell(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          screenType: 'tasker',
-                          taskId: activeTasks[i]['id'],
-                        ),
-                      ),
-                    ),
+                    onTap: () => Navigator.of(context)
+                        .pushNamed('/chatscreen', arguments: {
+                      "screenType": 'tasker',
+                      "taskId": activeTasks[i]['id'],
+                    }),
                     child: Container(
                       margin: const EdgeInsets.only(
                         right: 25,

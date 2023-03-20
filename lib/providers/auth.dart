@@ -13,8 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/methods.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-import 'chat.dart';
-
 class Auth with ChangeNotifier {
   String _token = '';
   String _username = '';
@@ -111,7 +109,7 @@ class Auth with ChangeNotifier {
     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
-  Future<Response> getUserData() async {
+  Future<Response> getUserData(BuildContext context) async {
     const url = '${BaseURL.url}/user/get-user';
 
     final response = await Dio().get(
@@ -127,9 +125,17 @@ class Auth with ChangeNotifier {
     final responseData = response.data;
     if (response.statusCode == 200 && responseData['username'] != null) {
       _username = responseData['username'];
+      _isTasker = response.data['isTasker'];
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('userdata', jsonEncode(responseData));
+      if (response.data['isTasker'] == true) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pushReplacementNamed('/tasker-dashboard');
+      } else {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pushReplacementNamed('/home');
+      }
     }
     return response;
   }
@@ -155,7 +161,8 @@ class Auth with ChangeNotifier {
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
-      getUserData();
+      // ignore: use_build_context_synchronously
+      getUserData(context);
       updateFcmToken();
       updateGeoLocation();
       // ignore: use_build_context_synchronously
@@ -223,7 +230,8 @@ class Auth with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
       prefs.setString('token', responseData['token']);
-      getUserData();
+      // ignore: use_build_context_synchronously
+      getUserData(context);
       updateFcmToken();
       updateGeoLocation();
       // ignore: use_build_context_synchronously
@@ -349,7 +357,6 @@ class Auth with ChangeNotifier {
         },
       ),
     );
-
     final responseData = response.data;
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
@@ -359,6 +366,8 @@ class Auth with ChangeNotifier {
       userdata['isTasker'] = true;
       userdata['tasker'] = responseData['data'];
       prefs.setString('userdata', jsonEncode(userdata));
+      _isTasker = true;
+      notifyListeners();
     }
     return response;
   }
@@ -388,6 +397,32 @@ class Auth with ChangeNotifier {
         userdata['tasker']['bio'] = taskerdata['bio'];
       }
       prefs.setString('userdata', jsonEncode(userdata));
+    }
+    return response;
+  }
+
+  Future<Response> deleteTaskerAccount() async {
+    const url = '${BaseURL.url}/user/tasker-account';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().delete(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      final prefs = await SharedPreferences.getInstance();
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      userdata['isTasker'] = false;
+      prefs.setString('userdata', jsonEncode(userdata));
+      _isTasker = false;
+      notifyListeners();
     }
     return response;
   }

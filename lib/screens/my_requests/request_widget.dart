@@ -23,18 +23,11 @@ class RequestWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final page = ChatScreen(
-      screenType: 'user',
-      taskId: id.toString(),
-    );
     return InkWell(
-      onTap: () => Navigator.of(context)
-          .push(
-        MaterialPageRoute(
-          builder: (context) => page,
-        ),
-      )
-          .then((value) {
+      onTap: () => Navigator.of(context).pushNamed('/chatscreen', arguments: {
+        "screenType": 'user',
+        "taskId": id.toString(),
+      }).then((value) {
         fetchRequests();
       }),
       child: Container(

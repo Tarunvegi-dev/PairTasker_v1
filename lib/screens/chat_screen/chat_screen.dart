@@ -25,10 +25,8 @@ import '../../providers/user.dart';
 
 class ChatScreen extends StatefulWidget {
   // ignore: prefer_typing_uninitialized_variables
-  final screenType;
-  final taskId;
 
-  const ChatScreen({this.screenType, this.taskId, super.key});
+  const ChatScreen({super.key});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -37,6 +35,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   late IO.Socket socket;
   final TextEditingController msgController = TextEditingController();
+  String screenType = '';
+  String taskId = '';
   String userId = '';
   String reqId = '';
   List<dynamic> pendingTaskers = [];
@@ -68,7 +68,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    socket.emit('iam-offline', widget.taskId);
+    socket.emit('iam-offline', taskId);
     setState(() {
       isTimerEnded = true;
     });
@@ -87,13 +87,20 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  @override
-  void initState() {
-    msgController.addListener(() {
-      updateIsMessageEmpty();
+  void fetchArguments() {
+    final arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+    setState(() {
+      screenType = arguments['screenType'];
+      taskId = arguments['taskId'];
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    fetchArguments();
     if (_isInit) {
-      if (widget.screenType == 'user') {
+      if (screenType == 'user') {
         fetchRequestDetails();
       } else {
         fetchTaskDetails();
@@ -104,6 +111,14 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _isInit = false;
     });
+    super.didChangeDependencies();
+  }
+
+  @override
+  void initState() {
+    msgController.addListener(() {
+      updateIsMessageEmpty();
+    });
     socket = IO.io(
       BaseURL.socketURL,
       IO.OptionBuilder().setTransports(['websocket']).enableForceNew().build(),
@@ -112,17 +127,17 @@ class _ChatScreenState extends State<ChatScreen> {
     socket.on('connect', (data) {
       socket.emit(
         'join-room',
-        widget.taskId,
+        taskId,
       );
     });
-    socket.on('reconnect', (data) => socket.emit('join-room', widget.taskId));
+    socket.on('reconnect', (data) => socket.emit('join-room', taskId));
     socket.on(
       'recieved-message',
       (data) => recieveMessage(data),
     );
     socket.on('online', (data) {
       if (local && !remote) {
-        socket.emit('iam-online', widget.taskId);
+        socket.emit('iam-online', taskId);
       }
       setState(() {
         remote = true;
@@ -157,10 +172,9 @@ class _ChatScreenState extends State<ChatScreen> {
       final pendingPref = prefs.getString('unread-messages');
       Map<String, dynamic> pendingData =
           jsonDecode(pendingPref!) as Map<String, dynamic>;
-      if (pendingData[widget.taskId] != null &&
-          pendingData[widget.taskId] > 0) {
-        socket.emit('message-seen', widget.taskId);
-        pendingData[widget.taskId] = 0;
+      if (pendingData[taskId] != null && pendingData[taskId] > 0) {
+        socket.emit('message-seen', taskId);
+        pendingData[taskId] = 0;
         prefs.setString('unread-messages', jsonEncode(pendingData));
       }
     }
@@ -172,14 +186,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }
     // ignore: use_build_context_synchronously
     Provider.of<Chat>(context, listen: false).updateMessages(
-      widget.taskId,
+      taskId,
       message,
       isRecieve: true,
     );
     setState(() {
       _needsScroll = true;
     });
-    socket.emit('message-seen', widget.taskId);
+    socket.emit('message-seen', taskId);
   }
 
   void fetchUserData() async {
@@ -192,14 +206,14 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     // ignore: use_build_context_synchronously
     Provider.of<Chat>(context, listen: false).fetchMessages(
-      widget.taskId,
-      widget.screenType,
+      taskId,
+      screenType,
     );
   }
 
   void fetchRequestDetails() async {
     final response = await Provider.of<Chat>(context, listen: false)
-        .getRequestDetails(widget.taskId);
+        .getRequestDetails(taskId);
     final responsedata = response.data['data']['request'];
     if (response.statusCode == 200) {
       setState(() {
@@ -214,8 +228,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void fetchTaskDetails() async {
-    final response = await Provider.of<Chat>(context, listen: false)
-        .getTaskDetails(widget.taskId);
+    final response =
+        await Provider.of<Chat>(context, listen: false).getTaskDetails(taskId);
     final responsedata = response.data['data']['request'];
     if (response.statusCode == 200) {
       setState(() {
@@ -237,12 +251,12 @@ class _ChatScreenState extends State<ChatScreen> {
       "text": message,
       "sender": userId,
       "reciever":
-          widget.screenType == 'user' ? currentTasker['id'] : currentUser['id'],
+          screenType == 'user' ? currentTasker['id'] : currentUser['id'],
       "timestamp": '${DateTime.now()}',
       "image": imageURL,
       "sentBy": {"username": userdata['username']}.toString(),
-      "taskId": widget.taskId,
-      "screenType": widget.screenType
+      "taskId": taskId,
+      "screenType": screenType
     };
     if (type == 'prompt') {
       data = {...data, "text": '${userdata['username']} ${data['text']}'};
@@ -254,15 +268,15 @@ class _ChatScreenState extends State<ChatScreen> {
     };
     socket.emit('send-message', {
       "data": data,
-      "room": widget.taskId,
-      "fcmId": widget.screenType == 'user'
+      "room": taskId,
+      "fcmId": screenType == 'user'
           ? currentTasker['deviceId']
           : currentUser['deviceId'],
       "notification": notification,
     });
     // ignore: use_build_context_synchronously
     Provider.of<Chat>(context, listen: false).updateMessages(
-      widget.taskId,
+      taskId,
       data,
     );
     setState(() {
@@ -309,11 +323,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void confirmTask({bool ack = false}) async {
     if (!ack) {
-      final res = await Provider.of<User>(context, listen: false)
-          .confirmTask(widget.taskId);
+      final res =
+          await Provider.of<User>(context, listen: false).confirmTask(taskId);
       if (res.statusCode == 200) {
         sendMessage('Task confirmed', 'task-confirmation');
-        socket.emit('task-confirmed', widget.taskId);
+        socket.emit('task-confirmed', taskId);
       }
     }
     setState(() {
@@ -330,7 +344,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void completeTask({bool ack = false}) async {
     if (!ack) {
       sendMessage('Task Completed', 'task-completion');
-      socket.emit('task-completed', widget.taskId);
+      socket.emit('task-completed', taskId);
       Provider.of<Tasker>(context, listen: false).getMyTasks();
     }
     setState(() {
@@ -341,12 +355,12 @@ class _ChatScreenState extends State<ChatScreen> {
   void terminateTasker({bool ack = false}) async {
     if (!ack) {
       final res = await Provider.of<Tasker>(context, listen: false)
-          .terminateTask(widget.taskId);
+          .terminateTask(taskId);
       if (res.statusCode == 200) {
         sendMessage('Tasker terminated', 'info');
         // ignore: use_build_context_synchronously
         Provider.of<Tasker>(context, listen: false).getMyTasks();
-        socket.emit('tasker-terminated', widget.taskId);
+        socket.emit('tasker-terminated', taskId);
         // ignore: use_build_context_synchronously
         Navigator.of(context).pop();
       }
@@ -360,12 +374,12 @@ class _ChatScreenState extends State<ChatScreen> {
   void withdrawRequest({bool ack = false}) async {
     if (!ack) {
       final res = await Provider.of<User>(context, listen: false)
-          .withdrawRequest(widget.taskId);
+          .withdrawRequest(taskId);
       if (res.statusCode == 200) {
         sendMessage('Task has been withdrawn', 'task-cancellation');
         // ignore: use_build_context_synchronously
         Provider.of<User>(context, listen: false).getMyRequests();
-        socket.emit('task-withdraw', widget.taskId);
+        socket.emit('task-withdraw', taskId);
         // ignore: use_build_context_synchronously
         Navigator.of(context).pop();
       }
@@ -498,8 +512,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     bool showPrompt() {
       if (loadedMessages.isNotEmpty) {
-        if (loadedMessages.last['type'] == 'prompt' &&
-            widget.screenType == 'user') {
+        if (loadedMessages.last['type'] == 'prompt' && screenType == 'user') {
           return true;
         }
       }
@@ -541,7 +554,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       const SizedBox(
                         width: 10,
                       ),
-                      if (widget.screenType == 'user')
+                      if (screenType == 'user')
                         Row(
                           children: [
                             Column(
@@ -590,7 +603,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                           ],
                         ),
-                      if (widget.screenType == 'tasker')
+                      if (screenType == 'tasker')
                         Row(
                           children: [
                             SizedBox(
@@ -636,12 +649,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   PopupMenuButton(
                       itemBuilder: (_) => [
-                            if (widget.screenType == 'tasker' && taskStatus < 2)
+                            if (screenType == 'tasker' && taskStatus < 2)
                               PopupMenuItem(
                                 onTap: terminateTasker,
                                 child: const Text('Terminate'),
                               ),
-                            if (widget.screenType == 'user' && taskStatus < 2)
+                            if (screenType == 'user' && taskStatus < 2)
                               PopupMenuItem(
                                 onTap: withdrawRequest,
                                 child: const Text('Withdraw request'),
@@ -652,7 +665,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   const Duration(seconds: 0),
                                   () => Helper.showReportModal(
                                     context,
-                                    widget.screenType == 'user'
+                                    screenType == 'user'
                                         ? currentTasker['id']
                                         : currentUser['id'],
                                     userId,
@@ -673,7 +686,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ],
               ),
             ),
-            if (widget.screenType == 'user' &&
+            if (screenType == 'user' &&
                 (pendingTaskers.isNotEmpty || terminatedTaskers.isNotEmpty))
               Container(
                 padding: const EdgeInsets.symmetric(
@@ -797,7 +810,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               )
                             : IncomingMessage(
                                 message: loadedMessages[i]['text'],
-                                screenType: widget.screenType,
+                                screenType: screenType,
                                 timestamp: loadedMessages[i]['timestamp'],
                                 sender: loadedMessages[i]['sentBy']
                                     .toString()
@@ -830,7 +843,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Container(
-                        width: widget.screenType == 'user'
+                        width: screenType == 'user'
                             ? MediaQuery.of(context).size.width * 66 / 100
                             : isMessageEmpty
                                 ? MediaQuery.of(context).size.width * 64 / 100
@@ -874,7 +887,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       const SizedBox(
                         width: 8,
                       ),
-                      if (widget.screenType == 'user')
+                      if (screenType == 'user')
                         Expanded(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -925,7 +938,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             ],
                           ),
                         ),
-                      if (widget.screenType == 'tasker')
+                      if (screenType == 'tasker')
                         Expanded(
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -1073,7 +1086,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   )
                 ],
               ),
-            if (taskStatus == 3 && widget.screenType == 'user')
+            if (taskStatus == 3 && screenType == 'user')
               Container(
                 margin: const EdgeInsets.only(
                   bottom: 10,
@@ -1102,7 +1115,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
               ),
-            if (taskStatus == 2 && widget.screenType == 'tasker')
+            if (taskStatus == 2 && screenType == 'tasker')
               Container(
                 margin: const EdgeInsets.only(
                   top: 20,
@@ -1119,7 +1132,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           final res = await Provider.of<Tasker>(
                             context,
                             listen: false,
-                          ).completeTask(widget.taskId);
+                          ).completeTask(taskId);
                           if (res.statusCode == 200) {
                             setState(() {
                               isLoading = false;
@@ -1248,7 +1261,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                             context,
                                                             listen: false,
                                                           ).completeTask(
-                                                            widget.taskId,
+                                                            taskId,
                                                           );
                                                           if (res.statusCode ==
                                                               200) {
@@ -1352,7 +1365,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                                 context,
                                                                 listen: false,
                                                               ).verifyTaskOTP(
-                                                                widget.taskId,
+                                                                taskId,
                                                                 otp,
                                                               );
                                                               if (res.statusCode ==

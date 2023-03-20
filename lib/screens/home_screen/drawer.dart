@@ -52,19 +52,59 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         Navigator.of(context).pushNamed('/');
       } else {
         if (response.data['hasAccount'] == false) {
-          // ignore: use_build_context_synchronously
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: HexColor('FF033E'),
-            content: Text(
-              'You are currently not a tasker, please create a tasker account to continue',
-              style: GoogleFonts.poppins(
-                // ignore: use_build_context_synchronously
-                color: Helper.isDark(context) ? Colors.white : Colors.black,
-              ),
-            ),
-          ));
-          // ignore: use_build_context_synchronously
-          Navigator.of(context).pushNamed('/taskerform');
+          showDialog<void>(
+            context: context,
+            builder: (BuildContext context) {
+              return Dialog(
+                child: Container(
+                  height: 160,
+                  color: Helper.isDark(context)
+                      ? HexColor('252B30')
+                      : HexColor('DEE0E0'),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Create a new Tasker account',
+                        style: GoogleFonts.lato(
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        'You are currently not a tasker, please create a tasker account to continue',
+                        style: GoogleFonts.lato(
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            child: const Text('Yes'),
+                            onPressed: () =>
+                                Navigator.of(context).pushNamed('/taskerform'),
+                          ),
+                          TextButton(
+                            child: const Text('No'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pushNamed('/');
+                            },
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
         }
       }
     });

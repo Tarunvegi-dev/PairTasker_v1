@@ -27,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   var _isLoading = false;
   String sortCategory = 'rating';
   String address = '';
+  int page = 1;
 
   @override
   void didChangeDependencies() async {
@@ -71,6 +72,18 @@ class _HomePageState extends State<HomePage> {
       sortBy: sortCategory,
       sort: true,
     );
+  }
+
+  Future<void> loadMoreTaskers() async {
+    setState(() {
+      page += 1;
+    });
+    final response = await Provider.of<User>(context, listen: false).getTaskers(
+      page: page.toString(),
+    );
+    setState(() {
+      filteredTaskers.addAll(response);
+    });
   }
 
   Future<void> searchTaskers() async {
@@ -510,6 +523,14 @@ class _HomePageState extends State<HomePage> {
                           selectTaskers: selectTaskers,
                         ),
                       ),
+                      if (filteredTaskers.length > 15)
+                        TextButton(
+                          onPressed: loadMoreTaskers,
+                          child: Text(
+                            'Load More',
+                            style: GoogleFonts.lato(),
+                          ),
+                        )
                     ],
                   ),
                 ),
