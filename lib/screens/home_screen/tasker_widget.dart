@@ -48,232 +48,225 @@ class TaskerWidget extends StatelessWidget {
         .replaceAll('[', '')
         .replaceAll(']', '')
         .split(' ');
-    return InkWell(
-      onLongPress: () => isSelected || isWishlist ? null : selectTaskers(id),
-      onTap: () => (isSelected || selectedTaskers.isNotEmpty) && !isWishlist
-          ? selectTaskers(id)
-          : null,
-      child: Container(
-        color: Helper.isDark(context) ? Colors.black : Colors.white,
-        margin: const EdgeInsets.only(
-          bottom: 4,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      children: [
+        InkWell(
+          onLongPress: () =>
+              isSelected || isWishlist ? null : selectTaskers(id),
+          onTap: () => (isSelected || selectedTaskers.isNotEmpty) && !isWishlist
+              ? selectTaskers(id)
+              : null,
+          child: Container(
+            color: Helper.isDark(context) ? Colors.black : Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              child: Column(
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      isSelected
-                          ? Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(125),
-                                ),
-                                color: HexColor('#007FFF'),
-                              ),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.check,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            )
-                          : SizedBox(
-                              height: 40,
-                              width: 40,
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: profilePicture == null
-                                    ? const AssetImage(
-                                        'assets/images/default_user.png',
-                                      )
-                                    : NetworkImage(profilePicture)
-                                        as ImageProvider,
-                              ),
-                            ),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      InkWell(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => TaskerProfile(
-                              id: id,
-                            ),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              displayName,
-                              style: GoogleFonts.lato(
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              '@$username',
-                              style: GoogleFonts.lato(
-                                fontSize: 10,
-                                color: HexColor('#AAABAB'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  !isSelected
-                      ? AnimatedTextKit(
-                          animatedTexts: _workingCategories
-                              .map(
-                                (category) => TyperAnimatedText(
-                                  category.toUpperCase().replaceAll(',', ''),
-                                  textStyle: GoogleFonts.lato(
-                                    color: HexColor('#AAABAB'),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                      Row(
+                        children: [
+                          isSelected
+                              ? Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(125),
+                                    ),
+                                    color: HexColor('#007FFF'),
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(
+                                  height: 40,
+                                  width: 40,
+                                  child: CircleAvatar(
+                                    radius: 30,
+                                    backgroundImage: profilePicture == null
+                                        ? const AssetImage(
+                                            'assets/images/default_user.png',
+                                          )
+                                        : NetworkImage(profilePicture)
+                                            as ImageProvider,
                                   ),
                                 ),
-                              )
-                              .toList(),
-                          repeatForever: true,
-                          isRepeatingAnimation: true,
-                        )
-                      : Text(
-                          'SELECTED',
-                          style: GoogleFonts.lato(
-                            color: HexColor('#007FFF'),
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(
+                            width: 12,
                           ),
-                        )
+                          InkWell(
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => TaskerProfile(
+                                  id: id,
+                                ),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  displayName,
+                                  style: GoogleFonts.lato(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Text(
+                                  '@$username',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 10,
+                                    color: HexColor('#AAABAB'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      !isSelected
+                          ? AnimatedTextKit(
+                              animatedTexts: _workingCategories
+                                  .map(
+                                    (category) => TyperAnimatedText(
+                                      category
+                                          .toUpperCase()
+                                          .replaceAll(',', ''),
+                                      textStyle: GoogleFonts.lato(
+                                        color: HexColor('#AAABAB'),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              repeatForever: true,
+                              isRepeatingAnimation: true,
+                            )
+                          : Text(
+                              'SELECTED',
+                              style: GoogleFonts.lato(
+                                color: HexColor('#007FFF'),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 5,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: HexColor('#FFC72C'),
+                              size: 18,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              rating,
+                              style: GoogleFonts.lato(
+                                color: HexColor('#AAABAB'),
+                                fontSize: 14,
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.favorite,
+                              color: HexColor('#FF033E'),
+                              size: 18,
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              saves,
+                              style: GoogleFonts.lato(
+                                color: HexColor('#AAABAB'),
+                                fontSize: 14,
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              child: SvgPicture.asset(
+                                'assets/images/icons/task.svg',
+                                height: 18,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              tasks,
+                              style: GoogleFonts.lato(
+                                color: HexColor('#AAABAB'),
+                                fontSize: 14,
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              availability == 0 ? Icons.wifi_off : Icons.wifi,
+                              color: availability < 33.3
+                                  ? HexColor('FF033E')
+                                  : availability > 33.33 && availability < 66.66
+                                      ? HexColor('FFC72C')
+                                      : HexColor('#00CE15'),
+                              size: 18,
+                            ),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              '$availability%',
+                              style: GoogleFonts.lato(
+                                color: HexColor('#AAABAB'),
+                                fontSize: 14,
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
                 ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 5,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.star,
-                          color: HexColor('#FFC72C'),
-                          size: 18,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          rating,
-                          style: GoogleFonts.lato(
-                            color: HexColor('#AAABAB'),
-                            fontSize: 14,
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.favorite,
-                          color: HexColor('#FF033E'),
-                          size: 18,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          saves,
-                          style: GoogleFonts.lato(
-                            color: HexColor('#AAABAB'),
-                            fontSize: 14,
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          child: SvgPicture.asset(
-                            'assets/images/icons/task.svg',
-                            height: 18,
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          tasks,
-                          style: GoogleFonts.lato(
-                            color: HexColor('#AAABAB'),
-                            fontSize: 14,
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          availability < 33.3
-                              ? Icons.wifi_1_bar
-                              : availability > 33.33 && availability < 66.66
-                                  ? Icons.wifi_2_bar
-                                  : Icons.wifi,
-                          color: availability < 33.3
-                              ? HexColor('FF033E')
-                              : availability > 33.33 && availability < 66.66
-                                  ? HexColor('FFC72C')
-                                  : HexColor('#00CE15'),
-                          size: 18,
-                        ),
-                        const SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          '$availability%',
-                          style: GoogleFonts.lato(
-                            color: HexColor('#AAABAB'),
-                            fontSize: 14,
-                          ),
-                        )
-                      ],
-                    ),
-                    //   LinearPercentIndicator(
-                    //   backgroundColor: HexColor('FF0303'),
-                    //   progressColor: HexColor('00CE15'),
-                    //   percent: availability / 100,
-                    //   width: 100.0,
-                    //   lineHeight: 8.0,
-                    //   trailing: Text(
-                    //     '$availability%',
-                    //     style: GoogleFonts.lato(
-                    //       fontWeight: FontWeight.bold,
-                    //       fontSize: 10,
-                    //     ),
-                    //   ),
-                    //   barRadius: const Radius.circular(25),
-                    // )
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
         ),
-      ),
+        Container(
+          height: 4,
+          decoration: BoxDecoration(
+            color: HexColor(
+              Helper.isDark(context) ? '252B30' : '#E4ECF5',
+            ),
+          ),
+        )
+      ],
     );
   }
 }

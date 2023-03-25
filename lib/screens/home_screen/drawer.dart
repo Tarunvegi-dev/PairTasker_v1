@@ -42,7 +42,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   void switchMode() {
     Navigator.of(context).pushNamed('/loading');
-    Future.delayed(const Duration(seconds: 5), () async {
+    Future.delayed(const Duration(seconds: 3), () async {
       final response =
           await Provider.of<Auth>(context, listen: false).updateIsTasker();
       if (response.statusCode == 200) {

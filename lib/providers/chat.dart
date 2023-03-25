@@ -75,7 +75,7 @@ class Chat extends ChangeNotifier {
 
   Future<Response> getRequestDetails(String taskId,
       {bool chats = false}) async {
-    const url = '${BaseURL.url}/user/get-task-details';
+    const url = '${BaseURL.url}/task/get-request-details';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(
@@ -96,7 +96,7 @@ class Chat extends ChangeNotifier {
   }
 
   Future<Response> getTaskDetails(String taskId, {bool chats = false}) async {
-    const url = '${BaseURL.url}/tasker/get-task-details';
+    const url = '${BaseURL.url}/task/get-task-details';
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');

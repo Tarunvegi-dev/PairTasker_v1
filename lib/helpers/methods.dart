@@ -48,7 +48,7 @@ class Helper {
 
   static void showRequestModal(
       BuildContext context, List<dynamic> selectedTaskers, String category,
-      {workingCategories = ''}) {
+      {workingCategories = '', setSelectedTaskers = Function}) {
     final messageController = TextEditingController();
     showModalBottomSheet(
       context: context,
@@ -172,6 +172,7 @@ class Helper {
                               });
                               // ignore: use_build_context_synchronously
                               Navigator.of(context).pop();
+                              setSelectedTaskers();
                               // ignore: use_build_context_synchronously
                               final navigator = Navigator.of(context);
                               Future.delayed(const Duration(seconds: 2), () {
@@ -546,16 +547,43 @@ class Helper {
       ),
     );
   }
+
+  static String convertTimeFromMilliSeconds(double milliseconds) {
+    double seconds = (milliseconds / 1000);
+    double minutes = (seconds / 60);
+    double hours = (minutes / 60);
+    double days = (hours / 24);
+    double weeks = (days / 7);
+
+    if (seconds < 60) {
+      return seconds < 10
+          ? '0${seconds.round()} Seconds'
+          : '${seconds.round()} Seconds';
+    }
+    if (minutes < 60) {
+      return minutes < 10
+          ? '0${minutes.round()} Minutes'
+          : '${minutes.round()} Minutes';
+    }
+    if (hours < 24) {
+      return hours < 10 ? '0${hours.round()} Hours' : '${hours.round()} Hours';
+    }
+    if (days < 7) {
+      return days < 10 ? '0${days.round()} Days' : '${days.round()} Days';
+    } else {
+      return weeks < 10 ? '0${weeks.round()} Weeks' : '$weeks Weeks';
+    }
+  }
 }
 
 class BaseURL {
-  static const url = 
-  'http://65.0.31.100/api';
-  // 'http://192.168.248.47:3000/api';
+  static const url =
+      'http://65.0.31.100/api';
+      // 'http://192.168.248.47:3000/api';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
-  static const socketURL = 
-  'http://65.0.31.100/';
-  // 'http://192.168.248.47:3000';
+  static const socketURL =
+      'http://65.0.31.100/';
+      // 'http://192.168.248.47:3000';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

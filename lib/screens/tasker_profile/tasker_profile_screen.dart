@@ -29,9 +29,15 @@ class _TaskerProfileState extends State<TaskerProfile> {
   String totalTasks = '';
   String profilePicture = '';
   bool isWishlisted = false;
-  int availability = 100;
   List<dynamic> reviewsdata = [];
   List<dynamic> workingCategories = [];
+  int availability = 100;
+  int acceptanceRatio = 0;
+  int avgTaskCompletionTime = 0;
+  int network = 0;
+  int saves = 0;
+  String bio = 'I am a delivery boy';
+  bool isOnline = false;
 
   @override
   void didChangeDependencies() async {
@@ -50,17 +56,24 @@ class _TaskerProfileState extends State<TaskerProfile> {
       setState(() {
         isWishlisted = wishlist.contains(widget.id) != false;
       });
-      if (response.data['status'] == true) {
+      if (response.statusCode == 200) {
         var taskerData = response.data['data'];
         setState(() {
           reviewsdata = reviews;
-          availability = taskerData['availability'];
-          workingCategories = taskerData['workingCategories'];
-          profilePicture = taskerData['user']['profilePicture'] ?? '';
-          username = taskerData['user']['username'] ?? '';
-          displayName = taskerData['user']['displayName'] ?? '';
-          rating = taskerData['rating'].toString();
-          totalTasks = taskerData['totalTasks'].toString();
+          availability = taskerData['metrics']['availabilityRatio'] ?? 0;
+          acceptanceRatio = taskerData['metrics']['acceptanceRatio'] ?? 0;
+          avgTaskCompletionTime =
+              taskerData['metrics']['avgTaskCompletionTime'] ?? 0;
+          workingCategories = taskerData['tasker']['workingCategories'] ?? [];
+          profilePicture = taskerData['tasker']['user']['profilePicture'] ?? '';
+          username = taskerData['tasker']['user']['username'] ?? '';
+          displayName = taskerData['tasker']['user']['displayName'] ?? '';
+          rating = taskerData['tasker']['rating'].toString();
+          totalTasks = taskerData['tasker']['completedTasks'].toString();
+          network = taskerData['tasker']['network'] ?? 0;
+          saves = taskerData['tasker']['saves'] ?? 0;
+          bio = taskerData['tasker']['bio'] ?? '';
+          isOnline = taskerData['tasker']['isOnline'] ?? false;
         });
       }
     }
@@ -252,7 +265,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  InkWell(
+                  InkWell(  
                     onTap: () {
                       Navigator.of(context).pop();
                     },
@@ -263,11 +276,11 @@ class _TaskerProfileState extends State<TaskerProfile> {
                     ),
                   ),
                   Text(
-                    'ACTIVE',
+                    isOnline ? 'ACTIVE' : 'OFFLINE',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: HexColor('32DE84'),
+                      color: isOnline ? HexColor('32DE84') : HexColor('FF033E'),
                     ),
                   ),
                   InkWell(
@@ -295,228 +308,451 @@ class _TaskerProfileState extends State<TaskerProfile> {
                           Helper.isDark(context) ? Colors.black : Colors.white,
                       padding: const EdgeInsets.only(
                         top: 28,
-                        left: 26,
-                        right: 20,
                         bottom: 10,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 37,
-                                    width: 37,
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 12,
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 26,
+                              right: 20,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: 37,
+                                      width: 37,
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage: profilePicture != ''
+                                            ? NetworkImage(
+                                                profilePicture,
+                                              )
+                                            : const AssetImage(
+                                                'assets/images/default_user.png',
+                                              ) as ImageProvider,
+                                      ),
                                     ),
-                                    child: CircleAvatar(
-                                      radius: 30,
-                                      backgroundImage: profilePicture != ''
-                                          ? NetworkImage(
-                                              profilePicture,
-                                            )
-                                          : const AssetImage(
-                                              'assets/images/default_user.png',
-                                            ) as ImageProvider,
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          displayName,
+                                          style: GoogleFonts.lato(
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          '@$username',
+                                          style: GoogleFonts.lato(
+                                            fontSize: 12,
+                                            color: HexColor('#AAABAB'),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 30,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(0),
+                                      ),
+                                      backgroundColor: HexColor('007FFF'),
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 0,
+                                        horizontal: 25,
+                                      ),
+                                    ),
+                                    onPressed: () => Helper.showRequestModal(
+                                        context, [widget.id], '',
+                                        workingCategories:
+                                            workingCategories.join(' ')),
+                                    child: Text(
+                                      'REQUEST',
+                                      style: GoogleFonts.lato(
+                                        fontSize: 10,
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 10,
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 25,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 26,
+                              right: 20,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.star,
+                                      color: HexColor('#FFC72C'),
+                                      size: 20,
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      rating,
+                                      style: GoogleFonts.lato(
+                                        color: HexColor('#AAABAB'),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      child: SvgPicture.asset(
+                                        'assets/images/icons/task.svg',
+                                        height: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      totalTasks,
+                                      style: GoogleFonts.lato(
+                                        color: HexColor('#AAABAB'),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      child: SvgPicture.asset(
+                                        'assets/images/icons/wishlist.svg',
+                                        height: 20,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      saves.toString(),
+                                      style: GoogleFonts.lato(
+                                        color: HexColor('#AAABAB'),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      child: SvgPicture.asset(
+                                        'assets/images/icons/network.svg',
+                                        height: 20,
+                                        color: HexColor('007FFF'),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      network.toString(),
+                                      style: GoogleFonts.lato(
+                                        color: HexColor('#AAABAB'),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.only(
+                              top: 20,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Helper.isDark(context)
+                                  ? HexColor('252B30')
+                                  : HexColor('E4ECF5'),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 15,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/icons/availability.svg',
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            'Availability',
+                                            style: GoogleFonts.lato(
+                                              fontSize: 12,
+                                              color: HexColor('6F7273'),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        '$availability  %',
+                                        style: GoogleFonts.lato(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Helper.isDark(context)
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      )
+                                    ],
                                   ),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        displayName,
-                                        style: GoogleFonts.lato(
-                                          fontSize: 14,
-                                        ),
+                                      Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/icons/task.svg',
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            'Acceptance',
+                                            style: GoogleFonts.lato(
+                                              fontSize: 12,
+                                              color: HexColor('6F7273'),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
                                       ),
                                       Text(
-                                        '@$username',
+                                        '$acceptanceRatio  %',
                                         style: GoogleFonts.lato(
-                                          fontSize: 12,
-                                          color: HexColor('#AAABAB'),
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Helper.isDark(context)
+                                              ? Colors.white
+                                              : Colors.black,
                                         ),
-                                      ),
+                                      )
                                     ],
                                   ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 30,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(0),
-                                    ),
-                                    backgroundColor: HexColor('007FFF'),
-                                    elevation: 0,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 0,
-                                      horizontal: 25,
-                                    ),
-                                  ),
-                                  onPressed: () => Helper.showRequestModal(
-                                      context, [widget.id], '',
-                                      workingCategories:
-                                          workingCategories.join(' ')),
-                                  child: Text(
-                                    'REQUEST',
-                                    style: GoogleFonts.lato(
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 25,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    color: HexColor('#FFC72C'),
-                                    size: 20,
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    rating,
-                                    style: GoogleFonts.lato(
-                                      color: HexColor('#AAABAB'),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/icons/time.svg',
+                                          ),
+                                          const SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                            'Avg Task Time',
+                                            style: GoogleFonts.lato(
+                                              fontSize: 12,
+                                              color: HexColor('6F7273'),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            Helper.convertTimeFromMilliSeconds(
+                                                    avgTaskCompletionTime
+                                                        .toDouble())
+                                                .toString()
+                                                .substring(0, 3),
+                                            style: GoogleFonts.lato(
+                                              fontSize: 24,
+                                              color: Helper.isDark(context)
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 10,
+                                            ),
+                                            child: Text(
+                                              Helper.convertTimeFromMilliSeconds(
+                                                      avgTaskCompletionTime
+                                                          .toDouble())
+                                                  .toString()
+                                                  .substring(3),
+                                              style: GoogleFonts.lato(
+                                                fontSize: 10,
+                                                color: HexColor('6F7273'),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
                                   )
                                 ],
                               ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    child: SvgPicture.asset(
-                                      'assets/images/icons/task.svg',
-                                      height: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    totalTasks,
-                                    style: GoogleFonts.lato(
-                                      color: HexColor('#AAABAB'),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Icon(
-                                    availability < 33.3
-                                        ? Icons.wifi_1_bar
-                                        : availability > 33.33 &&
-                                                availability < 66.66
-                                            ? Icons.wifi_2_bar
-                                            : Icons.wifi,
-                                    color: availability < 33.3
-                                        ? HexColor('FF033E')
-                                        : availability > 33.33 &&
-                                                availability < 66.66
-                                            ? HexColor('FFC72C')
-                                            : HexColor('#00CE15'),
-                                    size: 18,
-                                  ),
-                                  const SizedBox(
-                                    width: 4,
-                                  ),
-                                  Text(
-                                    '$availability%',
-                                    style: GoogleFonts.lato(
-                                      color: HexColor('#AAABAB'),
-                                      fontSize: 14,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                            height: 48,
-                          ),
-                          Text(
-                            'Working Categories',
-                            textAlign: TextAlign.start,
-                            style: GoogleFonts.lato(
-                              color: HexColor('99A4AE'),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(
                             height: 20,
                           ),
-                          Wrap(
-                            spacing: 5.0,
-                            runSpacing: 15.0,
-                            children: workingCategories
-                                .map((category) => Container(
-                                      width: 100,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 20,
-                                        vertical: 10,
-                                      ),
-                                      margin: const EdgeInsets.only(right: 5),
-                                      decoration: BoxDecoration(
-                                        color: Helper.isDark(context)
-                                            ? const Color.fromRGBO(
-                                                255,
-                                                255,
-                                                255,
-                                                0.1,
-                                              )
-                                            : const Color.fromRGBO(
-                                                0,
-                                                0,
-                                                0,
-                                                0.1,
-                                              ),
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          category,
-                                          style: const TextStyle(
-                                            fontSize: 10,
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 26,
+                              right: 20,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Bio',
+                                  textAlign: TextAlign.start,
+                                  style: GoogleFonts.lato(
+                                    color: HexColor('99A4AE'),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Text(
+                                  bio,
+                                  style: GoogleFonts.lato(
+                                    fontSize: 14,
+                                    color: Helper.isDark(context)
+                                        ? Colors.white
+                                        : HexColor('1A1E1F'),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 26,
+                              right: 20,
+                            ),
+                            child: Text(
+                              'Working Categories',
+                              textAlign: TextAlign.start,
+                              style: GoogleFonts.lato(
+                                color: HexColor('99A4AE'),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 26,
+                              right: 20,
+                            ),
+                            child: Wrap(
+                              spacing: 5.0,
+                              runSpacing: 15.0,
+                              children: workingCategories
+                                  .map((category) => Container(
+                                        width: 100,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 20,
+                                          vertical: 10,
+                                        ),
+                                        margin: const EdgeInsets.only(right: 5),
+                                        decoration: BoxDecoration(
+                                          color: HexColor('007FFF'),
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            category,
+                                            style: const TextStyle(
+                                              fontSize: 10,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ))
-                                .toList(),
+                                      ))
+                                  .toList(),
+                            ),
                           ),
                           const SizedBox(
                             height: 35,
                           ),
-                          Text(
-                            'Reviews',
-                            textAlign: TextAlign.start,
-                            style: GoogleFonts.lato(
-                              color: HexColor('99A4AE'),
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 26,
+                              right: 20,
+                            ),
+                            child: Text(
+                              'Reviews',
+                              textAlign: TextAlign.start,
+                              style: GoogleFonts.lato(
+                                color: HexColor('99A4AE'),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           )
                         ],
@@ -544,6 +780,9 @@ class _TaskerProfileState extends State<TaskerProfile> {
                           margin: const EdgeInsets.only(
                             top: 4,
                           ),
+                          color: Helper.isDark(context)
+                              ? Colors.black
+                              : Colors.white,
                           child: ListView.builder(
                             shrinkWrap: true,
                             itemCount: reviewsdata.length,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/helpers/methods.dart';
-
 import 'package:pairtasker/screens/chat_screen/view_image.dart';
 
 class OutgoingMessage extends StatelessWidget {
@@ -11,12 +10,14 @@ class OutgoingMessage extends StatelessWidget {
   final timestamp;
   final showMsgStatus;
   final msgStatus;
+  final isPrompt;
   const OutgoingMessage(
       {this.message,
       this.image,
       this.timestamp,
       this.showMsgStatus,
       this.msgStatus,
+      this.isPrompt,
       super.key});
 
   @override
@@ -99,11 +100,36 @@ class OutgoingMessage extends StatelessWidget {
                               ),
                             ),
                           )
-                        : Text(
-                            message,
-                            style: GoogleFonts.lato(
-                                fontSize: 14, color: Colors.white),
-                          ),
+                        : !isPrompt
+                            ? Text(
+                                message,
+                                style: GoogleFonts.lato(
+                                  fontSize: 14,
+                                  color: Colors.white
+                                ),
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'I want you to confirm the task',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    'Please consider confirming the task, if you are sure about the task.',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 11,
+                                    ),
+                                  )
+                                ],
+                              ),
                   ],
                 ),
               ),
@@ -150,11 +176,15 @@ class IncomingMessage extends StatelessWidget {
   final sender;
   final image;
   final timestamp;
+  final isPrompt;
+  final senderImage;
 
   const IncomingMessage(
       {this.message,
       this.screenType,
+      this.isPrompt,
       this.sender,
+      this.senderImage,
       this.image,
       this.timestamp,
       super.key});
@@ -169,92 +199,135 @@ class IncomingMessage extends StatelessWidget {
           left: 16,
           top: 10,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                  minWidth: 130, maxWidth: 280, minHeight: 35),
-              child: Container(
-                padding:
-                    image.toString().isNotEmpty && message.toString().isEmpty
-                        ? const EdgeInsets.symmetric(
-                            vertical: 5,
-                            horizontal: 5,
-                          )
-                        : const EdgeInsets.symmetric(
-                            vertical: 5,
-                            horizontal: 10,
-                          ),
-                decoration: BoxDecoration(
-                  color: Helper.isDark(context)
-                      ? HexColor('252B30')
-                      : HexColor('DEE0E0'),
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (screenType == 'user')
-                      Container(
-                        margin: const EdgeInsets.only(
-                          bottom: 5,
-                        ),
-                        child: Text(
-                          '@$sender'.replaceAll(' ', ''),
-                          style: GoogleFonts.lato(
-                              color: HexColor('007FFF'),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800),
+            if (isPrompt)
+              CircleAvatar(
+                radius: 22,
+                backgroundImage: senderImage != null
+                    ? NetworkImage(senderImage)
+                    : const AssetImage('assets/images/default_user.png')
+                        as ImageProvider,
+              ),
+            Container(
+              margin: EdgeInsets.only(
+                left: isPrompt ? 10 : 0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minWidth: 130,
+                      maxWidth: 280,
+                      minHeight: 35,
+                    ),
+                    child: Container(
+                      padding: image.toString().isNotEmpty &&
+                              message.toString().isEmpty
+                          ? const EdgeInsets.symmetric(
+                              vertical: 5,
+                              horizontal: 5,
+                            )
+                          : const EdgeInsets.symmetric(
+                              vertical: 5,
+                              horizontal: 10,
+                            ),
+                      decoration: BoxDecoration(
+                        color: Helper.isDark(context)
+                            ? HexColor('252B30')
+                            : HexColor('DEE0E0'),
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
                         ),
                       ),
-                    image.toString().isNotEmpty
-                        ? InkWell(
-                            onTap: image.toString().isNotEmpty
-                                ? () => Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                      builder: (context) => ViewImage(
-                                        Image: image,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (screenType == 'user' && !isPrompt)
+                            Container(
+                              margin: const EdgeInsets.only(
+                                bottom: 5,
+                              ),
+                              child: Text(
+                                '@$sender'.replaceAll(' ', ''),
+                                style: GoogleFonts.lato(
+                                    color: HexColor('007FFF'),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ),
+                          image.toString().isNotEmpty
+                              ? InkWell(
+                                  onTap: image.toString().isNotEmpty
+                                      ? () => Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                            builder: (context) => ViewImage(
+                                              Image: image,
+                                            ),
+                                          ))
+                                      : () {},
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxHeight: 300,
+                                    ),
+                                    child: Image.network(
+                                      image,
+                                      fit: BoxFit.cover,
+                                      gaplessPlayback: true,
+                                    ),
+                                  ),
+                                )
+                              : !isPrompt
+                                  ? Text(
+                                      message,
+                                      style: GoogleFonts.lato(
+                                        fontSize: 14,
                                       ),
-                                    ))
-                                : () {},
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxHeight: 300,
-                              ),
-                              child: Image.network(
-                                image,
-                                fit: BoxFit.cover,
-                                gaplessPlayback: true,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            message,
-                            style: GoogleFonts.lato(
-                              fontSize: 14,
-                            ),
-                          ),
-                  ],
-                ),
+                                    )
+                                  : Column(
+                                      children: [
+                                        Text(
+                                          '$sender wants you to confirm the task',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            color: HexColor('007FFF'),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          'please choose below options to confirm/cancel this prompt, by confirming you are not able to continue to chat further. So, please check while you can confirm or not.',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 11,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 3, right: 8),
+                    child: Text(
+                      '${datetime.hour}: ${datetime.minute < 10 ? '0${datetime.minute}' : '${datetime.minute}'} ${datetime.hour >= 12 ? 'PM' : 'AM'} ',
+                      textAlign: TextAlign.right,
+                      style: GoogleFonts.lato(
+                        fontSize: 8,
+                        color: HexColor('AAABAB'),
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 3, right: 8),
-              child: Text(
-                '${datetime.hour}: ${datetime.minute < 10 ? '0${datetime.minute}' : '${datetime.minute}'} ${datetime.hour >= 12 ? 'PM' : 'AM'} ',
-                textAlign: TextAlign.right,
-                style: GoogleFonts.lato(
-                  fontSize: 8,
-                  color: HexColor('AAABAB'),
-                ),
-              ),
-            )
           ],
         ),
       ),

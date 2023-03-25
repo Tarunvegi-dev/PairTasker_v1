@@ -37,7 +37,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       userModeHeight = mode == 'Tasker' ? 300.0 : 0;
       taskerModeHeight = mode == 'User' ? 300.0 : 0;
     });
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 1), () {
       setState(() {
         userModeHeight = mode == 'Tasker' ? 0 : 300.0;
         taskerModeHeight = mode == 'User' ? 0 : 300.0;

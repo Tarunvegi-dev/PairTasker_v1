@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/my_requests/request_widget.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +18,7 @@ class MyRequests extends StatefulWidget {
 class _MyRequestsState extends State<MyRequests> {
   List<dynamic> loadedRequests = [];
   bool isLoading = false;
+  Map<String, dynamic> unreadMessages = {};
 
   Future<void> fetchRequests() async {
     setState(() {
@@ -48,12 +48,27 @@ class _MyRequestsState extends State<MyRequests> {
         isLoading = false;
       });
     }
+    checkUnreadMessages();
   }
 
   @override
   void initState() {
     fetchRequests();
+    checkUnreadMessages();
     super.initState();
+  }
+
+  void checkUnreadMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    if (prefs.containsKey('unread-messages')) {
+      final pendingPref = prefs.getString('unread-messages');
+      Map<String, dynamic> pendingData =
+          jsonDecode(pendingPref!) as Map<String, dynamic>;
+      setState(() {
+        unreadMessages = pendingData;
+      });
+    }
   }
 
   @override
@@ -61,7 +76,8 @@ class _MyRequestsState extends State<MyRequests> {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: RefreshIndicator(
+          onRefresh: fetchRequests,
           child: Column(
             children: [
               Container(
@@ -110,30 +126,26 @@ class _MyRequestsState extends State<MyRequests> {
                     backgroundColor: Colors.white,
                   ),
                 ),
-              RefreshIndicator(
-                onRefresh: fetchRequests,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: HexColor(
-                      Helper.isDark(context) ? '252B30' : '#E4ECF5',
-                    ),
-                  ),
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: loadedRequests.length,
-                      itemBuilder: (ctx, i) {
-                        return RequestWidget(
-                          requestId: loadedRequests[i]['reqId'],
-                          id: loadedRequests[i]['id'],
-                          fetchRequests: fetchRequests,
-                          message: loadedRequests[i]['message'],
-                          status: loadedRequests[i]['status'],
-                          currentTasker: loadedRequests[i]['tasker'] != null
-                              ? loadedRequests[i]['tasker']['user']['username']
-                              : '',
-                        );
-                      }),
-                ),
+              Expanded(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: loadedRequests.length,
+                    itemBuilder: (ctx, i) {
+                      return RequestWidget(
+                        unreadCount:
+                            unreadMessages.containsKey(loadedRequests[i]['id'])
+                                ? unreadMessages[loadedRequests[i]['id']]
+                                : 0,
+                        requestId: loadedRequests[i]['reqId'],
+                        id: loadedRequests[i]['id'],
+                        fetchRequests: fetchRequests,
+                        message: loadedRequests[i]['message'],
+                        status: loadedRequests[i]['status'],
+                        currentTasker: loadedRequests[i]['tasker'] != null
+                            ? loadedRequests[i]['tasker']['user']['username']
+                            : '',
+                      );
+                    }),
               ),
             ],
           ),

@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:pairtasker/providers/auth.dart';
+import 'package:provider/provider.dart';
 import '../screens/screens.dart';
 import '../helpers/methods.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -9,6 +13,12 @@ import 'package:google_fonts/google_fonts.dart';
 class BottomNavBarWidget extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
   final selectedScreen;
+
+  const BottomNavBarWidget(
+    this.selectedScreen, {
+    super.key,
+  });
+
   final List<Widget> screens = const [
     HomePage(),
     MyRequests(),
@@ -16,10 +26,10 @@ class BottomNavBarWidget extends StatelessWidget {
     WishlistScreen(),
   ];
 
-  const BottomNavBarWidget(this.selectedScreen, {super.key});
-
   @override
   Widget build(BuildContext context) {
+    final unreadNotifications = Provider.of<Auth>(context).unreadNotifications;
+    final unreadRequests = Provider.of<Auth>(context).unreadRequests;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -50,6 +60,14 @@ class BottomNavBarWidget extends StatelessWidget {
                 ),
               );
             }
+            if (value == 1) {
+              Provider.of<Auth>(context, listen: false)
+                  .updateUnread('requests', false);
+            }
+            if (value == 2) {
+              Provider.of<Auth>(context, listen: false)
+                  .updateUnread('notifications', false);
+            }
           },
           items: [
             BottomNavigationBarItem(
@@ -63,22 +81,56 @@ class BottomNavBarWidget extends StatelessWidget {
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                "assets/images/icons/navbar/my_requests.svg",
-                width: 25,
-                color: selectedScreen == 1
-                    ? HexColor('007FFF')
-                    : HexColor('99A4AE'),
+              icon: Stack(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/icons/navbar/my_requests.svg",
+                    width: 25,
+                    color: selectedScreen == 1
+                        ? HexColor('007FFF')
+                        : HexColor('99A4AE'),
+                  ),
+                  if (unreadRequests)
+                    Positioned(
+                      right: 0,
+                      left: 15,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: HexColor('FF033E'),
+                        ),
+                        width: 8,
+                        height: 8,
+                      ),
+                    )
+                ],
               ),
               label: 'MyRequests',
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                "assets/images/icons/navbar/notifications.svg",
-                width: 25,
-                color: selectedScreen == 2
-                    ? HexColor('007FFF')
-                    : HexColor('99A4AE'),
+              icon: Stack(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/icons/navbar/notifications.svg",
+                    width: 25,
+                    color: selectedScreen == 2
+                        ? HexColor('007FFF')
+                        : HexColor('99A4AE'),
+                  ),
+                  if (unreadNotifications)
+                    Positioned(
+                      right: 0,
+                      left: 15,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: HexColor('FF033E'),
+                        ),
+                        width: 8,
+                        height: 8,
+                      ),
+                    )
+                ],
               ),
               label: "notifications",
             ),
@@ -102,6 +154,9 @@ class BottomNavBarWidget extends StatelessWidget {
 class TaskerBottomNavBarWidget extends StatelessWidget {
   // ignore: prefer_typing_uninitialized_variables
   final selectedScreen;
+
+  const TaskerBottomNavBarWidget(this.selectedScreen, {super.key});
+
   final List<Widget> screens = const [
     TaskerDashboard(),
     MyTasks(),
@@ -109,10 +164,10 @@ class TaskerBottomNavBarWidget extends StatelessWidget {
     MyTaskerProfile()
   ];
 
-  const TaskerBottomNavBarWidget(this.selectedScreen, {super.key});
-
   @override
   Widget build(BuildContext context) {
+    final unreadNotifications = Provider.of<Auth>(context).unreadNotifications;
+    final unreadTasks = Provider.of<Auth>(context).unreadTasks;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -143,12 +198,22 @@ class TaskerBottomNavBarWidget extends StatelessWidget {
                 ),
               );
             }
+            if (value == 1) {
+              Provider.of<Auth>(context, listen: false)
+                  .updateUnread('tasks', false);
+            }
+            if (value == 2) {
+              Provider.of<Auth>(context, listen: false).updateUnread(
+                'notifications',
+                false,
+              );
+            }
           },
           items: [
             BottomNavigationBarItem(
               icon: SvgPicture.asset(
                 "assets/images/icons/navbar/dashboard.svg",
-                width: 25,
+                width: 27,
                 color: selectedScreen == 0
                     ? HexColor('007FFF')
                     : HexColor('99A4AE'),
@@ -156,22 +221,56 @@ class TaskerBottomNavBarWidget extends StatelessWidget {
               label: 'Dashboard',
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                "assets/images/icons/navbar/my_tasks.svg",
-                width: 25,
-                color: selectedScreen == 1
-                    ? HexColor('007FFF')
-                    : HexColor('99A4AE'),
+              icon: Stack(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/icons/navbar/my_tasks.svg",
+                    width: 25,
+                    color: selectedScreen == 1
+                        ? HexColor('007FFF')
+                        : HexColor('99A4AE'),
+                  ),
+                  if (unreadTasks)
+                    Positioned(
+                      right: 0,
+                      left: 15,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: HexColor('FF033E'),
+                        ),
+                        width: 8,
+                        height: 8,
+                      ),
+                    )
+                ],
               ),
               label: "mytasks",
             ),
             BottomNavigationBarItem(
-              icon: SvgPicture.asset(
-                "assets/images/icons/navbar/notifications.svg",
-                width: 25,
-                color: selectedScreen == 2
-                    ? HexColor('007FFF')
-                    : HexColor('99A4AE'),
+              icon: Stack(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/icons/navbar/notifications.svg",
+                    width: 25,
+                    color: selectedScreen == 2
+                        ? HexColor('007FFF')
+                        : HexColor('99A4AE'),
+                  ),
+                  if (unreadNotifications)
+                    Positioned(
+                      right: 0,
+                      left: 15,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: HexColor('FF033E'),
+                        ),
+                        width: 8,
+                        height: 8,
+                      ),
+                    )
+                ],
               ),
               label: "notifications",
             ),

@@ -56,7 +56,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: RefreshIndicator(
+          onRefresh: fetchWishlist,
           child: Column(
             children: [
               Container(
@@ -95,10 +96,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     child: Text('No Taskers Found in your wishlist!'),
                   ),
                 ),
-              RefreshIndicator(
-                onRefresh: () {
-                  return fetchWishlist();
-                },
+              Expanded(
                 child: Container(
                   decoration: BoxDecoration(
                     color: HexColor(
@@ -112,13 +110,13 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       isWishlist: true,
                       index: i,
                       username: loadedTaskers[i]['user']['username'],
-                      availability: loadedTaskers[i]['availability'],
+                      availability: loadedTaskers[i]['metrics']['availabilityRatio'],
                       workingCategories: loadedTaskers[i]['workingCategories'],
                       id: loadedTaskers[i]['id'],
                       displayName: loadedTaskers[i]['user']['displayName'],
                       rating: loadedTaskers[i]['rating'].toString(),
                       saves: loadedTaskers[i]['saves'].toString(),
-                      tasks: loadedTaskers[i]['totalTasks'].toString(),
+                      tasks: loadedTaskers[i]['completedTasks'].toString(),
                       profilePicture: loadedTaskers[i]['user']
                           ['profilePicture'],
                       selectedTaskers: selectedTaskers,

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+// import 'package:flutter/scheduler.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pairtasker/providers/chat.dart';
@@ -34,13 +34,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.data['type'] == 'task-completion') {
     getMyRequests();
   }
-  if (message.data['type'] == 'task-cancellation') {
+  if (message.data['type'] == 'task-cancellation' || message.data['type'] == 'tasker-terminated') {
     getMyTasks();
   }
-  updateMessages(
-    message.data,
-    message.data['taskId'],
-  );
+  if (message.data['type'] != 'task') {
+    updateMessages(
+      message.data,
+      message.data['taskId'],
+    );
+  }
 }
 
 Future<Map<String, dynamic>> getMyRequests() async {
@@ -70,6 +72,7 @@ Future<Map<String, dynamic>> getMyRequests() async {
 Future<Map<String, dynamic>> getMyTasks() async {
   var url = '${BaseURL.url}/tasker/get-my-tasks';
   final prefs = await SharedPreferences.getInstance();
+  await prefs.reload();
   final token = prefs.getString('token');
   final response = await Dio().get(
     url,
@@ -90,7 +93,7 @@ Future<Map<String, dynamic>> getMyTasks() async {
 }
 
 Future<void> updateChats(String taskId, String type) async {
-  var url = '${BaseURL.url}/$type/get-task-details';
+  var url = '${BaseURL.url}/task/get-$type-details';
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
   final response = await Dio().post(
@@ -125,21 +128,32 @@ void updateMessages(Map<String, dynamic> message, String taskId) async {
     prefs.setString(taskId, jsonEncode(chatsData));
   } else {
     if (message['screenType'] == 'user') {
-      updateChats(taskId, 'tasker');
+      updateChats(taskId, 'task');
     } else {
-      updateChats(taskId, 'user');
+      updateChats(taskId, 'request');
     }
   }
   if (prefs.containsKey('unread-messages')) {
     final pendingPref = prefs.getString('unread-messages');
     Map<String, dynamic> pendingData =
         jsonDecode(pendingPref!) as Map<String, dynamic>;
-    pendingData[taskId] = pendingData[taskId] + 1;
+    if (pendingData.containsKey(taskId)) {
+      pendingData[taskId] = pendingData[taskId] + 1;
+    } else {
+      pendingData[taskId] = 1;
+    }
     prefs.setString('unread-messages', jsonEncode(pendingData));
   } else {
     Map<String, dynamic> pendingData = {};
     pendingData[taskId] = 1;
     prefs.setString('unread-messages', jsonEncode(pendingData));
+  }
+  if (message['type'] == 'message') {
+    if (message['screenType'] == 'user') {
+      prefs.setString('unread-tasks', jsonEncode(true));
+    } else {
+      prefs.setString('unread-requests', jsonEncode(true));
+    }
   }
 }
 
@@ -214,23 +228,33 @@ class _MyAppState extends State<MyApp> {
           notification.title,
           notification.body,
           NotificationDetails(
-            android: AndroidNotificationDetails(channel.id, channel.name,
-                channelDescription: channel.description,
-                playSound: true,
-                icon: '@drawable/notification_icon'),
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: channel.description,
+              playSound: true,
+              icon: '@drawable/notification_icon',
+            ),
           ),
         );
       }
       if (message.data['type'] == 'task-completion') {
         getMyRequests();
       }
-      if (message.data['type'] == 'task-cancellation') {
+      if (message.data['type'] == 'task-cancellation' || message.data['type'] == 'tasker-terminated') {
         getMyTasks();
       }
-      updateMessages(
-        message.data,
-        message.data['taskId'],
-      );
+      if (message.data['type'] != 'task') {
+        updateMessages(
+          message.data,
+          message.data['taskId'],
+        );
+      }
+      if (message.data['type'] == 'task') {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.reload();
+        prefs.setString('unread-notifications', jsonEncode(true));
+      }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pairtasker/helpers/methods.dart';
 import 'package:pairtasker/screens/tasker_profile/tasker_profile_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:pairtasker/providers/user.dart';
@@ -40,7 +41,12 @@ class _RecentsState extends State<Recents> {
   @override
   Widget build(BuildContext context) {
     if (recentTaskers.isNotEmpty) {
-      return SizedBox(
+      return Container(
+        decoration: BoxDecoration(
+          color: HexColor(
+            Helper.isDark(context) ? '252B30' : '#E4ECF5',
+          ),
+        ),
         width: MediaQuery.of(context).size.width * 100,
         height: MediaQuery.of(context).size.height * 16 / 100,
         child: Column(

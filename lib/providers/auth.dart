@@ -17,6 +17,9 @@ class Auth with ChangeNotifier {
   String _token = '';
   String _username = '';
   bool _isTasker = false;
+  bool _unreadNotifications = false;
+  bool _unreadRequests = false;
+  bool _unreadTasks = false;
 
   bool get isAuth {
     return _token != '';
@@ -35,6 +38,61 @@ class Auth with ChangeNotifier {
       return _token;
     }
     return '';
+  }
+
+  bool get unreadNotifications {
+    return _unreadNotifications;
+  }
+
+  bool get unreadRequests {
+    return _unreadRequests;
+  }
+
+  bool get unreadTasks {
+    return _unreadTasks;
+  }
+
+  Future<void> updateUnread(String type, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    if (type == 'notifications') {
+      prefs.remove('unread-notifications');
+      prefs.setString('unread-notifcations', jsonEncode(value));
+      _unreadNotifications = value;
+      notifyListeners();
+    }
+    if (type == 'requests') {
+      prefs.remove('unread-requests');
+      prefs.setString('unread-requests', jsonEncode(value));
+      _unreadRequests = value;
+      notifyListeners();
+    }
+    if (type == 'tasks') {
+      prefs.remove('unread-tasks');
+      prefs.setString('unread-tasks', jsonEncode(value));
+      _unreadTasks = value;
+      notifyListeners();
+    }
+  }
+
+  Future<void> checkUnread() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    if (prefs.containsKey('unread-notifications')) {
+      final notifcationsPref = prefs.getString('unread-notifications');
+      _unreadNotifications = jsonDecode(notifcationsPref!) as bool;
+      notifyListeners();
+    }
+    if (prefs.containsKey('unread-requests')) {
+      final requestsPref = prefs.getString('unread-requests');
+      _unreadRequests = jsonDecode(requestsPref!) as bool;
+      notifyListeners();
+    }
+    if (prefs.containsKey('unread-tasks')) {
+      final tasksPref = prefs.getString('unread-tasks');
+      _unreadTasks = jsonDecode(tasksPref!) as bool;
+      notifyListeners();
+    }
   }
 
   Future<bool> checkIsTasker() async {
@@ -95,6 +153,7 @@ class Auth with ChangeNotifier {
     notifyListeners();
     checkisSignUpCompleted();
     checkIsTasker();
+    checkUnread();
     return true;
   }
 
@@ -269,15 +328,26 @@ class Auth with ChangeNotifier {
         prefs.setString('userdata', jsonEncode(responseData['data']));
       } else {
         final userPref = prefs.getString('userdata');
-        Map<String, dynamic> userdata =
+        Map<String, dynamic> userdataPref =
             jsonDecode(userPref!) as Map<String, dynamic>;
+        Map<String, dynamic> updatedUserDataPref = responseData['data'];
         Map<String, dynamic> updatedUserData = {
-          ...userdata,
-          'username': responseData['data']['username'],
-          'displayName': responseData['data']['displayName'],
-          'mobileNumber': responseData['data']['mobileNumber'],
-          'dob': responseData['data']['dob'],
-          'gender': responseData['data']['gender'],
+          ...userdataPref,
+          'username': updatedUserDataPref.containsKey('username')
+              ? updatedUserDataPref['username']
+              : userdataPref['username'],
+          'displayName': updatedUserDataPref.containsKey('displayName')
+              ? updatedUserDataPref['displayName']
+              : userdataPref['displayName'],
+          'mobileNumber': updatedUserDataPref.containsKey('mobileNumber')
+              ? updatedUserDataPref['mobileNumber']
+              : userdataPref['mobileNumber'],
+          'dob': updatedUserDataPref.containsKey('dob')
+              ? updatedUserDataPref['dob']
+              : userdataPref['dob'],
+          'gender': updatedUserDataPref.containsKey('gender')
+              ? updatedUserDataPref['gender']
+              : userdataPref['gender'],
           if (responseData['data']['profilePicture'] != null)
             'profilePicture': responseData['data']['profilePicture'],
         };
@@ -424,6 +494,22 @@ class Auth with ChangeNotifier {
       _isTasker = false;
       notifyListeners();
     }
+    return response;
+  }
+
+  Future<Response> fetchWorkingCategories() async {
+    const url = '${BaseURL.url}/admin/list-categories';
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        contentType: "multipart/form-data",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          'token': _token,
+        },
+      ),
+    );
     return response;
   }
 

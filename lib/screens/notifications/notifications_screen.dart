@@ -46,42 +46,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     super.didChangeDependencies();
   }
 
-  Future<void> acceptRequest(String taskId, bool accept) async {
-    final response = await Provider.of<Tasker>(context, listen: false)
-        .acceptRequest(taskId, accept);
-    if (response.statusCode == 200) {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        // ignore: use_build_context_synchronously
-        backgroundColor: HexColor('007FFF'),
-        content: Text(
-          response.data['message'],
-          style: GoogleFonts.poppins(
-            // ignore: use_build_context_synchronously
-            color: Helper.isDark(context) ? Colors.white : Colors.black,
-          ),
-        ),
-      ));
-      // ignore: use_build_context_synchronously
-      final navigator = Navigator.of(context);
-      Future.delayed(const Duration(seconds: 2), () {
-        navigator.pushReplacementNamed('/mytasks');
-      });
-    } else {
-      // ignore: use_build_context_synchronously
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        // ignore: use_build_context_synchronously
-        backgroundColor: HexColor('FF033E'),
-        content: Text(
-          response.data['message'],
-          style: GoogleFonts.poppins(
-            // ignore: use_build_context_synchronously
-            color: Helper.isDark(context) ? Colors.white : Colors.black,
-          ),
-        ),
-      ));
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,78 +54,82 @@ class _NotificationScreenState extends State<NotificationScreen> {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 8 / 100,
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Helper.isDark(context) ? Colors.white : Colors.black,
-                    width: 0.2,
+        child: RefreshIndicator(
+          onRefresh: () =>
+              Provider.of<Tasker>(context, listen: false).getNotifications(),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 8 / 100,
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color:
+                          Helper.isDark(context) ? Colors.white : Colors.black,
+                      width: 0.2,
+                    ),
+                  ),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
+                child: Text(
+                  'Notifications',
+                  style: GoogleFonts.poppins(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 20,
+              const SizedBox(
+                height: 20,
               ),
-              child: Text(
-                'Notifications',
-                style: GoogleFonts.poppins(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+              if (notifications.isEmpty && !_isLoading)
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  color: Helper.isDark(context) ? Colors.black : Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
+                  child: const Center(
+                    child: Text('No Notifications!'),
+                  ),
+                ),
+              if (_isLoading)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 15,
+                  ),
+                  child: const CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  ),
+                ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: notifications.length,
+                  itemBuilder: (ctx, i) {
+                    if (notifications[i]['type'] == 'task') {
+                      return RequestNotification(
+                          taskId: notifications[i]['taskId'],
+                          description: notifications[i]['description'],
+                          profilePicture: notifications[i]['user']
+                              ['profilePicture'],
+                          username: notifications[i]['user']['displayName']);
+                    } else if (notifications[i]['type'] == 'warning') {
+                      return const WarningNotification();
+                    } else {
+                      return const AnnouncementNotification();
+                    }
+                  },
                 ),
               ),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            if (notifications.isEmpty && !_isLoading)
-              Container(
-                width: MediaQuery.of(context).size.width,
-                color: Helper.isDark(context) ? Colors.black : Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                child: const Center(
-                  child: Text('No Notifications!'),
-                ),
-              ),
-            if (_isLoading)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 15,
-                ),
-                child: const CircularProgressIndicator(
-                  backgroundColor: Colors.white,
-                ),
-              ),
-            SizedBox(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: notifications.length,
-                itemBuilder: (ctx, i) {
-                  if (notifications[i]['type'] == 'task') {
-                    return RequestNotification(
-                        acceptRequest: acceptRequest,
-                        taskId: notifications[i]['taskId'],
-                        description: notifications[i]['description'],
-                        profilePicture: notifications[i]['user']
-                            ['profilePicture'],
-                        username: notifications[i]['user']['displayName']);
-                  } else if (notifications[i]['type'] == 'warning') {
-                    return const WarningNotification();
-                  } else {
-                    return const AnnouncementNotification();
-                  }
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: isTasker

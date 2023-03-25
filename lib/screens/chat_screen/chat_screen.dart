@@ -57,6 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
   bool isLoading = false;
   bool isTimerEnded = false;
   bool isMessageEmpty = true;
+  bool isTerminated = false;
 
   _scrollToEnd() async {
     if (_needsScroll) {
@@ -237,11 +238,15 @@ class _ChatScreenState extends State<ChatScreen> {
         reqMessage = responsedata['message'];
         currentUser = responsedata['user'];
         taskStatus = int.parse(responsedata['status']);
+        isTerminated = responsedata['terminated'];
       });
     }
   }
 
   Future<void> sendMessage(String message, String type) async {
+    if (message.isEmpty) {
+      return;
+    }
     final prefs = await SharedPreferences.getInstance();
     final userPref = prefs.getString('userdata');
     Map<String, dynamic> userdata =
@@ -250,8 +255,11 @@ class _ChatScreenState extends State<ChatScreen> {
       "type": type,
       "text": message,
       "sender": userId,
-      "reciever":
-          screenType == 'user' ? currentTasker['id'] : currentUser['id'],
+      "reciever": currentTasker.isEmpty || currentUser.isEmpty
+          ? userId
+          : screenType == 'user'
+              ? currentTasker['id'].toString()
+              : currentUser['id'].toString(),
       "timestamp": '${DateTime.now()}',
       "image": imageURL,
       "sentBy": {"username": userdata['username']}.toString(),
@@ -261,7 +269,6 @@ class _ChatScreenState extends State<ChatScreen> {
     if (type == 'prompt') {
       data = {...data, "text": '${userdata['username']} ${data['text']}'};
     }
-
     final notification = {
       "title": userdata['displayName'],
       "body": imageURL.isNotEmpty ? 'Photo' : message,
@@ -352,23 +359,36 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void terminateTasker({bool ack = false}) async {
+  void terminateTasker({bool ack = false, String taskerId = ''}) async {
     if (!ack) {
-      final res = await Provider.of<Tasker>(context, listen: false)
-          .terminateTask(taskId);
+      final res =
+          await Provider.of<Tasker>(context, listen: false).terminateTask(
+        taskId,
+        taskerId,
+      );
       if (res.statusCode == 200) {
-        sendMessage('Tasker terminated', 'info');
-        // ignore: use_build_context_synchronously
-        Provider.of<Tasker>(context, listen: false).getMyTasks();
-        socket.emit('tasker-terminated', taskId);
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
+        if (taskerId.isEmpty) {
+          sendMessage('Tasker terminated', 'tasker-terminated');
+          socket.emit('tasker-terminated', taskId);
+        } else {
+          sendMessage(
+            '${currentUser['username']} terminated ${currentTasker['username']}',
+            'tasker-terminated',
+          );
+          socket.emit('tasker-terminated', taskId);
+        }
       }
     }
-    setState(() {
-      taskStatus = 0;
-      currentTasker = {};
-    });
+    if (screenType == 'user') {
+      setState(() {
+        taskStatus = 0;
+      });
+    } else {
+      setState(() {
+        taskStatus = 0;
+        Provider.of<Tasker>(context, listen: false).getMyTasks();
+      });
+    }
   }
 
   void withdrawRequest({bool ack = false}) async {
@@ -380,8 +400,6 @@ class _ChatScreenState extends State<ChatScreen> {
         // ignore: use_build_context_synchronously
         Provider.of<User>(context, listen: false).getMyRequests();
         socket.emit('task-withdraw', taskId);
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop();
       }
     }
     setState(() {
@@ -447,40 +465,38 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: ListView.builder(
                   itemCount: terminatedTaskers.length,
                   shrinkWrap: true,
-                  itemBuilder: ((context, i) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 15,
-                                backgroundImage: terminatedTaskers[i]
-                                            ['profilePicture'] !=
-                                        null
-                                    ? NetworkImage(
-                                        terminatedTaskers[i]['profilePicture'],
-                                      )
-                                    : const AssetImage(
-                                        'assets/images/default_user.png',
-                                      ) as ImageProvider,
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                '@${terminatedTaskers[i]['username']}',
-                                style: GoogleFonts.lato(),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            'terminated',
-                            style: GoogleFonts.lato(
-                              color: HexColor('FF033E'),
+                  itemBuilder: ((context, i) => Container(
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundImage:
+                                  terminatedTaskers[i]['profilePicture'] != null
+                                      ? NetworkImage(
+                                          terminatedTaskers[i]
+                                              ['profilePicture'],
+                                        )
+                                      : const AssetImage(
+                                          'assets/images/default_user.png',
+                                        ) as ImageProvider,
                             ),
-                          )
-                        ],
+                            Text(
+                              '@${terminatedTaskers[i]['username']}',
+                              style: GoogleFonts.lato(),
+                            ),
+                            Text(
+                              'terminated',
+                              style: GoogleFonts.lato(
+                                color: HexColor('FF033E'),
+                              ),
+                            )
+                          ],
+                        ),
                       )),
                 ),
               ),
@@ -648,16 +664,58 @@ class _ChatScreenState extends State<ChatScreen> {
                     ],
                   ),
                   PopupMenuButton(
+                      padding: const EdgeInsets.all(0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       itemBuilder: (_) => [
-                            if (screenType == 'tasker' && taskStatus < 2)
+                            if (screenType == 'tasker' && taskStatus < 2 && !isTerminated)
                               PopupMenuItem(
                                 onTap: terminateTasker,
-                                child: const Text('Terminate'),
+                                child: Text(
+                                  'Terminate',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ),
-                            if (screenType == 'user' && taskStatus < 2)
+                            if (screenType == 'user' &&
+                                taskStatus >= 0 &&
+                                taskStatus < 2)
                               PopupMenuItem(
                                 onTap: withdrawRequest,
-                                child: const Text('Withdraw request'),
+                                child: Text(
+                                  'Withdraw request',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            if (screenType == 'user' &&
+                                taskStatus < 2 &&
+                                currentTasker.isNotEmpty)
+                              PopupMenuItem(
+                                onTap: () => terminateTasker(
+                                  taskerId: currentTasker['id'],
+                                ),
+                                child: Text(
+                                  'Terminate ${currentTasker['username']}',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            if (screenType == 'user' &&
+                                taskStatus < 2 &&
+                                currentTasker.isNotEmpty)
+                              PopupMenuItem(
+                                onTap: confirmTask,
+                                child: Text(
+                                  'Confirm task',
+                                  style: GoogleFonts.lato(
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ),
                             PopupMenuItem(
                               onTap: () {
@@ -673,12 +731,17 @@ class _ChatScreenState extends State<ChatScreen> {
                                 );
                               },
                               child: Row(
-                                children: const [
-                                  Icon(Icons.report),
-                                  SizedBox(
+                                children: [
+                                  const Icon(Icons.report),
+                                  const SizedBox(
                                     width: 10,
                                   ),
-                                  Text('Report')
+                                  Text(
+                                    'Report',
+                                    style: GoogleFonts.lato(
+                                      fontSize: 14,
+                                    ),
+                                  )
                                 ],
                               ),
                             ),
@@ -789,12 +852,14 @@ class _ChatScreenState extends State<ChatScreen> {
                         message: '${loadedMessages[i]['text']}',
                         type: loadedMessages[i]['type'],
                       )
-                    : loadedMessages[i]['type'] == 'info'
+                    : loadedMessages[i]['type'] == 'info' ||
+                            loadedMessages[i]['type'] == 'tasker-terminated'
                         ? InfoMessage(
                             message: '${loadedMessages[i]['text']}',
                           )
                         : loadedMessages[i]['sender'] == userId
                             ? OutgoingMessage(
+                                isPrompt: loadedMessages[i]['type'] == 'prompt',
                                 message: loadedMessages[i]['text'],
                                 timestamp: loadedMessages[i]['timestamp'],
                                 msgStatus: messageStatus,
@@ -809,7 +874,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                     : '',
                               )
                             : IncomingMessage(
+                                senderImage: currentTasker['profilePicture'],
                                 message: loadedMessages[i]['text'],
+                                isPrompt: loadedMessages[i]['type'] == 'prompt',
                                 screenType: screenType,
                                 timestamp: loadedMessages[i]['timestamp'],
                                 sender: loadedMessages[i]['sentBy']
@@ -839,47 +906,44 @@ class _ChatScreenState extends State<ChatScreen> {
                     color: Helper.isDark(context) ? Colors.black : Colors.white,
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        width: screenType == 'user'
-                            ? MediaQuery.of(context).size.width * 66 / 100
-                            : isMessageEmpty
-                                ? MediaQuery.of(context).size.width * 64 / 100
-                                : MediaQuery.of(context).size.width * 74 / 100,
-                        height: MediaQuery.of(context).size.height * 5 / 100,
-                        decoration: BoxDecoration(
-                          color: Helper.isDark(context)
-                              ? HexColor('FFFFFF')
-                              : HexColor('E4ECF5'),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        padding: const EdgeInsets.only(
-                          left: 25,
-                          top: 10,
-                        ),
-                        child: TextField(
-                          maxLines: 8,
-                          style: GoogleFonts.lato(
-                            color: HexColor('252B30'),
+                      Expanded(
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 5 / 100,
+                          decoration: BoxDecoration(
+                            color: Helper.isDark(context)
+                                ? HexColor('FFFFFF')
+                                : HexColor('E4ECF5'),
+                            borderRadius: BorderRadius.circular(25),
                           ),
-                          onTap: () {
-                            setState(() {
-                              _needsScroll = true;
-                            });
-                            _scrollToEnd();
-                          },
-                          onTapOutside: (value) =>
-                              FocusManager.instance.primaryFocus?.unfocus(),
-                          controller: msgController,
-                          decoration: InputDecoration.collapsed(
-                            border: InputBorder.none,
-                            hintText: "Type....",
-                            hintStyle: GoogleFonts.lato(
-                              color: Helper.isDark(context)
-                                  ? HexColor('252B30')
-                                  : HexColor('AAABAB'),
+                          padding: const EdgeInsets.only(
+                            left: 25,
+                            top: 10,
+                          ),
+                          child: TextField(
+                            maxLines: 8,
+                            style: GoogleFonts.lato(
+                              color: HexColor('252B30'),
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _needsScroll = true;
+                              });
+                              _scrollToEnd();
+                            },
+                            onTapOutside: (value) =>
+                                FocusManager.instance.primaryFocus?.unfocus(),
+                            controller: msgController,
+                            decoration: InputDecoration.collapsed(
+                              border: InputBorder.none,
+                              hintText: "Type....",
+                              hintStyle: GoogleFonts.lato(
+                                color: Helper.isDark(context)
+                                    ? HexColor('252B30')
+                                    : HexColor('AAABAB'),
+                              ),
                             ),
                           ),
                         ),
@@ -888,7 +952,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         width: 8,
                       ),
                       if (screenType == 'user')
-                        Expanded(
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -913,25 +980,21 @@ class _ChatScreenState extends State<ChatScreen> {
                                   ),
                                 ),
                               ),
+                              const SizedBox(
+                                width: 5,
+                              ),
                               InkWell(
                                 onTap: () =>
                                     sendMessage(msgController.text, 'message'),
                                 child: Container(
                                   margin: const EdgeInsets.only(
-                                    left: 4,
+                                    left: 3,
+                                    bottom: 3,
                                   ),
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
+                                  child: Icon(
+                                    Icons.send,
+                                    size: 38,
                                     color: HexColor('007FFF'),
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                  child: Container(
-                                    margin: const EdgeInsets.only(left: 3),
-                                    child: const Icon(
-                                      Icons.send,
-                                      size: 30,
-                                      color: Colors.white,
-                                    ),
                                   ),
                                 ),
                               )
@@ -939,7 +1002,10 @@ class _ChatScreenState extends State<ChatScreen> {
                           ),
                         ),
                       if (screenType == 'tasker')
-                        Expanded(
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                          ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -950,20 +1016,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                       msgController.text, 'message'),
                                   child: Container(
                                     margin: const EdgeInsets.only(
-                                      left: 4,
+                                      left: 3,
+                                      bottom: 3,
                                     ),
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
+                                    child: Icon(
+                                      Icons.send,
+                                      size: 38,
                                       color: HexColor('007FFF'),
-                                      borderRadius: BorderRadius.circular(25),
-                                    ),
-                                    child: Container(
-                                      margin: const EdgeInsets.only(left: 3),
-                                      child: const Icon(
-                                        Icons.send,
-                                        size: 30,
-                                        color: Colors.white,
-                                      ),
                                     ),
                                   ),
                                 ),
@@ -991,7 +1050,16 @@ class _ChatScreenState extends State<ChatScreen> {
                                         ),
                                       ),
                                     ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
                                     PopupMenuButton(
+                                      padding: const EdgeInsets.all(0),
+                                      // color:
+                                      //     Helper.isDark(context) ? Colors.black : Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                       child: Container(
                                         padding: const EdgeInsets.all(6),
                                         decoration: BoxDecoration(
@@ -1018,12 +1086,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                             'wants you to confirm the order?',
                                             'prompt',
                                           ),
-                                          child: Row(
-                                            children: const [
-                                              Text(
-                                                'Request confirmation',
-                                              ),
-                                            ],
+                                          child: Text(
+                                            'Request confirmation',
+                                            style: GoogleFonts.lato(
+                                              fontSize: 14,
+                                            ),
                                           ),
                                         )
                                       ],
@@ -1418,18 +1485,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         },
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
-                    backgroundColor: HexColor('#32DE84'),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(25),
-                      ),
-                    ),
+                    backgroundColor:
+                        Helper.isDark(context) ? Colors.black : Colors.white,
                   ),
                   child: isLoading
                       ? const LoadingSpinner()
                       : Text(
-                          'Task Done',
-                          style: PairTaskerTheme.buttonText,
+                          'Verify user to complete the task',
+                          style: GoogleFonts.lato(
+                            fontSize: 18,
+                            color: HexColor('007FFF'),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                 ),
               ),

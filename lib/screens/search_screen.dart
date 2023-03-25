@@ -249,13 +249,13 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (BuildContext context, int i) => TaskerWidget(
                   index: i,
                   username: filteredTaskers[i]['user']['username'],
-                  availability: filteredTaskers[i]['availability'],
+                  availability: filteredTaskers[i]['metrics']['availabilityRatio'],
                   id: filteredTaskers[i]['id'],
                   displayName: filteredTaskers[i]['user']['displayName'],
                   workingCategories: filteredTaskers[i]['workingCategories'],
                   rating: filteredTaskers[i]['rating'].toString(),
                   saves: filteredTaskers[i]['saves'].toString(),
-                  tasks: filteredTaskers[i]['totalTasks'].toString(),
+                  tasks: filteredTaskers[i]['completedTasks'].toString(),
                   profilePicture: filteredTaskers[i]['user']['profilePicture'],
                   selectedTaskers: selectedTaskers,
                   isSelected:

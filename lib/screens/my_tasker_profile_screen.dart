@@ -141,6 +141,30 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                       ),
                     ],
                   ),
+                  InkWell(
+                    onTap: _isEditing
+                        ? updateTaskerBio
+                        : () => setState(() {
+                              _isEditing = true;
+                            }),
+                    child: isLoading
+                        ? const LoadingSpinner()
+                        : _isEditing
+                            ? Icon(
+                                Icons.done,
+                                size: 28,
+                                color: HexColor('007FFF'),
+                              )
+                            : Helper.isDark(context)
+                                ? Image.asset(
+                                    'assets/images/icons/edit_light.png',
+                                    height: 20,
+                                  )
+                                : Image.asset(
+                                    'assets/images/icons/edit.png',
+                                    height: 20,
+                                  ),
+                  )
                 ],
               ),
             ),
@@ -272,7 +296,7 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${'${workingCategories[index][0]}'.toUpperCase()}${workingCategories[index].toString().substring(1).toLowerCase()}',
+                              '${workingCategories[index]}',
                               style: GoogleFonts.lato(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -304,43 +328,43 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                 ),
               ),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(0),
-                    ),
-                  ),
-                  backgroundColor: _isEditing
-                      ? HexColor('007FFF')
-                      : Helper.isDark(context)
-                          ? HexColor('252B30')
-                          : HexColor('DEE0E0'),
-                  elevation: 0,
-                ),
-                onPressed: isLoading
-                    ? null
-                    : _isEditing
-                        ? updateTaskerBio
-                        : () => setState(() {
-                              _isEditing = true;
-                            }),
-                child: isLoading
-                    ? const LoadingSpinner()
-                    : Text(
-                        _isEditing ? 'Save' : 'Edit',
-                        style: GoogleFonts.lato(
-                          color: _isEditing ? Colors.white : HexColor('007FFF'),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-            )
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       padding: const EdgeInsets.symmetric(
+            //         vertical: 16,
+            //       ),
+            //       shape: const RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.all(
+            //           Radius.circular(0),
+            //         ),
+            //       ),
+            //       backgroundColor: _isEditing
+            //           ? HexColor('007FFF')
+            //           : Helper.isDark(context)
+            //               ? HexColor('252B30')
+            //               : HexColor('DEE0E0'),
+            //       elevation: 0,
+            //     ),
+            //     onPressed: isLoading
+            //         ? null
+            //         : _isEditing
+            //             ? updateTaskerBio
+            //             : () => setState(() {
+            //                   _isEditing = true;
+            //                 }),
+            //     child: isLoading
+            //         ? const LoadingSpinner()
+            //         : Text(
+            //             _isEditing ? 'Save' : 'Edit',
+            //             style: GoogleFonts.lato(
+            //               color: _isEditing ? Colors.white : HexColor('007FFF'),
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //   ),
+            // )
           ],
         ),
       ),

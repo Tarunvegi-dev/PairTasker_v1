@@ -20,10 +20,7 @@ class TaskerDetails extends StatefulWidget {
 }
 
 class _TaskerDetailsState extends State<TaskerDetails> {
-  final List<String> kOptions = <String>[
-    'delivery boy',
-    'photographer',
-  ];
+  final List<String> kOptions = [];
 
   List<dynamic> _workingCategories = <String>[];
   final category = TextEditingController();
@@ -38,6 +35,21 @@ class _TaskerDetailsState extends State<TaskerDetails> {
       });
     }
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    final response = await Provider.of<Auth>(context, listen: false)
+        .fetchWorkingCategories();
+    final workingCategories = response.data['data'] as List<dynamic>;
+    if (response.statusCode == 200) {
+      for (var w in workingCategories) {
+        setState(() {
+          kOptions.add(w['name']);
+        });
+      }
+    }
+    super.didChangeDependencies();
   }
 
   Future<void> createTasker() async {
@@ -104,151 +116,215 @@ class _TaskerDetailsState extends State<TaskerDetails> {
                   const SizedBox(
                     height: 35,
                   ),
-                  Autocomplete<String>(
-                    fieldViewBuilder: (
-                      context,
-                      category,
-                      focusNode,
-                      onFieldSubmitted,
-                    ) =>
-                        TextFormField(
-                      controller: category,
-                      focusNode: focusNode,
-                      decoration: InputDecoration(
-                        hintText: 'search category..',
-                        hintStyle: GoogleFonts.lato(
-                          fontSize: 14,
-                          color: HexColor('6F7273'),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: kOptions.length,
+                    itemBuilder: (context, i) => InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (_workingCategories.contains(kOptions[i])) {
+                            _workingCategories.remove(kOptions[i]);
+                          } else {
+                            _workingCategories.add(kOptions[i]);
+                          }
+                        });
+                      },
+                      child: Container(
+                        width: 335,
+                        height: 46,
+                        margin: const EdgeInsets.only(
+                          bottom: 15,
                         ),
-                        prefixIcon: Icon(
-                          Icons.search,
-                          size: 20,
-                          color: HexColor('AAABAB'),
-                        ),
-                        constraints: const BoxConstraints(
-                          maxHeight: 50,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          borderSide: BorderSide(
-                            color: HexColor('AAABAB'),
-                            width: 1,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: HexColor('007FFF'),
                           ),
+                          color: _workingCategories.contains(kOptions[i])
+                              ? HexColor('007FFF')
+                              : Helper.isDark(context)
+                                  ? Colors.black
+                                  : Colors.white,
                         ),
-                      ),
-                    ),
-                    optionsViewBuilder: (context, onSelected, options) => Align(
-                      alignment: Alignment.topLeft,
-                      child: Material(
-                        child: SizedBox(
-                          width: 370,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            padding: const EdgeInsets.all(1.0),
-                            itemCount: options.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              final option = options.elementAt(index);
-                              return GestureDetector(
-                                onTap: () {
-                                  onSelected(option);
-                                },
-                                child: ListTile(
-                                  title: Text(
-                                    option,
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                kOptions[i]
+                                        .toString()
+                                        .characters
+                                        .first
+                                        .toUpperCase() +
+                                    kOptions[i].toString().substring(1),
+                                style: GoogleFonts.lato(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                              );
-                            },
+                              ),
+                              if (_workingCategories.contains(kOptions[i]))
+                                const Icon(Icons.done)
+                              else
+                                InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _workingCategories.add(kOptions[i]);
+                                      });
+                                    },
+                                    child: const Icon(Icons.add))
+                            ],
                           ),
                         ),
                       ),
                     ),
-                    optionsBuilder: (TextEditingValue textEditingValue) {
-                      if (textEditingValue.text == '') {
-                        return const Iterable<String>.empty();
-                      }
-                      return kOptions.where((String option) {
-                        return option
-                            .contains(textEditingValue.text.toLowerCase());
-                      });
-                    },
-                    onSelected: (String selection) {
-                      setState(() {
-                        if (!_workingCategories.contains(selection)) {
-                          _workingCategories.add(selection);
-                        }
-                      });
-                      category.clear();
-                    },
                   ),
-                  SizedBox(
-                    height: error != '' ? 20 : 35,
-                  ),
-                  if (error != '')
-                    Column(
-                      children: [
-                        ErrorMessage(error),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                      ],
-                    ),
-                  Text(
-                    'Working Categories',
-                    style: GoogleFonts.lato(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: HexColor('6F7273')),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Wrap(
-                    spacing: 5.0,
-                    runSpacing: 15.0,
-                    children: _workingCategories
-                        .map(
-                          (category) => Container(
-                            width: 100,
-                            height: 24,
-                            margin: const EdgeInsets.only(right: 5),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 1,
-                            ),
-                            decoration: BoxDecoration(
-                              color: HexColor('007FFF'),
-                              borderRadius: BorderRadius.circular(50),
-                            ),
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    category,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                  InkWell(
-                                    onTap: () => setState(() {
-                                      _workingCategories.remove(category);
-                                    }),
-                                    child: Image.asset(
-                                      "assets/images/icons/close.png",
-                                      height: 16,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
+                  // Autocomplete<String>(
+                  //   fieldViewBuilder: (
+                  //     context,
+                  //     category,
+                  //     focusNode,
+                  //     onFieldSubmitted,
+                  //   ) =>
+                  //       TextFormField(
+                  //     controller: category,
+                  //     focusNode: focusNode,
+                  //     decoration: InputDecoration(
+                  //       hintText: 'search category..',
+                  //       hintStyle: GoogleFonts.lato(
+                  //         fontSize: 14,
+                  //         color: HexColor('6F7273'),
+                  //       ),
+                  //       prefixIcon: Icon(
+                  //         Icons.search,
+                  //         size: 20,
+                  //         color: HexColor('AAABAB'),
+                  //       ),
+                  //       constraints: const BoxConstraints(
+                  //         maxHeight: 50,
+                  //       ),
+                  //       border: OutlineInputBorder(
+                  //         borderRadius: BorderRadius.circular(5),
+                  //         borderSide: BorderSide(
+                  //           color: HexColor('AAABAB'),
+                  //           width: 1,
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   optionsViewBuilder: (context, onSelected, options) => Align(
+                  //     alignment: Alignment.topLeft,
+                  //     child: Material(
+                  //       child: SizedBox(
+                  //         width: 370,
+                  //         child: ListView.builder(
+                  //           shrinkWrap: true,
+                  //           padding: const EdgeInsets.all(1.0),
+                  //           itemCount: options.length,
+                  //           itemBuilder: (BuildContext context, int index) {
+                  //             final option = options.elementAt(index);
+                  //             return GestureDetector(
+                  //               onTap: () {
+                  //                 onSelected(option);
+                  //               },
+                  //               child: ListTile(
+                  //                 title: Text(
+                  //                   option,
+                  //                   style: const TextStyle(color: Colors.white),
+                  //                 ),
+                  //               ),
+                  //             );
+                  //           },
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  //   optionsBuilder: (TextEditingValue textEditingValue) {
+                  //     if (textEditingValue.text == '') {
+                  //       return const Iterable<String>.empty();
+                  //     }
+                  //     return kOptions.where((String option) {
+                  //       return option
+                  //           .contains(textEditingValue.text.toLowerCase());
+                  //     });
+                  //   },
+                  //   onSelected: (String selection) {
+                  //     setState(() {
+                  //       if (!_workingCategories.contains(selection)) {
+                  //         _workingCategories.add(selection);
+                  //       }
+                  //     });
+                  //     category.clear();
+                  //   },
+                  // ),
+                  // SizedBox(
+                  //   height: error != '' ? 20 : 35,
+                  // ),
+                  // if (error != '')
+                  //   Column(
+                  //     children: [
+                  //       ErrorMessage(error),
+                  //       const SizedBox(
+                  //         height: 20,
+                  //       ),
+                  //     ],
+                  //   ),
+                  // Text(
+                  //   'Working Categories',
+                  //   style: GoogleFonts.lato(
+                  //       fontSize: 14,
+                  //       fontWeight: FontWeight.w600,
+                  //       color: HexColor('6F7273')),
+                  // ),
+                  // const SizedBox(
+                  //   height: 25,
+                  // ),
+                  // Wrap(
+                  //   spacing: 5.0,
+                  //   runSpacing: 15.0,
+                  //   children: _workingCategories
+                  //       .map(
+                  //         (category) => Container(
+                  //           width: 100,
+                  //           height: 24,
+                  //           margin: const EdgeInsets.only(right: 5),
+                  //           padding: const EdgeInsets.symmetric(
+                  //             horizontal: 10,
+                  //             vertical: 1,
+                  //           ),
+                  //           decoration: BoxDecoration(
+                  //             color: HexColor('007FFF'),
+                  //             borderRadius: BorderRadius.circular(50),
+                  //           ),
+                  //           child: Center(
+                  //             child: Row(
+                  //               mainAxisAlignment:
+                  //                   MainAxisAlignment.spaceBetween,
+                  //               children: [
+                  //                 Text(
+                  //                   category,
+                  //                   style: const TextStyle(
+                  //                     color: Colors.white,
+                  //                     fontSize: 10,
+                  //                   ),
+                  //                 ),
+                  //                 InkWell(
+                  //                   onTap: () => setState(() {
+                  //                     _workingCategories.remove(category);
+                  //                   }),
+                  //                   child: Image.asset(
+                  //                     "assets/images/icons/close.png",
+                  //                     height: 16,
+                  //                   ),
+                  //                 )
+                  //               ],
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       )
+                  //       .toList(),
+                  // ),
                 ],
               ),
             ),

@@ -40,8 +40,6 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _isLoading = true;
       });
-      // ignore: use_build_context_synchronously
-      Provider.of<Auth>(context, listen: false).updateGeoLocation();
       searchTaskers().then((_) {
         setState(() {
           _isLoading = false;
@@ -218,6 +216,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void setSelectedTaskersEmpty() {
+    setState(() {
+      selectedTaskers = [];
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -345,12 +349,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: HexColor(
-                    Helper.isDark(context) ? '252B30' : '#E4ECF5',
-                  ),
-                ),
+              Expanded(
                 child: RefreshIndicator(
                   onRefresh: searchTaskers,
                   child: Column(
@@ -359,6 +358,11 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
+                        ),
+                        decoration: BoxDecoration(
+                          color: HexColor(
+                            Helper.isDark(context) ? '252B30' : '#E4ECF5',
+                          ),
                         ),
                         width: MediaQuery.of(context).size.width,
                         height: 60,
@@ -499,28 +503,31 @@ class _HomePageState extends State<HomePage> {
                             child: Text('No Taskers Found, please try again!'),
                           ),
                         ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: filteredTaskers.length,
-                        itemBuilder: (ctx, i) => TaskerWidget(
-                          index: i,
-                          username: filteredTaskers[i]['user']['username'],
-                          availability: filteredTaskers[i]['availability'],
-                          id: filteredTaskers[i]['id'],
-                          displayName: filteredTaskers[i]['user']
-                              ['displayName'],
-                          workingCategories: filteredTaskers[i]
-                              ['workingCategories'],
-                          rating: filteredTaskers[i]['rating'].toString(),
-                          saves: filteredTaskers[i]['saves'].toString(),
-                          tasks: filteredTaskers[i]['totalTasks'].toString(),
-                          profilePicture: filteredTaskers[i]['user']
-                              ['profilePicture'],
-                          selectedTaskers: selectedTaskers,
-                          isSelected: selectedTaskers
-                                  .contains(filteredTaskers[i]['id']) !=
-                              false,
-                          selectTaskers: selectTaskers,
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: filteredTaskers.length,
+                          itemBuilder: (ctx, i) => TaskerWidget(
+                            index: i,
+                            username: filteredTaskers[i]['user']['username'],
+                            availability: filteredTaskers[i]['metrics']['availabilityRatio'],
+                            id: filteredTaskers[i]['id'],
+                            displayName: filteredTaskers[i]['user']
+                                ['displayName'],
+                            workingCategories: filteredTaskers[i]
+                                ['workingCategories'],
+                            rating: filteredTaskers[i]['rating'].toString(),
+                            saves: filteredTaskers[i]['saves'].toString(),
+                            tasks:
+                                filteredTaskers[i]['completedTasks'].toString(),
+                            profilePicture: filteredTaskers[i]['user']
+                                ['profilePicture'],
+                            selectedTaskers: selectedTaskers,
+                            isSelected: selectedTaskers
+                                    .contains(filteredTaskers[i]['id']) !=
+                                false,
+                            selectTaskers: selectTaskers,
+                          ),
                         ),
                       ),
                       if (filteredTaskers.length > 15)
@@ -553,11 +560,7 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(0),
                       ),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        selectedTaskers = [];
-                      });
-                    },
+                    onPressed: setSelectedTaskersEmpty,
                     child: Text(
                       'Cancel',
                       style: GoogleFonts.lato(
@@ -580,7 +583,11 @@ class _HomePageState extends State<HomePage> {
                       backgroundColor: HexColor('007FFF'),
                     ),
                     onPressed: () => Helper.showRequestModal(
-                        context, selectedTaskers, _workingCategories.join('')),
+                      context,
+                      selectedTaskers,
+                      _workingCategories.join(''),
+                      setSelectedTaskers: setSelectedTaskersEmpty
+                    ),
                     child: Text(
                       'Request',
                       style: GoogleFonts.lato(

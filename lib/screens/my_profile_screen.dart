@@ -67,7 +67,7 @@ class _MyProfileState extends State<MyProfile> {
 
   Future<void> updateUserDetails() async {
     setState(() {
-      isLoading = true;
+      // isLoading = true;
     });
     String dob = DateFormat('yyyy-MM-dd').format(_dob);
     FormData formData = FormData.fromMap(
@@ -76,11 +76,14 @@ class _MyProfileState extends State<MyProfile> {
           'image': await MultipartFile.fromFile(
             _croppedFile!.path,
           ),
-        'username': username.text,
-        'displayName': displayName.text,
-        'mobileNumber': mobileNumber.text,
-        'dob': dob,
-        'gender': gender,
+        if (_userdata['username'] != username.text.replaceAll(' ', ''))
+          'username': username.text,
+        if (_userdata['displayName'] != displayName.text)
+          'displayName': displayName.text,
+        if (_userdata['mobileNumber'] != mobileNumber.text)
+          'mobileNumber': mobileNumber.text,
+        if (_userdata['dob'] != dob) 'dob': dob,
+        if (_userdata['gender'] != gender) 'gender': gender,
       },
     );
     // ignore: use_build_context_synchronously
@@ -89,7 +92,7 @@ class _MyProfileState extends State<MyProfile> {
     if (response.statusCode != 200) {
       setState(() {
         isLoading = false;
-        error = response.data['error'];
+        error = response.data['message'];
       });
     } else {
       setState(() {
@@ -654,6 +657,7 @@ class _MyProfileState extends State<MyProfile> {
                         const SizedBox(
                           height: 30,
                         ),
+                        if (error.isNotEmpty) ErrorMessage(error),
                         if (!_isTasker)
                           TextButton(
                             onPressed: () =>
@@ -667,18 +671,13 @@ class _MyProfileState extends State<MyProfile> {
                             ),
                           ),
                         if (_isTasker)
-                          Container(
-                            margin: const EdgeInsets.only(
-                              bottom: 20,
-                            ),
-                            child: TextButton(
-                              onPressed: deleteTaskerAccount,
-                              child: Text(
-                                'Delete tasker account',
-                                style: GoogleFonts.lato(
-                                  fontSize: 14,
-                                  color: HexColor('FF033E'),
-                                ),
+                          TextButton(
+                            onPressed: deleteTaskerAccount,
+                            child: Text(
+                              'Delete tasker account',
+                              style: GoogleFonts.lato(
+                                fontSize: 14,
+                                color: HexColor('FF033E'),
                               ),
                             ),
                           ),

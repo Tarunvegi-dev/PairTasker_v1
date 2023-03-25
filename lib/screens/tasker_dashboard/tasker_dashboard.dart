@@ -28,15 +28,18 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
   bool taskerMode = false;
   bool _isInit = true;
   String address = '';
-  int totalTasks = 1;
+  int totalTasks = 0;
   int thresholdLimit = 5;
-  int ratingsAbove3 = 0;
-  int totalRatings = 1;
+  int rating = 0;
   int activeTasks = 0;
-  int totalRequests = 1;
+  int totalRequests = 0;
   int totalSaves = 0;
   int completedTasks = 0;
   int terminatedTasks = 0;
+  int acceptanceRatio = 0;
+  int availabilityRatio = 0;
+  int avgTaskCompletionTime = 0;
+  int network = 0;
   Map<dynamic, dynamic> workingCategories = {};
 
   final colorList = <Color>[
@@ -49,7 +52,6 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
 
   @override
   void didChangeDependencies() async {
-    Provider.of<Auth>(context, listen: false).updateGeoLocation();
     final prefs = await SharedPreferences.getInstance();
     final a = prefs.getString('address');
     setState(() {
@@ -77,18 +79,23 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
       setState(() {
         totalTasks = response.data['data']['totalTasks'];
         totalRequests = response.data['data']['totalRequests'];
-        totalSaves = response.data['data']['totalSaves'];
+        totalSaves = response.data['data']['saves'];
+        rating = response.data['data']['rating'];
         activeTasks = response.data['data']['activeTasks'];
         completedTasks = response.data['data']['completedTasks'];
-        thresholdLimit = response.data['data']['thresholdLimit'];
-        ratingsAbove3 = response.data['data']['ratingsAbove3'];
-        totalRatings = response.data['data']['totalRatings'];
-        workingCategories = response.data['data']['workingCategories'].map(
-          (key, value) => MapEntry(
-            key.toString(),
-            double.parse(value.toString()),
-          ),
-        );
+        thresholdLimit = int.parse(response.data['data']['thresholdLimit']);
+        acceptanceRatio = response.data['data']['acceptanceRatio'];
+        availabilityRatio = response.data['data']['availabilityRatio'];
+        avgTaskCompletionTime = response.data['data']['avgTaskCompletionTime'];
+        network = response.data['data']['network'];
+        if (response.data['data']['taskCategoriesCount'] != null) {
+          workingCategories = response.data['data']['taskCategoriesCount'].map(
+            (key, value) => MapEntry(
+              key.toString(),
+              double.parse(value.toString()),
+            ),
+          );
+        }
       });
     }
   }
@@ -97,7 +104,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
     setState(() {
       taskerMode = status;
     });
-    final response = await Provider.of<Tasker>(context, listen: false)  
+    final response = await Provider.of<Tasker>(context, listen: false)
         .setTaskerOnline(status);
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -157,7 +164,11 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                                     ),
                                     color: Helper.isDark(context)
                                         ? const Color.fromRGBO(
-                                            242, 242, 243, 0.35)
+                                            242,
+                                            242,
+                                            243,
+                                            0.349,
+                                          )
                                         : const Color.fromRGBO(0, 0, 0, 0.1),
                                   ),
                                   child: Container(
@@ -214,17 +225,121 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                         child: ListView(
                           children: [
                             const ActiveTasks(),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Helper.isDark(context)
+                                    ? Colors.black
+                                    : Colors.white,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                  horizontal: 25,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      width: 75,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(5),
+                                        ),
+                                        border: Border.all(
+                                          color: HexColor('FFC72C'),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 5,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/icons/rating.svg',
+                                          ),
+                                          Text(
+                                            rating.toString(),
+                                            style: GoogleFonts.lato(
+                                              color: HexColor('FFC72C'),
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 75,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(5),
+                                        ),
+                                        border: Border.all(
+                                          color: HexColor('FF033E'),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 5,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/icons/wishlist_dark.svg',
+                                          ),
+                                          Text(
+                                            totalSaves.toString(),
+                                            style: GoogleFonts.lato(
+                                              color: HexColor('FF033E'),
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 75,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                          Radius.circular(5),
+                                        ),
+                                        border: Border.all(
+                                          color: HexColor('551BFB'),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 5,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          SvgPicture.asset(
+                                            'assets/images/icons/network.svg',
+                                          ),
+                                          Text(
+                                            network.toString(),
+                                            style: GoogleFonts.lato(
+                                              color: HexColor('551BFB'),
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
                             RatioWidget(
                               icon: 'availability',
                               title: 'Availability Ratio',
                               description: 'Active tasks by Threshold',
                               ratio: '$activeTasks/0$thresholdLimit',
-                              percentage: (100 -
-                                          activeTasks / thresholdLimit * 100)
-                                      .isNaN
-                                  ? 0
-                                  : (100 - activeTasks / thresholdLimit * 100)
-                                      .toInt(),
+                              percentage: availabilityRatio,
                               color: '007FFF',
                             ),
                             const SizedBox(
@@ -236,40 +351,23 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                               description:
                                   'Total accepted tasks by Number of Requests',
                               ratio: '$totalTasks/$totalRequests',
-                              percentage: (totalTasks / totalRequests * 100)
-                                      .isNaN
-                                  ? 0
-                                  : (totalTasks / totalRequests * 100).toInt(),
+                              percentage: acceptanceRatio,
                               color: '00CE15',
                             ),
                             const SizedBox(
                               height: 8,
                             ),
                             RatioWidget(
-                              icon: 'wishlist',
-                              title: 'Trust Ratio',
+                              icon: 'time',
+                              title: 'Average Task completion time',
                               description:
-                                  'Total Saves by Number of Tasks Done',
-                              ratio: '$totalSaves/$totalTasks',
-                              percentage: (totalSaves / totalTasks * 100).isNaN
-                                  ? 0
-                                  : (totalSaves / totalTasks * 100).toInt(),
-                              color: 'FF033E',
-                            ),
-                            const SizedBox(
-                              height: 8,
-                            ),
-                            RatioWidget(
-                              icon: 'rating',
-                              title: 'Rating Ratio',
-                              description: 'Above 3 stars by Total Ratings',
-                              ratio: '$ratingsAbove3/$totalRatings',
-                              percentage:
-                                  (ratingsAbove3 / totalRatings * 100).isNaN
-                                      ? 0
-                                      : (ratingsAbove3 / totalRatings * 100)
-                                          .toInt(),
-                              color: 'FFC72C',
+                                  'Sum of all task completion time by Completed Tasks',
+                              ratio: '',
+                              percentage: 0,
+                              time: Helper.convertTimeFromMilliSeconds(
+                                avgTaskCompletionTime.toDouble(),
+                              ),
+                              color: '551BFB',
                             ),
                             const SizedBox(
                               height: 8,
@@ -394,24 +492,25 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                             const SizedBox(
                               height: 8,
                             ),
-                            Container(
-                              padding: const EdgeInsets.all(20),
-                              color: Helper.isDark(context)
-                                  ? Colors.black
-                                  : Colors.white,
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Working Categories Pie Chart',
-                                      style: GoogleFonts.lato(
-                                        color: HexColor('99A4AE'),
+                            if (workingCategories.isNotEmpty)
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                color: Helper.isDark(context)
+                                    ? Colors.black
+                                    : Colors.white,
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Working Categories Pie Chart',
+                                        style: GoogleFonts.lato(
+                                          color: HexColor('99A4AE'),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    if (workingCategories.isNotEmpty)
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
                                       PieChart(
                                         dataMap: workingCategories.cast(),
                                         colorList: colorList,
@@ -424,8 +523,8 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                                           decimalPlaces: 0,
                                         ),
                                       )
-                                  ]),
-                            )
+                                    ]),
+                              )
                           ],
                         ),
                       ),

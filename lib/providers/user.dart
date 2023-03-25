@@ -107,7 +107,7 @@ class User with ChangeNotifier {
 
   Future<Response> sendNewRequest(
       List<dynamic> taskers, String message, String category) async {
-    const url = '${BaseURL.url}/user/send-request';
+    const url = '${BaseURL.url}/task/send-request';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(
@@ -188,7 +188,7 @@ class User with ChangeNotifier {
   }
 
   Future<Response> confirmTask(String taskId) async {
-    const url = '${BaseURL.url}/user/confirm-task';
+    const url = '${BaseURL.url}/task/confirm-task';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(
@@ -207,7 +207,7 @@ class User with ChangeNotifier {
   }
 
   Future<Response> withdrawRequest(String taskId) async {
-    const url = '${BaseURL.url}/user/withdraw-request';
+    const url = '${BaseURL.url}/task/withdraw-request';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(

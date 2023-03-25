@@ -19,12 +19,21 @@ class MyTasks extends StatefulWidget {
 class _MyTasksState extends State<MyTasks> {
   List<dynamic> loadedTasks = [];
   bool isLoading = false;
+  Map<String, dynamic> unreadMessages = {};
+  String userId = '';
 
   Future<void> fetchTasks() async {
     setState(() {
       isLoading = true;
     });
     final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final userPref = prefs.getString('userdata');
+    Map<String, dynamic> userdata =
+        jsonDecode(userPref!) as Map<String, dynamic>;
+    setState(() {
+      userId = userdata['id'].toString();
+    });
     final tasksPref = prefs.getString('tasks');
     Map<String, dynamic> tasksData =
         jsonDecode(tasksPref!) as Map<String, dynamic>;
@@ -37,6 +46,7 @@ class _MyTasksState extends State<MyTasks> {
         loadedTasks.addAll(response['completed']);
         isLoading = false;
       });
+      print(tasksData);
       return;
     } else {
       setState(() {
@@ -47,9 +57,23 @@ class _MyTasksState extends State<MyTasks> {
     }
   }
 
+  void checkUnreadMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    if (prefs.containsKey('unread-messages')) {
+      final pendingPref = prefs.getString('unread-messages');
+      Map<String, dynamic> pendingData =
+          jsonDecode(pendingPref!) as Map<String, dynamic>;
+      setState(() {
+        unreadMessages = pendingData;
+      });
+    }
+  }
+
   @override
   void initState() {
     fetchTasks();
+    checkUnreadMessages();
     super.initState();
   }
 
@@ -58,7 +82,8 @@ class _MyTasksState extends State<MyTasks> {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: RefreshIndicator(
+          onRefresh: fetchTasks,
           child: Column(
             children: [
               Container(
@@ -107,31 +132,26 @@ class _MyTasksState extends State<MyTasks> {
                     backgroundColor: Colors.white,
                   ),
                 ),
-                RefreshIndicator(
-                  onRefresh: () {
-                    return fetchTasks();
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: HexColor(
-                          Helper.isDark(context) ? '252B30' : '#E4ECF5'),
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: loadedTasks.length,
-                      itemBuilder: (BuildContext context, int i) => TaskWidget(
-                        id: loadedTasks[i]['id'],
-                        fetchTasks: fetchTasks,
-                        username: loadedTasks[i]['user']['username'],
-                        displayName: loadedTasks[i]['user']['displayName'],
-                        profilePicture: loadedTasks[i]['user']
-                            ['profilePicture'],
-                        status: loadedTasks[i]['status'],
-                        message: loadedTasks[i]['message'],
-                      ),
-                    ),
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: loadedTasks.length,
+                  itemBuilder: (BuildContext context, int i) => TaskWidget(
+                    id: loadedTasks[i]['id'],
+                    fetchTasks: fetchTasks,
+                    unreadCount:
+                        unreadMessages.containsKey(loadedTasks[i]['id'])
+                            ? unreadMessages[loadedTasks[i]['id']]
+                            : 0,
+                    isTerminated: loadedTasks[i]['currentTasker'].toString() != userId,
+                    username: loadedTasks[i]['user']['username'],
+                    displayName: loadedTasks[i]['user']['displayName'],
+                    profilePicture: loadedTasks[i]['user']['profilePicture'],
+                    status: loadedTasks[i]['status'],
+                    message: loadedTasks[i]['message'],
                   ),
-                )
+                ),
+              )
             ],
           ),
         ),

@@ -137,7 +137,6 @@ class Tasker extends ChangeNotifier {
         },
       ),
     );
-
     if (response.statusCode == 200) {
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
@@ -152,7 +151,7 @@ class Tasker extends ChangeNotifier {
   }
 
   Future<Response> acceptRequest(String taskId, bool accept) async {
-    var url = '${BaseURL.url}/tasker/request?accept=$accept';
+    var url = '${BaseURL.url}/task/request?accept=$accept';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(
@@ -178,15 +177,20 @@ class Tasker extends ChangeNotifier {
     return response;
   }
 
-  Future<Response> terminateTask(taskId) async {
-    const url = '${BaseURL.url}/tasker/terminate-from-task';
+  Future<Response> terminateTask(taskId, taskerId) async {
+    const url = '${BaseURL.url}/task/terminate-tasker';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(
       url,
-      data: {
-        "taskId": taskId,
-      },
+      data: taskerId.toString().isNotEmpty
+          ? {
+              "taskId": taskId,
+              "taskerId": taskerId,
+            }
+          : {
+              "taskId": taskId,
+            },
       options: Options(
         validateStatus: (_) => true,
         headers: {
@@ -198,7 +202,7 @@ class Tasker extends ChangeNotifier {
   }
 
   Future<Response> completeTask(taskId) async {
-    const url = '${BaseURL.url}/tasker/ask-to-complete';
+    const url = '${BaseURL.url}/task/ask-to-complete';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(
@@ -217,7 +221,7 @@ class Tasker extends ChangeNotifier {
   }
 
   Future<Response> verifyTaskOTP(String taskId, String otp) async {
-    const url = '${BaseURL.url}/tasker/task-completed';
+    const url = '${BaseURL.url}/task/task-completed';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final response = await Dio().post(

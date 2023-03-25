@@ -11,8 +11,10 @@ class RatioWidget extends StatelessWidget {
   final percentage;
   final description;
   final color;
+  final time;
 
   const RatioWidget({
+    this.time,
     this.title,
     this.icon,
     this.ratio,
@@ -57,34 +59,89 @@ class RatioWidget extends StatelessWidget {
                       )
                     ],
                   ),
-                  const SizedBox(
-                    height: 5,
+                  SizedBox(
+                    height: icon == 'time' ? 10 : 5,
                   ),
-                  Text(
-                    description,
-                    style: GoogleFonts.lato(
-                        fontWeight: FontWeight.bold, fontSize: 10),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    ratio,
-                    style: GoogleFonts.lato(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                  if (icon != 'time')
+                    Text(
+                      description,
+                      style: GoogleFonts.lato(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    )
+                  else
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Sum of all task completion time',
+                          style: GoogleFonts.lato(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                        Text(
+                          'by Completed Tasks',
+                          style: GoogleFonts.lato(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
                     ),
-                  )
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  if (icon != 'time')
+                    Column(
+                      children: [
+                        Text(
+                          ratio,
+                          style: GoogleFonts.lato(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        )
+                      ],
+                    ),
                 ],
               ),
-              Text(
-                '$percentage%',
-                style: GoogleFonts.lato(
-                  fontSize: 42,
-                  color: HexColor(color),
-                  fontWeight: FontWeight.w700,
-                ),
-              )
+              if (icon != 'time')
+                Text(
+                  '$percentage%',
+                  style: GoogleFonts.lato(
+                    fontSize: 42,
+                    color: HexColor(color),
+                    fontWeight: FontWeight.w700,
+                  ),
+                )
+              else
+                Row(
+                  children: [
+                    Text(
+                      '$time'.substring(0, 3),
+                      style: GoogleFonts.lato(
+                        fontSize: 42,
+                        color: HexColor(color),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 20,
+                      ),
+                      child: Text(
+                        '$time'.substring(3),
+                        style: GoogleFonts.lato(
+                          fontSize: 12,
+                          color: HexColor('AAABAB'),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
             ],
           ),
         ),

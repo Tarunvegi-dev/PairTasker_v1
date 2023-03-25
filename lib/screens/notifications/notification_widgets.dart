@@ -1,21 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/helpers/methods.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:pairtasker/providers/tasker.dart';
+import 'package:pairtasker/theme/widgets.dart';
+import 'package:provider/provider.dart';
 
-class RequestNotification extends StatelessWidget {
+class RequestNotification extends StatefulWidget {
   final description;
   final profilePicture;
   final username;
   final taskId;
-  final Function acceptRequest;
 
   const RequestNotification(
       {this.description,
       this.profilePicture,
       this.username,
       this.taskId,
-      required this.acceptRequest,
       super.key});
+
+  @override
+  State<RequestNotification> createState() => _RequestNotificationState();
+}
+
+class _RequestNotificationState extends State<RequestNotification> {
+  bool isAccepting = false;
+  bool isRejecting = false;
+
+  Future<void> acceptRequest(String taskId, bool accept) async {
+    if (accept) {
+      setState(() {
+        isAccepting = true;
+      });
+    } else {
+      setState(() {
+        isRejecting = true;
+      });
+    }
+    final response =
+        await Provider.of<Tasker>(context, listen: false).acceptRequest(
+      taskId,
+      accept,
+    );
+    if (response.statusCode == 200) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        // ignore: use_build_context_synchronously
+        backgroundColor: HexColor('007FFF'),
+        content: Text(
+          response.data['message'],
+          style: GoogleFonts.poppins(
+            // ignore: use_build_context_synchronously
+            color: Helper.isDark(context) ? Colors.white : Colors.black,
+          ),
+        ),
+      ));
+      if (accept) {
+        // ignore: use_build_context_synchronously
+        final navigator = Navigator.of(context);
+        Future.delayed(const Duration(seconds: 2), () {
+          navigator.pushReplacementNamed('/mytasks');
+        });
+      }
+    } else {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        // ignore: use_build_context_synchronously
+        backgroundColor: HexColor('FF033E'),
+        content: Text(
+          response.data['message'],
+          style: GoogleFonts.poppins(
+            // ignore: use_build_context_synchronously
+            color: Helper.isDark(context) ? Colors.white : Colors.black,
+          ),
+        ),
+      ));
+    }
+    if (accept) {
+      setState(() {
+        isAccepting = false;
+      });
+    } else {
+      setState(() {
+        isRejecting = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,17 +113,17 @@ class RequestNotification extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 18,
-                  backgroundImage: profilePicture == null
+                  backgroundImage: widget.profilePicture == null
                       ? const AssetImage(
                           'assets/images/default_user.png',
                         )
-                      : NetworkImage(profilePicture) as ImageProvider,
+                      : NetworkImage(widget.profilePicture) as ImageProvider,
                 ),
                 const SizedBox(
                   width: 12,
                 ),
                 Text(
-                  username,
+                  widget.username,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -65,7 +135,7 @@ class RequestNotification extends StatelessWidget {
               height: 14,
             ),
             Text(
-              description,
+              widget.description,
               style: TextStyle(
                 color: Helper.isDark(context)
                     ? HexColor('99A4AE')
@@ -93,14 +163,16 @@ class RequestNotification extends StatelessWidget {
                         ),
                       ),
                     ),
-                    onPressed: () => acceptRequest(taskId, false),
-                    child: const Text(
-                      'Reject',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    onPressed: () => acceptRequest(widget.taskId, false),
+                    child: isRejecting
+                        ? const LoadingSpinner()
+                        : const Text(
+                            'Reject',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ),
                 SizedBox(
@@ -116,14 +188,16 @@ class RequestNotification extends StatelessWidget {
                         ),
                       ),
                     ),
-                    onPressed: () => acceptRequest(taskId, true),
-                    child: const Text(
-                      'Accept',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    onPressed: () => acceptRequest(widget.taskId, true),
+                    child: isAccepting
+                        ? const LoadingSpinner()
+                        : const Text(
+                            'Accept',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 )
               ],
