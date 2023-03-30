@@ -21,7 +21,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> key = GlobalKey();
-  final List<dynamic> _workingCategories = ['deliveryboy'];
+  List<dynamic> kOptions = [];
+  final List<dynamic> _workingCategories = ['DeliveryBoy'];
   List<dynamic> filteredTaskers = [];
   var _isInit = true;
   var _isLoading = false;
@@ -33,6 +34,17 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() async {
     final prefs = await SharedPreferences.getInstance();
     final a = prefs.getString('address');
+    // ignore: use_build_context_synchronously
+    final response = await Provider.of<Auth>(context, listen: false)
+        .fetchWorkingCategories();
+    final workingCategories = response.data['data'] as List<dynamic>;
+    if (response.statusCode == 200) {
+      for (var w in workingCategories) {
+        setState(() {
+          kOptions.add(w['name']);
+        });
+      }
+    }
     setState(() {
       address = a.toString();
     });
@@ -366,126 +378,37 @@ class _HomePageState extends State<HomePage> {
                         ),
                         width: MediaQuery.of(context).size.width,
                         height: 60,
-                        child: ListView(
+                        child: ListView.builder(
                           scrollDirection: Axis.horizontal,
-                          children: [
-                            InkWell(
-                              onTap: () => manageWorkingCategories('Mechanic'),
-                              child: Container(
-                                width: 100,
-                                margin: const EdgeInsets.only(right: 5),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 1,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _workingCategories.contains('Mechanic')
-                                      ? HexColor('007FFF')
-                                      : Helper.isDark(context)
-                                          ? const Color.fromRGBO(
-                                              255, 255, 255, 0.1)
-                                          : const Color.fromRGBO(0, 0, 0, 0.1),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'Mechanic',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                    ),
+                          itemCount: kOptions.length,
+                          itemBuilder: (context, i) => InkWell(
+                            onTap: () => manageWorkingCategories(kOptions[i]),
+                            child: Container(
+                              width: 100,
+                              margin: const EdgeInsets.only(right: 5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 1,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _workingCategories.contains(kOptions[i])
+                                    ? HexColor('007FFF')
+                                    : Helper.isDark(context)
+                                        ? const Color.fromRGBO(
+                                            255, 255, 255, 0.1)
+                                        : const Color.fromRGBO(0, 0, 0, 0.1),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  kOptions[i],
+                                  style: GoogleFonts.lato(
+                                    fontSize: 10,
                                   ),
                                 ),
                               ),
                             ),
-                            InkWell(
-                              onTap: () =>
-                                  manageWorkingCategories('deliveryboy'),
-                              child: Container(
-                                width: 100,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 1,
-                                ),
-                                margin: const EdgeInsets.only(right: 5),
-                                decoration: BoxDecoration(
-                                  color: _workingCategories
-                                          .contains('deliveryboy')
-                                      ? HexColor('007FFF')
-                                      : Helper.isDark(context)
-                                          ? const Color.fromRGBO(
-                                              255, 255, 255, 0.1)
-                                          : const Color.fromRGBO(0, 0, 0, 0.1),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'Delivery Boy',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () =>
-                                  manageWorkingCategories('Photographer'),
-                              child: Container(
-                                width: 100,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 1,
-                                ),
-                                margin: const EdgeInsets.only(right: 5),
-                                decoration: BoxDecoration(
-                                  color: _workingCategories
-                                          .contains('Photographer')
-                                      ? HexColor('007FFF')
-                                      : Helper.isDark(context)
-                                          ? const Color.fromRGBO(
-                                              255, 255, 255, 0.1)
-                                          : const Color.fromRGBO(0, 0, 0, 0.1),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'Photographer',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () => manageWorkingCategories('Rider'),
-                              child: Container(
-                                width: 100,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 1,
-                                ),
-                                margin: const EdgeInsets.only(right: 5),
-                                decoration: BoxDecoration(
-                                  color: _workingCategories.contains('Rider')
-                                      ? HexColor('007FFF')
-                                      : Helper.isDark(context)
-                                          ? const Color.fromRGBO(
-                                              255, 255, 255, 0.1)
-                                          : const Color.fromRGBO(0, 0, 0, 0.1),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'Rider',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                       const Recents(),
@@ -510,7 +433,8 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (ctx, i) => TaskerWidget(
                             index: i,
                             username: filteredTaskers[i]['user']['username'],
-                            availability: filteredTaskers[i]['metrics']['availabilityRatio'],
+                            availability: filteredTaskers[i]['metrics']
+                                ['availabilityRatio'],
                             id: filteredTaskers[i]['id'],
                             displayName: filteredTaskers[i]['user']
                                 ['displayName'],
@@ -586,7 +510,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       selectedTaskers,
                       _workingCategories.join(''),
-                      setSelectedTaskers: setSelectedTaskersEmpty
+                      setSelectedTaskers: setSelectedTaskersEmpty,
                     ),
                     child: Text(
                       'Request',

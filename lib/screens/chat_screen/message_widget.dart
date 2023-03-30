@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:pairtasker/helpers/methods.dart';
 import 'package:pairtasker/screens/chat_screen/view_image.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
+import 'dart:io';
 
-class OutgoingMessage extends StatelessWidget {
+class OutgoingMessage extends StatefulWidget {
   final message;
   final image;
   final timestamp;
@@ -21,8 +25,29 @@ class OutgoingMessage extends StatelessWidget {
       super.key});
 
   @override
+  State<OutgoingMessage> createState() => _OutgoingMessageState();
+}
+
+class _OutgoingMessageState extends State<OutgoingMessage> {
+  File? myFile;
+
+  Future<void> convertUrlToFile() async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = path.join(dir.path, path.basename(widget.image));
+    setState(() {
+      myFile = File(pathName);
+    });
+  }
+
+  @override
+  void initState() {
+    convertUrlToFile();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final datetime = DateTime.parse(timestamp);
+    final datetime = DateTime.parse(widget.timestamp);
     return Align(
       alignment: Alignment.topRight,
       child: Container(
@@ -40,15 +65,16 @@ class OutgoingMessage extends StatelessWidget {
                 maxWidth: 280,
               ),
               child: Container(
-                padding: image.toString().isNotEmpty && image != null
-                    ? const EdgeInsets.symmetric(
-                        vertical: 5,
-                        horizontal: 5,
-                      )
-                    : const EdgeInsets.symmetric(
-                        vertical: 5,
-                        horizontal: 10,
-                      ),
+                padding:
+                    widget.image.toString().isNotEmpty && widget.image != null
+                        ? const EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal: 5,
+                          )
+                        : const EdgeInsets.symmetric(
+                            vertical: 5,
+                            horizontal: 10,
+                          ),
                 decoration: BoxDecoration(
                   color: HexColor('007FFF'),
                   borderRadius: const BorderRadius.only(
@@ -61,13 +87,13 @@ class OutgoingMessage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    image.toString().isNotEmpty
+                    widget.image.toString().isNotEmpty
                         ? InkWell(
-                            onTap: image.toString().isNotEmpty
+                            onTap: widget.image.toString().isNotEmpty
                                 ? () => Navigator.of(context)
                                         .push(MaterialPageRoute(
                                       builder: (context) => ViewImage(
-                                        Image: image,
+                                        Image: widget.image,
                                       ),
                                     ))
                                 : () {},
@@ -75,8 +101,7 @@ class OutgoingMessage extends StatelessWidget {
                               constraints: const BoxConstraints(
                                 maxHeight: 300,
                               ),
-                              child: Image.network(
-                                image,
+                              child: Image(
                                 loadingBuilder:
                                     (context, child, loadingProgress) {
                                   if (loadingProgress == null) {
@@ -97,16 +122,19 @@ class OutgoingMessage extends StatelessWidget {
                                 },
                                 fit: BoxFit.cover,
                                 gaplessPlayback: true,
+                                image: NetworkToFileImage(
+                                  url: widget.image,
+                                  file: myFile,
+                                  debug: true,
+                                ),
                               ),
                             ),
                           )
-                        : !isPrompt
+                        : !widget.isPrompt
                             ? Text(
-                                message,
+                                widget.message,
                                 style: GoogleFonts.lato(
-                                  fontSize: 14,
-                                  color: Colors.white
-                                ),
+                                    fontSize: 14, color: Colors.white),
                               )
                             : Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,16 +170,16 @@ class OutgoingMessage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  if (showMsgStatus)
+                  if (widget.showMsgStatus)
                     Text(
-                      '$msgStatus at ${datetime.hour}: ${datetime.minute < 10 ? '0${datetime.minute}' : '${datetime.minute}'} ${datetime.hour >= 12 ? 'PM' : 'AM'} ',
+                      '${widget.msgStatus} at ${datetime.hour}: ${datetime.minute < 10 ? '0${datetime.minute}' : '${datetime.minute}'} ${datetime.hour >= 12 ? 'PM' : 'AM'} ',
                       textAlign: TextAlign.right,
                       style: GoogleFonts.lato(
                         fontSize: 8,
                         color: HexColor('AAABAB'),
                       ),
                     ),
-                  if (!showMsgStatus)
+                  if (!widget.showMsgStatus)
                     Text(
                       '${datetime.hour}: ${datetime.minute < 10 ? '0${datetime.minute}' : '${datetime.minute}'} ${datetime.hour >= 12 ? 'PM' : 'AM'} ',
                       textAlign: TextAlign.right,
@@ -170,7 +198,7 @@ class OutgoingMessage extends StatelessWidget {
   }
 }
 
-class IncomingMessage extends StatelessWidget {
+class IncomingMessage extends StatefulWidget {
   final message;
   final screenType;
   final sender;
@@ -190,8 +218,29 @@ class IncomingMessage extends StatelessWidget {
       super.key});
 
   @override
+  State<IncomingMessage> createState() => _IncomingMessageState();
+}
+
+class _IncomingMessageState extends State<IncomingMessage> {
+  File? myFile;
+
+  Future<void> convertUrlToFile() async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = path.join(dir.path, path.basename(widget.image));
+    setState(() {
+      myFile = File(pathName);
+    });
+  }
+
+  @override
+  void initState() {
+    convertUrlToFile();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final datetime = DateTime.parse(timestamp);
+    final datetime = DateTime.parse(widget.timestamp);
     return Align(
       alignment: Alignment.topLeft,
       child: Container(
@@ -202,17 +251,17 @@ class IncomingMessage extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (isPrompt)
+            if (widget.isPrompt)
               CircleAvatar(
                 radius: 22,
-                backgroundImage: senderImage != null
-                    ? NetworkImage(senderImage)
+                backgroundImage: widget.senderImage != null
+                    ? NetworkImage(widget.senderImage)
                     : const AssetImage('assets/images/default_user.png')
                         as ImageProvider,
               ),
             Container(
               margin: EdgeInsets.only(
-                left: isPrompt ? 10 : 0,
+                left: widget.isPrompt ? 10 : 0,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -224,8 +273,8 @@ class IncomingMessage extends StatelessWidget {
                       minHeight: 35,
                     ),
                     child: Container(
-                      padding: image.toString().isNotEmpty &&
-                              message.toString().isEmpty
+                      padding: widget.image.toString().isNotEmpty &&
+                              widget.message.toString().isEmpty
                           ? const EdgeInsets.symmetric(
                               vertical: 5,
                               horizontal: 5,
@@ -248,26 +297,26 @@ class IncomingMessage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (screenType == 'user' && !isPrompt)
+                          if (widget.screenType == 'user' && !widget.isPrompt)
                             Container(
                               margin: const EdgeInsets.only(
                                 bottom: 5,
                               ),
                               child: Text(
-                                '@$sender'.replaceAll(' ', ''),
+                                '@${widget.sender}'.replaceAll(' ', ''),
                                 style: GoogleFonts.lato(
                                     color: HexColor('007FFF'),
                                     fontSize: 10,
                                     fontWeight: FontWeight.w800),
                               ),
                             ),
-                          image.toString().isNotEmpty
+                          widget.image.toString().isNotEmpty
                               ? InkWell(
-                                  onTap: image.toString().isNotEmpty
+                                  onTap: widget.image.toString().isNotEmpty
                                       ? () => Navigator.of(context)
                                               .push(MaterialPageRoute(
                                             builder: (context) => ViewImage(
-                                              Image: image,
+                                              Image: widget.image,
                                             ),
                                           ))
                                       : () {},
@@ -275,16 +324,37 @@ class IncomingMessage extends StatelessWidget {
                                     constraints: const BoxConstraints(
                                       maxHeight: 300,
                                     ),
-                                    child: Image.network(
-                                      image,
+                                    child: Image(
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        );
+                                      },
                                       fit: BoxFit.cover,
                                       gaplessPlayback: true,
+                                      image: NetworkToFileImage(
+                                          url: widget.image,
+                                          file: myFile,
+                                          debug: true),
                                     ),
                                   ),
                                 )
-                              : !isPrompt
+                              : !widget.isPrompt
                                   ? Text(
-                                      message,
+                                      widget.message,
                                       style: GoogleFonts.lato(
                                         fontSize: 14,
                                       ),
@@ -292,7 +362,7 @@ class IncomingMessage extends StatelessWidget {
                                   : Column(
                                       children: [
                                         Text(
-                                          '$sender wants you to confirm the task',
+                                          '${widget.sender} wants you to confirm the task',
                                           style: GoogleFonts.poppins(
                                             fontSize: 14,
                                             color: HexColor('007FFF'),

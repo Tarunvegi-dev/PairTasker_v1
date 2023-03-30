@@ -2,8 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:pairtasker/helpers/methods.dart';
+import 'package:network_to_file_image/network_to_file_image.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 import 'package:photo_view/photo_view.dart';
@@ -17,10 +18,20 @@ class ViewImage extends StatefulWidget {
 }
 
 class _ViewImageState extends State<ViewImage> {
+  File? myFile;
   final msgController = TextEditingController();
+
+  Future<void> convertUrlToFile() async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = path.join(dir.path, path.basename(widget.Image));
+    setState(() {
+      myFile = File(pathName);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    convertUrlToFile();
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
@@ -49,8 +60,9 @@ class _ViewImageState extends State<ViewImage> {
                 child: PhotoView(
                   minScale: 0.5,
                   maxScale: 0.6,
-                  imageProvider: NetworkImage(
-                    widget.Image,
+                  imageProvider: NetworkToFileImage(
+                    url: widget.Image,
+                    file: myFile
                   ),
                 ),
               ),

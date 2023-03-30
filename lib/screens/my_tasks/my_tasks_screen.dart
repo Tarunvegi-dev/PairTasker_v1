@@ -46,7 +46,6 @@ class _MyTasksState extends State<MyTasks> {
         loadedTasks.addAll(response['completed']);
         isLoading = false;
       });
-      print(tasksData);
       return;
     } else {
       setState(() {

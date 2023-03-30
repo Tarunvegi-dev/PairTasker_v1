@@ -97,34 +97,27 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   ),
                 ),
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: HexColor(
-                      Helper.isDark(context) ? '252B30' : '#E4ECF5',
-                    ),
-                  ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: loadedTaskers.length,
-                    itemBuilder: (ctx, i) => TaskerWidget(
-                      isWishlist: true,
-                      index: i,
-                      username: loadedTaskers[i]['user']['username'],
-                      availability: loadedTaskers[i]['metrics']['availabilityRatio'],
-                      workingCategories: loadedTaskers[i]['workingCategories'],
-                      id: loadedTaskers[i]['id'],
-                      displayName: loadedTaskers[i]['user']['displayName'],
-                      rating: loadedTaskers[i]['rating'].toString(),
-                      saves: loadedTaskers[i]['saves'].toString(),
-                      tasks: loadedTaskers[i]['completedTasks'].toString(),
-                      profilePicture: loadedTaskers[i]['user']
-                          ['profilePicture'],
-                      selectedTaskers: selectedTaskers,
-                      isSelected:
-                          selectedTaskers.contains(loadedTaskers[i]['id']) !=
-                              false,
-                      selectTaskers: selectTaskers,
-                    ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: loadedTaskers.length,
+                  itemBuilder: (ctx, i) => TaskerWidget(
+                    isWishlist: true,
+                    index: i,
+                    username: loadedTaskers[i]['user']['username'],
+                    availability: loadedTaskers[i]['metrics']['availabilityRatio'],
+                    workingCategories: loadedTaskers[i]['workingCategories'],
+                    id: loadedTaskers[i]['id'],
+                    displayName: loadedTaskers[i]['user']['displayName'],
+                    rating: loadedTaskers[i]['rating'].toString(),
+                    saves: loadedTaskers[i]['saves'].toString(),
+                    tasks: loadedTaskers[i]['completedTasks'].toString(),
+                    profilePicture: loadedTaskers[i]['user']
+                        ['profilePicture'],
+                    selectedTaskers: selectedTaskers,
+                    isSelected:
+                        selectedTaskers.contains(loadedTaskers[i]['id']) !=
+                            false,
+                    selectTaskers: selectTaskers,
                   ),
                 ),
               ),

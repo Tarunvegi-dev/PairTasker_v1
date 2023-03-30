@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -10,6 +9,11 @@ import 'package:provider/provider.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:core';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 
 class Helper {
   Helper._();
@@ -578,12 +582,12 @@ class Helper {
 
 class BaseURL {
   static const url =
-      'http://65.0.31.100/api';
-      // 'http://192.168.248.47:3000/api';
+      // 'http://65.0.31.100/api';
+      'http://192.168.236.47:3000/api';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
   static const socketURL =
-      'http://65.0.31.100/';
-      // 'http://192.168.248.47:3000';
+      // 'http://65.0.31.100/';
+      'http://192.168.236.47:3000';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

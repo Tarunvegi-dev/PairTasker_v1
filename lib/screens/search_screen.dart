@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/screens/home_screen/tasker_widget.dart';
 import '../helpers/methods.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class _SearchScreenState extends State<SearchScreen> {
   final keywordController = TextEditingController();
   final List<dynamic> _workingCategories = [];
   List<dynamic> filteredTaskers = [];
+  List<dynamic> kOptions = [];
 
   Future<void> searchTaskers() async {
     final response = await Provider.of<User>(context, listen: false).getTaskers(
@@ -49,6 +51,21 @@ class _SearchScreenState extends State<SearchScreen> {
       _workingCategories.add(category.toString().trim());
     });
     searchTaskers();
+  }
+
+  @override
+  void didChangeDependencies() async {
+    final response = await Provider.of<Auth>(context, listen: false)
+        .fetchWorkingCategories();
+    final workingCategories = response.data['data'] as List<dynamic>;
+    if (response.statusCode == 200) {
+      for (var w in workingCategories) {
+        setState(() {
+          kOptions.add(w['name']);
+        });
+      }
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -110,118 +127,36 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               width: MediaQuery.of(context).size.width,
               height: 60,
-              child: ListView(
+              child: ListView.builder(
+                itemCount: kOptions.length,
                 scrollDirection: Axis.horizontal,
-                children: [
-                  InkWell(
-                    onTap: () => manageWorkingCategories('Mechanic'),
-                    child: Container(
-                      width: 100,
-                      margin: const EdgeInsets.only(right: 5),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _workingCategories.contains('Mechanic')
-                            ? HexColor('007FFF')
-                            : Helper.isDark(context)
-                                ? const Color.fromRGBO(255, 255, 255, 0.1)
-                                : const Color.fromRGBO(0, 0, 0, 0.1),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Mechanic',
-                          style: TextStyle(
-                            fontSize: 10,
-                          ),
+                itemBuilder: (context, i) => InkWell(
+                  onTap: () => manageWorkingCategories(kOptions[i]),
+                  child: Container(
+                    width: 100,
+                    margin: const EdgeInsets.only(right: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _workingCategories.contains(kOptions[i])
+                          ? HexColor('007FFF')
+                          : Helper.isDark(context)
+                              ? const Color.fromRGBO(255, 255, 255, 0.1)
+                              : const Color.fromRGBO(0, 0, 0, 0.1),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Center(
+                      child: Text(
+                        kOptions[i],
+                        style: GoogleFonts.lato(
+                          fontSize: 10,
                         ),
                       ),
                     ),
                   ),
-                  InkWell(
-                    onTap: () => manageWorkingCategories('deliveryboy'),
-                    child: Container(
-                      width: 100,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 1,
-                      ),
-                      margin: const EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        color: _workingCategories.contains('deliveryboy')
-                            ? HexColor('007FFF')
-                            : Helper.isDark(context)
-                                ? const Color.fromRGBO(255, 255, 255, 0.1)
-                                : const Color.fromRGBO(0, 0, 0, 0.1),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Delivery Boy',
-                          style: TextStyle(
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => manageWorkingCategories('Photographer'),
-                    child: Container(
-                      width: 100,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 1,
-                      ),
-                      margin: const EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        color: _workingCategories.contains('Photographer')
-                            ? HexColor('007FFF')
-                            : Helper.isDark(context)
-                                ? const Color.fromRGBO(255, 255, 255, 0.1)
-                                : const Color.fromRGBO(0, 0, 0, 0.1),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Photographer',
-                          style: TextStyle(
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () => manageWorkingCategories('Rider'),
-                    child: Container(
-                      width: 100,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 1,
-                      ),
-                      margin: const EdgeInsets.only(right: 5),
-                      decoration: BoxDecoration(
-                        color: _workingCategories.contains('Rider')
-                            ? HexColor('007FFF')
-                            : Helper.isDark(context)
-                                ? const Color.fromRGBO(255, 255, 255, 0.1)
-                                : const Color.fromRGBO(0, 0, 0, 0.1),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Rider',
-                          style: TextStyle(
-                            fontSize: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
             if (filteredTaskers.isEmpty)
@@ -249,7 +184,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (BuildContext context, int i) => TaskerWidget(
                   index: i,
                   username: filteredTaskers[i]['user']['username'],
-                  availability: filteredTaskers[i]['metrics']['availabilityRatio'],
+                  availability: filteredTaskers[i]['metrics']
+                      ['availabilityRatio'],
                   id: filteredTaskers[i]['id'],
                   displayName: filteredTaskers[i]['user']['displayName'],
                   workingCategories: filteredTaskers[i]['workingCategories'],

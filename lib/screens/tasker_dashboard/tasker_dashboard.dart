@@ -66,8 +66,8 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
           taskerMode = userdata['tasker']['isOnline'];
         });
       }
-      fetchTaskerMetrics();
     }
+    fetchTaskerMetrics();
     _isInit = false;
     super.didChangeDependencies();
   }
@@ -75,6 +75,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
   Future<void> fetchTaskerMetrics() async {
     final response =
         await Provider.of<Tasker>(context, listen: false).getTaskerMetrics();
+    print(response.data);
     if (response.statusCode == 200) {
       setState(() {
         totalTasks = response.data['data']['totalTasks'];

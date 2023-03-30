@@ -67,14 +67,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    socket.emit('iam-offline', taskId);
-    setState(() {
-      isTimerEnded = true;
-    });
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   socket.emit('iam-offline', taskId);
+  //   setState(() {
+  //     isTimerEnded = true;
+  //   });
+  //   super.dispose();
+  // }
 
   void updateIsMessageEmpty() {
     if (msgController.text.isEmpty) {
@@ -244,9 +244,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> sendMessage(String message, String type) async {
-    if (message.isEmpty) {
-      return;
-    }
     final prefs = await SharedPreferences.getInstance();
     final userPref = prefs.getString('userdata');
     Map<String, dynamic> userdata =
