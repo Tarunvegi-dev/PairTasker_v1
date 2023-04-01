@@ -109,6 +109,7 @@ flutter:
     - assets/images/icons/wishlist_dark.svg
     - assets/images/icons/wishlist.svg
     - assets/images/icons/availability.svg
+    - assets/images/icons/acceptance.svg
     - assets/images/icons/user_male.png
     - assets/images/icons/user_female.png
     - assets/images/icons/Tasker.png

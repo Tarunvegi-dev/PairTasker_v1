@@ -347,7 +347,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                               height: 8,
                             ),
                             RatioWidget(
-                              icon: 'task',
+                              icon: 'acceptance',
                               title: 'Acceptance Ratio',
                               description:
                                   'Total accepted tasks by Number of Requests',

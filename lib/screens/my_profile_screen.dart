@@ -32,6 +32,7 @@ class _MyProfileState extends State<MyProfile> {
   var mobileNumber = TextEditingController();
   String gender = 'male';
   DateTime _dob = DateTime.now();
+  String email = '';
 
   bool _isTasker = false;
   bool _isEditing = false;
@@ -59,6 +60,7 @@ class _MyProfileState extends State<MyProfile> {
             : DateTime.now();
         gender = userdata['gender'] ?? '';
         _isTasker = userdata['isTasker'] ?? false;
+        email = userdata['email'];
       });
     }
     _isinit = false;
@@ -67,7 +69,7 @@ class _MyProfileState extends State<MyProfile> {
 
   Future<void> updateUserDetails() async {
     setState(() {
-      // isLoading = true;
+      isLoading = true;
     });
     String dob = DateFormat('yyyy-MM-dd').format(_dob);
     FormData formData = FormData.fromMap(
@@ -350,10 +352,31 @@ class _MyProfileState extends State<MyProfile> {
                       ),
                     ],
                   ),
-                  Icon(
-                    Icons.more_vert,
-                    size: 28,
-                    color: HexColor('99A4AE'),
+                  InkWell(
+                    onTap: isLoading
+                        ? null
+                        : _isEditing
+                            ? updateUserDetails
+                            : () => setState(() {
+                                  _isEditing = true;
+                                }),
+                    child: isLoading
+                        ? const LoadingSpinner()
+                        : _isEditing
+                            ? Icon(
+                                Icons.done,
+                                size: 28,
+                                color: HexColor('007FFF'),
+                              )
+                            : Helper.isDark(context)
+                                ? Image.asset(
+                                    'assets/images/icons/edit_light.png',
+                                    height: 18,
+                                  )
+                                : Image.asset(
+                                    'assets/images/icons/edit.png',
+                                    height: 18,
+                                  ),
                   )
                 ],
               ),
@@ -419,9 +442,7 @@ class _MyProfileState extends State<MyProfile> {
                               ),
                             ),
                             Text(
-                              _userdata['username'] != null
-                                  ? '@${_userdata['username']}'
-                                  : '',
+                              email,
                               style: GoogleFonts.lato(
                                 fontSize: 12,
                                 color: HexColor('AAABAB'),
@@ -687,43 +708,6 @@ class _MyProfileState extends State<MyProfile> {
                 ],
               ),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 16,
-                  ),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(0),
-                    ),
-                  ),
-                  backgroundColor: _isEditing
-                      ? HexColor('007FFF')
-                      : Helper.isDark(context)
-                          ? HexColor('252B30')
-                          : HexColor('DEE0E0'),
-                  elevation: 0,
-                ),
-                onPressed: isLoading
-                    ? null
-                    : _isEditing
-                        ? updateUserDetails
-                        : () => setState(() {
-                              _isEditing = true;
-                            }),
-                child: isLoading
-                    ? const LoadingSpinner()
-                    : Text(
-                        _isEditing ? 'Save' : 'Edit',
-                        style: GoogleFonts.lato(
-                          color: _isEditing ? Colors.white : HexColor('007FFF'),
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
-            )
           ],
         ),
       ),
