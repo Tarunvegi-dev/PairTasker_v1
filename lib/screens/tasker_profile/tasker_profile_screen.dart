@@ -265,7 +265,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  InkWell(  
+                  InkWell(
                     onTap: () {
                       Navigator.of(context).pop();
                     },
@@ -651,41 +651,42 @@ class _TaskerProfileState extends State<TaskerProfile> {
                           const SizedBox(
                             height: 20,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 26,
-                              right: 20,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Bio',
-                                  textAlign: TextAlign.start,
-                                  style: GoogleFonts.lato(
-                                    color: HexColor('99A4AE'),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                          if (bio.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 26,
+                                right: 20,
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Bio',
+                                    textAlign: TextAlign.start,
+                                    style: GoogleFonts.lato(
+                                      color: HexColor('99A4AE'),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                Text(
-                                  bio,
-                                  style: GoogleFonts.lato(
-                                    fontSize: 14,
-                                    color: Helper.isDark(context)
-                                        ? Colors.white
-                                        : HexColor('1A1E1F'),
+                                  const SizedBox(
+                                    height: 8,
                                   ),
-                                )
-                              ],
+                                  Text(
+                                    bio,
+                                    style: GoogleFonts.lato(
+                                      fontSize: 14,
+                                      color: Helper.isDark(context)
+                                          ? Colors.white
+                                          : HexColor('1A1E1F'),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 30,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 30,
-                          ),
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 26,

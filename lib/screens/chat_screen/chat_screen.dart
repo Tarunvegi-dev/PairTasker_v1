@@ -38,6 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String screenType = '';
   String taskId = '';
   String userId = '';
+  String userName = '';
   String reqId = '';
   List<dynamic> pendingTaskers = [];
   List<dynamic> terminatedTaskers = [];
@@ -67,14 +68,14 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // @override
-  // void dispose() {
-  //   socket.emit('iam-offline', taskId);
-  //   setState(() {
-  //     isTimerEnded = true;
-  //   });
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    socket.emit('iam-offline', taskId);
+    setState(() {
+      isTimerEnded = true;
+    });
+    super.dispose();
+  }
 
   void updateIsMessageEmpty() {
     if (msgController.text.isEmpty) {
@@ -204,6 +205,7 @@ class _ChatScreenState extends State<ChatScreen> {
         jsonDecode(userPref!) as Map<String, dynamic>;
     setState(() {
       userId = userdata['id'];
+      userName = userdata['username'];
     });
     // ignore: use_build_context_synchronously
     Provider.of<Chat>(context, listen: false).fetchMessages(
@@ -252,11 +254,13 @@ class _ChatScreenState extends State<ChatScreen> {
       "type": type,
       "text": message,
       "sender": userId,
-      "reciever": currentTasker.isEmpty || currentUser.isEmpty
+      "reciever": screenType == 'user' && currentTasker.isEmpty
           ? userId
-          : screenType == 'user'
-              ? currentTasker['id'].toString()
-              : currentUser['id'].toString(),
+          : screenType == 'tasker' && currentUser.isEmpty
+              ? userId
+              : screenType == 'user'
+                  ? currentTasker['id'].toString()
+                  : currentUser['id'].toString(),
       "timestamp": '${DateTime.now()}',
       "image": imageURL,
       "sentBy": {"username": userdata['username']}.toString(),
@@ -369,7 +373,7 @@ class _ChatScreenState extends State<ChatScreen> {
           socket.emit('tasker-terminated', taskId);
         } else {
           sendMessage(
-            '${currentUser['username']} terminated ${currentTasker['username']}',
+            '$userName terminated ${currentTasker['username']}',
             'tasker-terminated',
           );
           socket.emit('tasker-terminated', taskId);
@@ -666,7 +670,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       itemBuilder: (_) => [
-                            if (screenType == 'tasker' && taskStatus < 2 && !isTerminated)
+                            if (screenType == 'tasker' &&
+                                taskStatus < 2 &&
+                                !isTerminated)
                               PopupMenuItem(
                                 onTap: terminateTasker,
                                 child: Text(
@@ -690,6 +696,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               ),
                             if (screenType == 'user' &&
                                 taskStatus < 2 &&
+                                taskStatus > 0 &&
                                 currentTasker.isNotEmpty)
                               PopupMenuItem(
                                 onTap: () => terminateTasker(

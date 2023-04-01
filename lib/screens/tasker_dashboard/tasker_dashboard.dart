@@ -7,7 +7,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/helpers/methods.dart';
-import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/screens/tasker_dashboard/Ratio_widget.dart';
 import 'package:pairtasker/screens/tasker_dashboard/active_tasks.dart';
 import 'package:pairtasker/theme/widgets.dart';
@@ -30,7 +29,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
   String address = '';
   int totalTasks = 0;
   int thresholdLimit = 5;
-  int rating = 0;
+  double rating = 0;
   int activeTasks = 0;
   int totalRequests = 0;
   int totalSaves = 0;
@@ -75,13 +74,12 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
   Future<void> fetchTaskerMetrics() async {
     final response =
         await Provider.of<Tasker>(context, listen: false).getTaskerMetrics();
-    print(response.data);
     if (response.statusCode == 200) {
       setState(() {
         totalTasks = response.data['data']['totalTasks'];
         totalRequests = response.data['data']['totalRequests'];
         totalSaves = response.data['data']['saves'];
-        rating = response.data['data']['rating'];
+        rating = double.parse(response.data['data']['rating'].toString());
         activeTasks = response.data['data']['activeTasks'];
         completedTasks = response.data['data']['completedTasks'];
         thresholdLimit = int.parse(response.data['data']['thresholdLimit']);
@@ -89,11 +87,13 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
         availabilityRatio = response.data['data']['availabilityRatio'];
         avgTaskCompletionTime = response.data['data']['avgTaskCompletionTime'];
         network = response.data['data']['network'];
+        terminatedTasks = totalTasks - completedTasks;
         if (response.data['data']['taskCategoriesCount'] != null) {
           workingCategories = response.data['data']['taskCategoriesCount'].map(
             (key, value) => MapEntry(
               key.toString(),
-              double.parse(value.toString()),
+              1.0
+              // double.parse(value.toString()),
             ),
           );
         }
@@ -260,7 +260,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                                             'assets/images/icons/rating.svg',
                                           ),
                                           Text(
-                                            rating.toString(),
+                                            rating.toStringAsPrecision(2),
                                             style: GoogleFonts.lato(
                                               color: HexColor('FFC72C'),
                                               fontSize: 28,

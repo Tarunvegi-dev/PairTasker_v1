@@ -582,12 +582,12 @@ class Helper {
 
 class BaseURL {
   static const url =
-      // 'http://65.0.31.100/api';
-      'http://192.168.236.47:3000/api';
+      'http://65.0.31.100/api';
+      // 'http://192.168.142.47:3000/api';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
   static const socketURL =
-      // 'http://65.0.31.100/';
-      'http://192.168.236.47:3000';
+      'http://65.0.31.100/';
+      // 'http://192.168.142.47:3000';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

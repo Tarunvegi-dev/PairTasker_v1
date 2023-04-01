@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pairtasker/screens/home_screen/recents.dart';
 import 'package:pairtasker/screens/home_screen/tasker_widget.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/theme/widgets.dart';
@@ -84,6 +85,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   ),
                 ),
               ),
+              const Recents(),
               if (loadedTaskers.isEmpty)
                 Container(
                   width: MediaQuery.of(context).size.width,
@@ -104,15 +106,15 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     isWishlist: true,
                     index: i,
                     username: loadedTaskers[i]['user']['username'],
-                    availability: loadedTaskers[i]['metrics']['availabilityRatio'],
+                    availability: loadedTaskers[i]['metrics']
+                        ['availabilityRatio'],
                     workingCategories: loadedTaskers[i]['workingCategories'],
                     id: loadedTaskers[i]['id'],
                     displayName: loadedTaskers[i]['user']['displayName'],
                     rating: loadedTaskers[i]['rating'].toString(),
                     saves: loadedTaskers[i]['saves'].toString(),
                     tasks: loadedTaskers[i]['completedTasks'].toString(),
-                    profilePicture: loadedTaskers[i]['user']
-                        ['profilePicture'],
+                    profilePicture: loadedTaskers[i]['user']['profilePicture'],
                     selectedTaskers: selectedTaskers,
                     isSelected:
                         selectedTaskers.contains(loadedTaskers[i]['id']) !=

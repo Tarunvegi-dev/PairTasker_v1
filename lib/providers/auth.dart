@@ -290,7 +290,6 @@ class Auth with ChangeNotifier {
       prefs.setString('token', responseData['token']);
       prefs.setString('token', responseData['token']);
       // ignore: use_build_context_synchronously
-      getUserData(context);
       updateFcmToken();
       updateGeoLocation();
       // ignore: use_build_context_synchronously
@@ -303,7 +302,7 @@ class Auth with ChangeNotifier {
     return response;
   }
 
-  Future<Response> updateUserDetails(FormData userdata) async {
+  Future<Response> updateUserDetails(FormData userdata, BuildContext context) async {
     const url = '${BaseURL.url}/user/update-user';
 
     final response = await Dio().patch(
@@ -325,7 +324,8 @@ class Auth with ChangeNotifier {
       if (!prefs.containsKey('userdata')) {
         _username = responseData['data']['username'];
         notifyListeners();
-        prefs.setString('userdata', jsonEncode(responseData['data']));
+        // ignore: use_build_context_synchronously
+        getUserData(context);
       } else {
         final userPref = prefs.getString('userdata');
         Map<String, dynamic> userdataPref =

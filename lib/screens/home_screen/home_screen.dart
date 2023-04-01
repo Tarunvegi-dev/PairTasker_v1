@@ -366,52 +366,52 @@ class _HomePageState extends State<HomePage> {
                   onRefresh: searchTaskers,
                   child: Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 15,
-                        ),
-                        decoration: BoxDecoration(
-                          color: HexColor(
-                            Helper.isDark(context) ? '252B30' : '#E4ECF5',
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 15,
                           ),
-                        ),
-                        width: MediaQuery.of(context).size.width,
-                        height: 60,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: kOptions.length,
-                          itemBuilder: (context, i) => InkWell(
-                            onTap: () => manageWorkingCategories(kOptions[i]),
-                            child: Container(
-                              width: 100,
-                              margin: const EdgeInsets.only(right: 5),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 1,
-                              ),
-                              decoration: BoxDecoration(
-                                color: _workingCategories.contains(kOptions[i])
-                                    ? HexColor('007FFF')
-                                    : Helper.isDark(context)
-                                        ? const Color.fromRGBO(
-                                            255, 255, 255, 0.1)
-                                        : const Color.fromRGBO(0, 0, 0, 0.1),
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  kOptions[i],
-                                  style: GoogleFonts.lato(
-                                    fontSize: 10,
+                          decoration: BoxDecoration(
+                            color: HexColor(
+                              Helper.isDark(context) ? '252B30' : '#E4ECF5',
+                            ),
+                          ),
+                          width: MediaQuery.of(context).size.width,
+                          height: 60,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: kOptions.length,
+                            itemBuilder: (context, i) => InkWell(
+                              onTap: () => manageWorkingCategories(kOptions[i]),
+                              child: Container(
+                                width: 100,
+                                margin: const EdgeInsets.only(right: 5),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 1,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: _workingCategories
+                                          .contains(kOptions[i])
+                                      ? HexColor('007FFF')
+                                      : Helper.isDark(context)
+                                          ? const Color.fromRGBO(
+                                              255, 255, 255, 0.1)
+                                          : const Color.fromRGBO(0, 0, 0, 0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    kOptions[i],
+                                    style: GoogleFonts.lato(
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const Recents(),
                       if (filteredTaskers.isEmpty && !_isLoading)
                         Container(
                           width: MediaQuery.of(context).size.width,

@@ -122,7 +122,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
     );
     // ignore: use_build_context_synchronously
     final response = await Provider.of<Auth>(context, listen: false)
-        .updateUserDetails(formData);
+        .updateUserDetails(formData, context);
     if (response.statusCode != 200) {
       setState(() {
         error = response.data['error'];
