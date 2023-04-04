@@ -64,6 +64,9 @@ dependencies:
   pie_chart: ^5.3.2
   path_provider: ^2.0.11
   network_to_file_image: ^4.0.1
+  cool_alert: ^2.0.1
+  dotted_border: ^2.0.0+3
+  readmore: ^2.2.0
 
 dev_dependencies:
   flutter_native_splash: ^2.2.0
@@ -94,6 +97,8 @@ flutter:
     - assets/images/selecting_person.svg
     - assets/images/self_employment.svg
     - assets/images/name_logo.png
+    - assets/images/image_upload.svg
+    - assets/images/image.svg
     - assets/images/icons/close.png
     - assets/images/icons/mail.svg
     - assets/images/icons/gender.svg

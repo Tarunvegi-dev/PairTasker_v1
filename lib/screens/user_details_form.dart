@@ -15,7 +15,9 @@ import '../theme/widgets.dart';
 import 'package:image_cropper/image_cropper.dart';
 
 class UserFormScreen extends StatefulWidget {
-  const UserFormScreen({Key? key}) : super(key: key);
+  final email;
+
+  const UserFormScreen({this.email, Key? key}) : super(key: key);
 
   @override
   State<UserFormScreen> createState() => _UserFormScreenState();
@@ -30,12 +32,14 @@ class _UserFormScreenState extends State<UserFormScreen> {
   // ignore: unused_field, avoid_init_to_null
   File? _storedImage;
   File? _croppedFile;
+  String email = '';
 
-  final username = TextEditingController();
+  var username = TextEditingController();
   final displayName = TextEditingController();
   final mobileNumber = TextEditingController();
   bool isLoading = false;
   var error = '';
+  bool _isInit = true;
 
   String getToken() {
     final token = Provider.of<Auth>(context, listen: false).token;
@@ -48,6 +52,24 @@ class _UserFormScreenState extends State<UserFormScreen> {
       token = getToken();
     });
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      fetchArguments();
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
+  void fetchArguments() {
+    final arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
+    setState(() {
+      email = arguments['email'] ?? '';
+      username = TextEditingController(text: email.split('@')[0]);
+    });
   }
 
   Future<void> _cropImage() async {

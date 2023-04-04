@@ -1,14 +1,18 @@
 import 'dart:typed_data';
 
+import 'package:cool_alert/cool_alert.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/providers/chat.dart';
 import 'package:pairtasker/screens/chat_screen/message_widget.dart';
+import 'package:pairtasker/screens/chat_screen/view_image.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 import '../../helpers/methods.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,6 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<dynamic> pendingTaskers = [];
   List<dynamic> terminatedTaskers = [];
   String reqMessage = '';
+  String reqImage = '';
   Map<String, dynamic> currentTasker = {};
   Map<String, dynamic> currentUser = {};
   bool local = true;
@@ -224,6 +229,7 @@ class _ChatScreenState extends State<ChatScreen> {
         pendingTaskers = responsedata['pending'];
         terminatedTaskers = responsedata['terminated'];
         reqMessage = responsedata['message'];
+        reqImage = responsedata['image'];
         currentTasker = responsedata['currentTasker'] ?? {};
         taskStatus = int.parse(responsedata['status']);
       });
@@ -273,6 +279,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final notification = {
       "title": userdata['displayName'],
       "body": imageURL.isNotEmpty ? 'Photo' : message,
+      "tag": taskId
     };
     socket.emit('send-message', {
       "data": data,
@@ -362,24 +369,44 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void terminateTasker({bool ack = false, String taskerId = ''}) async {
     if (!ack) {
-      final res =
-          await Provider.of<Tasker>(context, listen: false).terminateTask(
-        taskId,
-        taskerId,
-      );
-      if (res.statusCode == 200) {
-        if (taskerId.isEmpty) {
-          sendMessage('Tasker terminated', 'tasker-terminated');
-          socket.emit('tasker-terminated', taskId);
-        } else {
-          sendMessage(
-            '$userName terminated ${currentTasker['username']}',
-            'tasker-terminated',
+      CoolAlert.show(
+        context: context,
+        type: CoolAlertType.warning,
+        showCancelBtn: true,
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+        title: screenType == 'user'
+            ? 'Are you sure want to terminate ${currentTasker['username']}'
+            : 'Are you sure want to terminate from task?',
+        onConfirmBtnTap: () async {
+          final res =
+              await Provider.of<Tasker>(context, listen: false).terminateTask(
+            taskId,
+            taskerId,
           );
-          socket.emit('tasker-terminated', taskId);
-        }
-      }
+          if (res.statusCode == 200) {
+            if (taskerId.isEmpty) {
+              sendMessage('Tasker terminated', 'tasker-terminated');
+              socket.emit('tasker-terminated', taskId);
+            } else {
+              sendMessage(
+                '$userName terminated ${currentTasker['username']}',
+                'tasker-terminated',
+              );
+              socket.emit('tasker-terminated', taskId);
+            }
+            updateTerminatedStatus();
+          }
+        },
+      );
+    } else {
+      updateTerminatedStatus();
     }
+  }
+
+  void updateTerminatedStatus() {
     if (screenType == 'user') {
       setState(() {
         taskStatus = 0;
@@ -394,18 +421,39 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void withdrawRequest({bool ack = false}) async {
     if (!ack) {
-      final res = await Provider.of<User>(context, listen: false)
-          .withdrawRequest(taskId);
-      if (res.statusCode == 200) {
-        sendMessage('Task has been withdrawn', 'task-cancellation');
-        // ignore: use_build_context_synchronously
-        Provider.of<User>(context, listen: false).getMyRequests();
-        socket.emit('task-withdraw', taskId);
-      }
+      CoolAlert.show(
+          context: context,
+          type: CoolAlertType.warning,
+          showCancelBtn: true,
+          titleTextStyle: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+          textTextStyle: GoogleFonts.poppins(
+            fontSize: 12,
+            color: HexColor('FF0338'),
+          ),
+          title: 'Are you sure want to withdraw request?',
+          text:
+              'confirming this action will remove the notification from all the requested taskers',
+          onConfirmBtnTap: () async {
+            final res = await Provider.of<User>(context, listen: false)
+                .withdrawRequest(taskId);
+            if (res.statusCode == 200) {
+              sendMessage('Task has been withdrawn', 'task-cancellation');
+              // ignore: use_build_context_synchronously
+              Provider.of<User>(context, listen: false).getMyRequests();
+              socket.emit('task-withdraw', taskId);
+              setState(() {
+                taskStatus = -1;
+              });
+            }
+          });
+    } else {
+      setState(() {
+        taskStatus = -1;
+      });
     }
-    setState(() {
-      taskStatus = -1;
-    });
   }
 
   GlobalKey<ScaffoldState> key = GlobalKey();
@@ -426,34 +474,39 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: ListView.builder(
                   itemCount: pendingTaskers.length,
                   shrinkWrap: true,
-                  itemBuilder: ((context, i) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          CircleAvatar(
-                            radius: 15,
-                            backgroundImage:
-                                pendingTaskers[i]['profilePicture'] != null
-                                    ? NetworkImage(
-                                        pendingTaskers[i]['profilePicture'],
-                                      )
-                                    : const AssetImage(
-                                        'assets/images/default_user.png',
-                                      ) as ImageProvider,
-                          ),
-                          Text(
-                            '@${pendingTaskers[i]['username']}',
-                            style: GoogleFonts.lato(
-                              color: HexColor('AAABAB'),
+                  itemBuilder: ((context, i) => Container(
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundImage:
+                                  pendingTaskers[i]['profilePicture'] != null
+                                      ? NetworkImage(
+                                          pendingTaskers[i]['profilePicture'],
+                                        )
+                                      : const AssetImage(
+                                          'assets/images/default_user.png',
+                                        ) as ImageProvider,
                             ),
-                          ),
-                          Text(
-                            'pending',
-                            style: GoogleFonts.lato(
-                              color: HexColor('007FFF'),
+                            Text(
+                              '@${pendingTaskers[i]['username']}',
+                              style: GoogleFonts.lato(
+                                color: HexColor('AAABAB'),
+                              ),
                             ),
-                          )
-                        ],
+                            Text(
+                              'pending',
+                              style: GoogleFonts.lato(
+                                color: HexColor('007FFF'),
+                              ),
+                            )
+                          ],
+                        ),
                       )),
                 ),
               ),
@@ -674,7 +727,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 taskStatus < 2 &&
                                 !isTerminated)
                               PopupMenuItem(
-                                onTap: terminateTasker,
+                                onTap: () {
+                                  Future.delayed(
+                                    const Duration(seconds: 0),
+                                    () => terminateTasker(),
+                                  );
+                                },
                                 child: Text(
                                   'Terminate',
                                   style: GoogleFonts.lato(
@@ -686,7 +744,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                 taskStatus >= 0 &&
                                 taskStatus < 2)
                               PopupMenuItem(
-                                onTap: withdrawRequest,
+                                onTap: () {
+                                  Future.delayed(
+                                    const Duration(
+                                      seconds: 0,
+                                    ),
+                                    () => withdrawRequest(),
+                                  );
+                                },
                                 child: Text(
                                   'Withdraw request',
                                   style: GoogleFonts.lato(
@@ -699,9 +764,14 @@ class _ChatScreenState extends State<ChatScreen> {
                                 taskStatus > 0 &&
                                 currentTasker.isNotEmpty)
                               PopupMenuItem(
-                                onTap: () => terminateTasker(
-                                  taskerId: currentTasker['id'],
-                                ),
+                                onTap: () {
+                                  Future.delayed(
+                                    const Duration(seconds: 0),
+                                    () => terminateTasker(
+                                      taskerId: currentTasker['id'],
+                                    ),
+                                  );
+                                },
                                 child: Text(
                                   'Terminate ${currentTasker['username']}',
                                   style: GoogleFonts.lato(
@@ -710,7 +780,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ),
                               ),
                             if (screenType == 'user' &&
-                                taskStatus < 2 &&
+                                taskStatus == 1 &&
                                 currentTasker.isNotEmpty)
                               PopupMenuItem(
                                 onTap: confirmTask,
@@ -771,23 +841,30 @@ class _ChatScreenState extends State<ChatScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: 80,
-                          child: Row(
-                            children: [...pendingTaskers, ...terminatedTaskers]
-                                .map(
-                                  (tasker) => CircleAvatar(
-                                    radius: 13,
-                                    backgroundImage: tasker['profilePicture'] !=
-                                            null
+                        Stack(
+                          children: [...pendingTaskers, ...terminatedTaskers]
+                              .map((tasker) {
+                            var taskers = [
+                              ...pendingTaskers,
+                              ...terminatedTaskers
+                            ];
+                            var index = taskers.indexOf(tasker);
+                            return Container(
+                              margin: EdgeInsets.only(
+                                left: index == 0 ? 0 : index + 18,
+                              ),
+                              // left: index+10,
+                              child: CircleAvatar(
+                                radius: 13,
+                                backgroundImage:
+                                    tasker['profilePicture'] != null
                                         ? NetworkImage(tasker['profilePicture'])
                                         : const AssetImage(
                                             'assets/images/default_user.png',
                                           ) as ImageProvider,
-                                  ),
-                                )
-                                .toList(),
-                          ),
+                              ),
+                            );
+                          }).toList(),
                         ),
                         InkWell(
                             onTap: () {
@@ -831,14 +908,57 @@ class _ChatScreenState extends State<ChatScreen> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  Text(
+                  ReadMoreText(
                     reqMessage,
+                    trimLines: 2,
+                    trimMode: TrimMode.Line,
+                    trimCollapsedText: 'more',
+                    trimExpandedText: 'less',
                     style: GoogleFonts.lato(
                       color: HexColor('6F7273'),
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
-                  )
+                    moreStyle: GoogleFonts.lato(
+                      color: HexColor('007FFF'),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    lessStyle: GoogleFonts.lato(
+                      color: HexColor('007FFF'),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  if (reqImage.toString().isNotEmpty)
+                    const SizedBox(
+                      height: 5,
+                    ),
+                  if (reqImage.toString().isNotEmpty)
+                    InkWell(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ViewImage(
+                            Image: reqImage,
+                          ),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Image.network(
+                            reqImage,
+                            height: 30,
+                          ),
+                          Positioned(
+                            top: 8,
+                            left: 8,
+                            child: SvgPicture.asset(
+                              'assets/images/image.svg',
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -914,39 +1034,47 @@ class _ChatScreenState extends State<ChatScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Container(
-                          height: MediaQuery.of(context).size.height * 5 / 100,
-                          decoration: BoxDecoration(
-                            color: Helper.isDark(context)
-                                ? HexColor('FFFFFF')
-                                : HexColor('E4ECF5'),
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          padding: const EdgeInsets.only(
-                            left: 25,
-                            top: 10,
-                          ),
-                          child: TextField(
-                            maxLines: 8,
-                            style: GoogleFonts.lato(
-                              color: HexColor('252B30'),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minHeight:
+                                  MediaQuery.of(context).size.height * 5 / 100,
+                              maxHeight: MediaQuery.of(context).size.height *
+                                  15 /
+                                  100),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Helper.isDark(context)
+                                  ? HexColor('FFFFFF')
+                                  : HexColor('E4ECF5'),
+                              borderRadius: BorderRadius.circular(25),
                             ),
-                            onTap: () {
-                              setState(() {
-                                _needsScroll = true;
-                              });
-                              _scrollToEnd();
-                            },
-                            onTapOutside: (value) =>
-                                FocusManager.instance.primaryFocus?.unfocus(),
-                            controller: msgController,
-                            decoration: InputDecoration.collapsed(
-                              border: InputBorder.none,
-                              hintText: "Type....",
-                              hintStyle: GoogleFonts.lato(
-                                color: Helper.isDark(context)
-                                    ? HexColor('252B30')
-                                    : HexColor('AAABAB'),
+                            padding: const EdgeInsets.only(
+                              left: 25,
+                              top: 10,
+                            ),
+                            child: TextField(
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              style: GoogleFonts.lato(
+                                color: HexColor('252B30'),
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  _needsScroll = true;
+                                });
+                                _scrollToEnd();
+                              },
+                              onTapOutside: (value) =>
+                                  FocusManager.instance.primaryFocus?.unfocus(),
+                              controller: msgController,
+                              decoration: InputDecoration.collapsed(
+                                border: InputBorder.none,
+                                hintText: "Type....",
+                                hintStyle: GoogleFonts.lato(
+                                  color: Helper.isDark(context)
+                                      ? HexColor('252B30')
+                                      : HexColor('AAABAB'),
+                                ),
                               ),
                             ),
                           ),

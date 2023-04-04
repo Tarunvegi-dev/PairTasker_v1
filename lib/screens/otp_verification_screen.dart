@@ -52,7 +52,9 @@ class _OtpVerificationState extends State<OtpVerification> {
       });
     } else {
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/userform');
+      Navigator.of(context).pushReplacementNamed('/select-community', arguments: {
+        "email": widget.email,
+      });
       setState(() {
         isLoading = false;
       });

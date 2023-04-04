@@ -67,6 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response.statusCode == 200) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: const Duration(
+          seconds: 2,
+        ),
         backgroundColor: HexColor('007FFF'),
         content: Text(
           response.data['message'],
@@ -79,6 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        duration: const Duration(
+          seconds: 2,
+        ),
         backgroundColor: HexColor('FF033E'),
         content: Text(
           response.data['message'],

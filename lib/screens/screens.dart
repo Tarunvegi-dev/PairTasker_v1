@@ -17,3 +17,4 @@ export './terms_and_conditions.dart';
 export './FAQ.dart';
 export './tasker_dashboard/tasker_dashboard.dart';
 export './loading_screen.dart';
+export './send_request_screen.dart';

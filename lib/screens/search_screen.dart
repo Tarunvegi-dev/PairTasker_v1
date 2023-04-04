@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'send_request_screen.dart';
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -71,6 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: SafeArea(
         child: Column(
@@ -244,8 +247,14 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       backgroundColor: HexColor('007FFF'),
                     ),
-                    onPressed: () => Helper.showRequestModal(
-                        context, selectedTaskers, _workingCategories.join('')),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SendRequest(
+                          selectedTaskers: selectedTaskers,
+                          category: _workingCategories.join(''),
+                        ),
+                      ),
+                    ),
                     child: Text(
                       'Request',
                       style: GoogleFonts.lato(

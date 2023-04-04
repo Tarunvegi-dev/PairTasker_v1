@@ -8,6 +8,7 @@ import 'package:pairtasker/providers/chat.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/screens/privacy_policy.dart';
+import 'package:pairtasker/screens/select_community/select_community_screen.dart';
 import 'helpers/methods.dart';
 import 'screens/screens.dart';
 import 'providers/auth.dart';
@@ -34,7 +35,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   if (message.data['type'] == 'task-completion') {
     getMyRequests();
   }
-  if (message.data['type'] == 'task-cancellation' || message.data['type'] == 'tasker-terminated') {
+  if (message.data['type'] == 'task-cancellation' ||
+      message.data['type'] == 'tasker-terminated') {
     getMyTasks();
   }
   if (message.data['type'] != 'task') {
@@ -117,7 +119,8 @@ Future<void> updateChats(String taskId, String type) async {
   }
 }
 
-void updateMessages(Map<String, dynamic> message, String taskId) async {
+void updateMessages(Map<String, dynamic> message, String taskId,
+    {bool updateUnread = true}) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.reload();
   if (prefs.containsKey(taskId)) {
@@ -133,20 +136,22 @@ void updateMessages(Map<String, dynamic> message, String taskId) async {
       updateChats(taskId, 'request');
     }
   }
-  if (prefs.containsKey('unread-messages')) {
-    final pendingPref = prefs.getString('unread-messages');
-    Map<String, dynamic> pendingData =
-        jsonDecode(pendingPref!) as Map<String, dynamic>;
-    if (pendingData.containsKey(taskId)) {
-      pendingData[taskId] = pendingData[taskId] + 1;
+  if (updateUnread) {
+    if (prefs.containsKey('unread-messages')) {
+      final pendingPref = prefs.getString('unread-messages');
+      Map<String, dynamic> pendingData =
+          jsonDecode(pendingPref!) as Map<String, dynamic>;
+      if (pendingData.containsKey(taskId)) {
+        pendingData[taskId] = pendingData[taskId] + 1;
+      } else {
+        pendingData[taskId] = 1;
+      }
+      prefs.setString('unread-messages', jsonEncode(pendingData));
     } else {
+      Map<String, dynamic> pendingData = {};
       pendingData[taskId] = 1;
+      prefs.setString('unread-messages', jsonEncode(pendingData));
     }
-    prefs.setString('unread-messages', jsonEncode(pendingData));
-  } else {
-    Map<String, dynamic> pendingData = {};
-    pendingData[taskId] = 1;
-    prefs.setString('unread-messages', jsonEncode(pendingData));
   }
   if (message['type'] == 'message') {
     if (message['screenType'] == 'user') {
@@ -214,6 +219,30 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    var androiInit =
+        const AndroidInitializationSettings('@mipmap/ic_launcher'); //for logo
+    var initSettings = InitializationSettings(android: androiInit);
+
+    flutterLocalNotificationsPlugin.initialize(initSettings,
+        onDidReceiveNotificationResponse:
+            (NotificationResponse notificationResponse) {
+      final payload = jsonDecode(notificationResponse.payload as String);
+      if (payload['type'] == 'task') {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await navigatorKey.currentState!.push(MaterialPageRoute(
+            builder: (context) => const NotificationScreen(),
+          ));
+        });
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await navigatorKey.currentState!.pushNamed('/chatscreen', arguments: {
+            "screenType": payload['screenType'] == 'user' ? 'tasker' : 'user',
+            "taskId": payload['taskId'],
+          });
+        });
+      }
+    });
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification notification = message.notification!;
       AndroidNotification? android = message.notification?.android;
@@ -236,18 +265,21 @@ class _MyAppState extends State<MyApp> {
               icon: '@drawable/notification_icon',
             ),
           ),
+          payload: jsonEncode(message.data),
         );
       }
       if (message.data['type'] == 'task-completion') {
         getMyRequests();
       }
-      if (message.data['type'] == 'task-cancellation' || message.data['type'] == 'tasker-terminated') {
+      if (message.data['type'] == 'task-cancellation' ||
+          message.data['type'] == 'tasker-terminated') {
         getMyTasks();
       }
       if (message.data['type'] != 'task') {
         updateMessages(
           message.data,
           message.data['taskId'],
+          updateUnread: currentPath != '/chatscreen',
         );
       }
       if (message.data['type'] == 'task') {
@@ -330,7 +362,9 @@ class _MyAppState extends State<MyApp> {
                   ? const TaskerDashboard()
                   : const HomePage()
               : auth.isAuth && !auth.isSignUpCompleted
-                  ? const UserFormScreen()
+                  ? auth.isCommunitySelected
+                      ? const UserFormScreen()
+                      : const SelectCommunityScreen()
                   : FutureBuilder(
                       future: auth.tryAutoLogin(),
                       builder: (ctx, authResult) =>
@@ -344,6 +378,7 @@ class _MyAppState extends State<MyApp> {
             '/home': (context) => const HomePage(),
             '/tasker-dashboard': (context) => const TaskerDashboard(),
             '/userform': (context) => const UserFormScreen(),
+            '/select-community': (context) => const SelectCommunityScreen(),
             '/wishlist': (context) => const WishlistScreen(),
             '/notifications': (context) => const NotificationScreen(),
             '/myrequests': (context) => const MyRequests(),

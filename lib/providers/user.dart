@@ -106,7 +106,8 @@ class User with ChangeNotifier {
   }
 
   Future<Response> sendNewRequest(
-      List<dynamic> taskers, String message, String category) async {
+      List<dynamic> taskers, String message, String category,
+      {String imageUrl = ''}) async {
     const url = '${BaseURL.url}/task/send-request';
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -116,6 +117,7 @@ class User with ChangeNotifier {
         'taskers': taskers,
         'message': message,
         'category': category,
+        'image': imageUrl,
       },
       options: Options(
         validateStatus: (_) => true,

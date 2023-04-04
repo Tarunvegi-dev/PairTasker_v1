@@ -16,6 +16,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 class Auth with ChangeNotifier {
   String _token = '';
   String _username = '';
+  String _communityId = '';
   bool _isTasker = false;
   bool _unreadNotifications = false;
   bool _unreadRequests = false;
@@ -27,6 +28,10 @@ class Auth with ChangeNotifier {
 
   bool get isSignUpCompleted {
     return _username != '';
+  }
+
+  bool get isCommunitySelected {
+    return _communityId != '';
   }
 
   bool get isTasker {
@@ -97,12 +102,15 @@ class Auth with ChangeNotifier {
 
   Future<bool> checkIsTasker() async {
     final prefs = await SharedPreferences.getInstance();
-    final userPref = prefs.getString('userdata');
-    Map<String, dynamic> userdata =
-        jsonDecode(userPref!) as Map<String, dynamic>;
-    _isTasker = userdata['isTasker'] ?? false;
-    notifyListeners();
-    return userdata['isTasker'];
+    if (prefs.containsKey('userdata')) {
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      _isTasker = userdata['isTasker'] ?? false;
+      notifyListeners();
+      return userdata['isTasker'];
+    }
+    return false;
   }
 
   Future<Response> updateIsTasker() async {
@@ -143,6 +151,17 @@ class Auth with ChangeNotifier {
     return true;
   }
 
+  Future<bool> checkIsCommunitySelected() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('communityId')) {
+      return false;
+    }
+    final communityId = prefs.getString('communityId');
+    _communityId = communityId!;
+    notifyListeners();
+    return true;
+  }
+
   Future<bool> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey('token')) {
@@ -152,6 +171,7 @@ class Auth with ChangeNotifier {
     _token = token!;
     notifyListeners();
     checkisSignUpCompleted();
+    checkIsCommunitySelected();
     checkIsTasker();
     checkUnread();
     return true;
@@ -302,7 +322,8 @@ class Auth with ChangeNotifier {
     return response;
   }
 
-  Future<Response> updateUserDetails(FormData userdata, BuildContext context) async {
+  Future<Response> updateUserDetails(
+      FormData userdata, BuildContext context) async {
     const url = '${BaseURL.url}/user/update-user';
 
     final response = await Dio().patch(
@@ -537,5 +558,49 @@ class Auth with ChangeNotifier {
       return response.data['url'];
     }
     return '';
+  }
+
+  Future<List<dynamic>> getCommunities() async {
+    const url = '${BaseURL.url}/communities';
+
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        contentType: "multipart/form-data",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          'token': _token,
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      return response.data['data'];
+    }
+    return [];
+  }
+
+  Future<Response> updateCommunity(String communityId) async {
+    const url = '${BaseURL.url}/user/update-community';
+
+    final response = await Dio().post(
+      url,
+      data: {
+        'communityId': communityId,
+      },
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': _token,
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('communityId', communityId);
+      _communityId = communityId;
+      notifyListeners();
+    }
+    return response;
   }
 }

@@ -47,7 +47,7 @@ class _OutgoingMessageState extends State<OutgoingMessage> {
 
   @override
   Widget build(BuildContext context) {
-    final datetime = DateTime.parse(widget.timestamp);
+    final datetime = DateTime.parse(widget.timestamp).toLocal();
     return Align(
       alignment: Alignment.topRight,
       child: Container(
@@ -240,7 +240,7 @@ class _IncomingMessageState extends State<IncomingMessage> {
 
   @override
   Widget build(BuildContext context) {
-    final datetime = DateTime.parse(widget.timestamp);
+    final datetime = DateTime.parse(widget.timestamp).toLocal();
     return Align(
       alignment: Alignment.topLeft,
       child: Container(

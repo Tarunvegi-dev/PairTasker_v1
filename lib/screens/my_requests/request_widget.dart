@@ -50,6 +50,7 @@ class RequestWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             requestId,
@@ -59,14 +60,11 @@ class RequestWidget extends StatelessWidget {
                             ),
                           ),
                           if (currentTasker != '')
-                            Padding(
-                              padding: const EdgeInsets.only(right: 20),
-                              child: Text(
-                                '@$currentTasker',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 10,
-                                  color: HexColor('AAABAB'),
-                                ),
+                            Text(
+                              '@$currentTasker',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                color: HexColor('AAABAB'),
                               ),
                             )
                         ],
@@ -109,13 +107,20 @@ class RequestWidget extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          message.toString(),
-                          style: GoogleFonts.lato(
-                            color: HexColor('6F7273'),
-                            fontSize: 14,
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth:
+                              MediaQuery.of(context).size.width * 80 / 100,
+                        ),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            message.toString(),
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.lato(
+                              color: HexColor('6F7273'),
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ),

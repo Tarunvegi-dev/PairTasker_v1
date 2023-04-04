@@ -30,20 +30,24 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
   @override
   void didChangeDependencies() async {
     if (_isinit) {
-      final prefs = await SharedPreferences.getInstance();
-      final userPref = prefs.getString('userdata');
-      Map<String, dynamic> userdata =
-          jsonDecode(userPref!) as Map<String, dynamic>;
-      if (userdata['isTasker'] != null) {
-        setState(() {
-          taskerMode = userdata['tasker']['isOnline'];
-          workingCategories = userdata['tasker']['workingCategories'];
-          bio = TextEditingController(text: userdata['tasker']['bio'] ?? '');
-        });
-      }
+      fetchTaskerProfile();
     }
     _isinit = false;
     super.didChangeDependencies();
+  }
+
+  void fetchTaskerProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userPref = prefs.getString('userdata');
+    Map<String, dynamic> userdata =
+        jsonDecode(userPref!) as Map<String, dynamic>;
+    if (userdata['isTasker'] != null) {
+      setState(() {
+        taskerMode = userdata['tasker']['isOnline'];
+        workingCategories = userdata['tasker']['workingCategories'];
+        bio = TextEditingController(text: userdata['tasker']['bio'] ?? '');
+      });
+    }
   }
 
   Future<void> updateTaskerStatus(bool status) async {
@@ -56,6 +60,9 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          duration: const Duration(
+            seconds: 2,
+          ),
           // ignore: use_build_context_synchronously
           backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
           content: Text(
@@ -174,24 +181,24 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                    TextField(
-                      readOnly: !_isEditing,
-                      maxLines: 3,
-                      controller: bio,
-                      decoration: InputDecoration(
-                        hintText: 'Describe yourself',
-                        hintStyle: GoogleFonts.lato(
-                          fontSize: 12,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: HexColor(
-                              '99A4AE',
+                      TextField(
+                        readOnly: !_isEditing,
+                        maxLines: 3,
+                        controller: bio,
+                        decoration: InputDecoration(
+                          hintText: 'Describe yourself',
+                          hintStyle: GoogleFonts.lato(
+                            fontSize: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: HexColor(
+                                '99A4AE',
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
                     if (error != '')
                       Column(
                         children: [
@@ -271,7 +278,9 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                                       isUpdating: true,
                                     )),
                               ),
-                            ),
+                            ).then((value) {
+                              fetchTaskerProfile();
+                            }),
                             child: Text(
                               'manage',
                               style: GoogleFonts.lato(
@@ -328,43 +337,6 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                 ),
               ),
             ),
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: ElevatedButton(
-            //     style: ElevatedButton.styleFrom(
-            //       padding: const EdgeInsets.symmetric(
-            //         vertical: 16,
-            //       ),
-            //       shape: const RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.all(
-            //           Radius.circular(0),
-            //         ),
-            //       ),
-            //       backgroundColor: _isEditing
-            //           ? HexColor('007FFF')
-            //           : Helper.isDark(context)
-            //               ? HexColor('252B30')
-            //               : HexColor('DEE0E0'),
-            //       elevation: 0,
-            //     ),
-            //     onPressed: isLoading
-            //         ? null
-            //         : _isEditing
-            //             ? updateTaskerBio
-            //             : () => setState(() {
-            //                   _isEditing = true;
-            //                 }),
-            //     child: isLoading
-            //         ? const LoadingSpinner()
-            //         : Text(
-            //             _isEditing ? 'Save' : 'Edit',
-            //             style: GoogleFonts.lato(
-            //               color: _isEditing ? Colors.white : HexColor('007FFF'),
-            //               fontWeight: FontWeight.bold,
-            //             ),
-            //           ),
-            //   ),
-            // )
           ],
         ),
       ),

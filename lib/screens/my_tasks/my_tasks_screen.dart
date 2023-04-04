@@ -26,6 +26,7 @@ class _MyTasksState extends State<MyTasks> {
     setState(() {
       isLoading = true;
     });
+    checkUnreadMessages();
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     final userPref = prefs.getString('userdata');
@@ -72,7 +73,6 @@ class _MyTasksState extends State<MyTasks> {
   @override
   void initState() {
     fetchTasks();
-    checkUnreadMessages();
     super.initState();
   }
 

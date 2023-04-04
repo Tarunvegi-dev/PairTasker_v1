@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pairtasker/helpers/methods.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pairtasker/providers/tasker.dart';
+import 'package:pairtasker/screens/chat_screen/view_image.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:readmore/readmore.dart';
 
 class RequestNotification extends StatefulWidget {
   final description;
   final profilePicture;
   final username;
   final taskId;
+  final image;
 
   const RequestNotification(
       {this.description,
       this.profilePicture,
       this.username,
       this.taskId,
+      this.image,
       super.key});
 
   @override
@@ -45,7 +50,9 @@ class _RequestNotificationState extends State<RequestNotification> {
     if (response.statusCode == 200) {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        // ignore: use_build_context_synchronously
+        duration: const Duration(
+          seconds: 2,
+        ),
         backgroundColor: HexColor('007FFF'),
         content: Text(
           response.data['message'],
@@ -65,7 +72,9 @@ class _RequestNotificationState extends State<RequestNotification> {
     } else {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        // ignore: use_build_context_synchronously
+        duration: const Duration(
+          seconds: 2,
+        ),
         backgroundColor: HexColor('FF033E'),
         content: Text(
           response.data['message'],
@@ -134,8 +143,22 @@ class _RequestNotificationState extends State<RequestNotification> {
             const SizedBox(
               height: 14,
             ),
-            Text(
+            ReadMoreText(
               widget.description,
+              trimMode: TrimMode.Line,
+              trimCollapsedText: 'more',
+              trimExpandedText: 'less',
+              trimLines: 2,
+              moreStyle: GoogleFonts.lato(
+                color: HexColor('007FFF'),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+              lessStyle: GoogleFonts.lato(
+                color: HexColor('007FFF'),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
               style: TextStyle(
                 color: Helper.isDark(context)
                     ? HexColor('99A4AE')
@@ -144,6 +167,35 @@ class _RequestNotificationState extends State<RequestNotification> {
                 fontWeight: FontWeight.w600,
               ),
             ),
+            if (widget.image.toString().isNotEmpty)
+              const SizedBox(
+                height: 5,
+              ),
+            if (widget.image.toString().isNotEmpty)
+              InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ViewImage(
+                      Image: widget.image,
+                    ),
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Image.network(
+                      widget.image,
+                      height: 30,
+                    ),
+                    Positioned(
+                      top: 8,
+                      left: 8,
+                      child: SvgPicture.asset(
+                        'assets/images/image.svg',
+                      ),
+                    )
+                  ],
+                ),
+              ),
             const SizedBox(
               height: 16,
             ),

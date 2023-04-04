@@ -1,12 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:network_to_file_image/network_to_file_image.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../helpers/methods.dart';
 import '../../providers/auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path/path.dart' as path;
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -22,6 +27,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   bool isTasker = false;
   var _isinit = true;
 
+  File? myFile;
+
+  Future<void> convertUrlToFile(profilePicture) async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = path.join(dir.path, path.basename(profilePicture));
+    setState(() {
+      myFile = File(pathName);
+    });
+  }
+
   @override
   void didChangeDependencies() async {
     if (_isinit) {
@@ -35,6 +50,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         profilePicture = userdata['profilePicture'] ?? '';
         isTasker = Provider.of<Auth>(context, listen: false).isTasker;
       });
+      convertUrlToFile(userdata['profilePicture']);
     }
     _isinit = false;
     super.didChangeDependencies();
@@ -52,59 +68,23 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         Navigator.of(context).pushNamed('/');
       } else {
         if (response.data['hasAccount'] == false) {
-          showDialog<void>(
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                child: Container(
-                  height: 160,
-                  color: Helper.isDark(context)
-                      ? HexColor('252B30')
-                      : HexColor('DEE0E0'),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Create a new Tasker account',
-                        style: GoogleFonts.lato(
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'You are currently not a tasker, please create a tasker account to continue',
-                        style: GoogleFonts.lato(
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            child: const Text('Yes'),
-                            onPressed: () =>
-                                Navigator.of(context).pushNamed('/taskerform'),
-                          ),
-                          TextButton(
-                            child: const Text('No'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pushNamed('/');
-                            },
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
+          // ignore: use_build_context_synchronously
+          CoolAlert.show(
+              context: context,
+              type: CoolAlertType.confirm,
+              titleTextStyle: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              textTextStyle: GoogleFonts.poppins(
+                fontSize: 12,
+              ),
+              title: 'Create a new Tasker account',
+              text:
+                  'You are currently not a tasker, please create a tasker account to continue',
+              onConfirmBtnTap: () =>
+                  Navigator.of(context).pushNamed('/taskerform'),
+              onCancelBtnTap: () => Navigator.of(context).pop());
         }
       }
     });
@@ -151,7 +131,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         height: 60,
                         child: CircleAvatar(
                           backgroundImage: profilePicture != ''
-                              ? NetworkImage(profilePicture)
+                              ? NetworkToFileImage(
+                                  url: profilePicture,
+                                  file: myFile,
+                                )
                               : const AssetImage(
                                   'assets/images/default_user.png',
                                 ) as ImageProvider,

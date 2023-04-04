@@ -1,14 +1,19 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:cool_alert/cool_alert.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:network_to_file_image/network_to_file_image.dart';
 import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/providers/user.dart';
+import 'package:pairtasker/screens/select_community/community_widget.dart';
+import 'package:pairtasker/screens/select_community/select_community_screen.dart';
 import 'package:pairtasker/theme/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:pairtasker/theme/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/methods.dart';
@@ -16,6 +21,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dio/dio.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
 
 class MyProfile extends StatefulWidget {
   const MyProfile({super.key});
@@ -41,6 +47,16 @@ class _MyProfileState extends State<MyProfile> {
   var error = '';
   var _isinit = true;
 
+  File? myFile;
+
+  Future<void> convertUrlToFile(profilePicture) async {
+    Directory dir = await getApplicationDocumentsDirectory();
+    String pathName = path.join(dir.path, path.basename(profilePicture));
+    setState(() {
+      myFile = File(pathName);
+    });
+  }
+
   @override
   void didChangeDependencies() async {
     if (_isinit) {
@@ -62,6 +78,7 @@ class _MyProfileState extends State<MyProfile> {
         _isTasker = userdata['isTasker'] ?? false;
         email = userdata['email'];
       });
+      convertUrlToFile(userdata['profilePicture']);
     }
     _isinit = false;
     super.didChangeDependencies();
@@ -101,6 +118,36 @@ class _MyProfileState extends State<MyProfile> {
         isLoading = false;
         _isEditing = false;
       });
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: HexColor('007FFF'),
+        duration: const Duration(
+          seconds: 2,
+        ),
+        content: Row(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(25),
+                ),
+              ),
+              child: Icon(
+                Icons.done,
+                color: HexColor('007FFF'),
+              ),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Text(
+              'Profile data updated successfully',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
+          ],
+        ),
+      ));
     }
   }
 
@@ -228,81 +275,47 @@ class _MyProfileState extends State<MyProfile> {
   }
 
   void deleteTaskerAccount() async {
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          child: Container(
-            height: 200,
-            color: Helper.isDark(context)
-                ? HexColor('252B30')
-                : HexColor('DEE0E0'),
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Text(
-                  'Are you sure want to delete your tasker account?',
-                  style: GoogleFonts.lato(
-                    fontSize: 16,
-                  ),
+    CoolAlert.show(
+        context: context,
+        type: CoolAlertType.warning,
+        showCancelBtn: true,
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+        textTextStyle: GoogleFonts.poppins(
+          fontSize: 12,
+          color: HexColor('FF0338'),
+        ),
+        title: 'Are you sure want to delete your tasker account?',
+        text:
+            'confirming this action will make you lose your tasker profile, your tasks, every data related to your tasker account.',
+        onConfirmBtnTap: () async {
+          final response = await Provider.of<Auth>(
+            context,
+            listen: false,
+          ).deleteTaskerAccount();
+          if (response.statusCode == 200) {
+            _isTasker = false;
+            // ignore: use_build_context_synchronously
+            Navigator.of(context).pushNamed('/home');
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              duration: const Duration(
+                seconds: 2,
+              ),
+              backgroundColor: HexColor('FF033E'),
+              content: Text(
+                response.data['message'],
+                style: GoogleFonts.poppins(
+                  color:
+                      // ignore: use_build_context_synchronously
+                      Helper.isDark(context) ? Colors.white : Colors.black,
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'confirming this action will make you lose your tasker profile, your tasks, every data related to your tasker account.',
-                  style: GoogleFonts.lato(
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      child: const Text('Yes'),
-                      onPressed: () async {
-                        final response = await Provider.of<Auth>(
-                          context,
-                          listen: false,
-                        ).deleteTaskerAccount();
-                        if (response.statusCode == 200) {
-                          _isTasker = false;
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pushNamed('/home');
-                          // ignore: use_build_context_synchronously
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            backgroundColor: HexColor('FF033E'),
-                            content: Text(
-                              response.data['message'],
-                              style: GoogleFonts.poppins(
-                                color:
-                                    // ignore: use_build_context_synchronously
-                                    Helper.isDark(context)
-                                        ? Colors.white
-                                        : Colors.black,
-                              ),
-                            ),
-                          ));
-                        }
-                      },
-                    ),
-                    TextButton(
-                      child: const Text('No'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
+              ),
+            ));
+          }
+        });
   }
 
   @override
@@ -404,8 +417,10 @@ class _MyProfileState extends State<MyProfile> {
                                     backgroundImage: _croppedFile != null
                                         ? FileImage(_croppedFile!)
                                         : _userdata['profilePicture'] != null
-                                            ? NetworkImage(
-                                                _userdata['profilePicture'],
+                                            ? NetworkToFileImage(
+                                                url:
+                                                    _userdata['profilePicture'],
+                                                file: myFile,
                                               )
                                             : const AssetImage(
                                                 'assets/images/default_user.png',
@@ -676,9 +691,70 @@ class _MyProfileState extends State<MyProfile> {
                           ],
                         ),
                         const SizedBox(
-                          height: 30,
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(
+                                left: 10,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.people,
+                                    color: HexColor('AAABAB'),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                      bottom: 5,
+                                    ),
+                                    child: Text(
+                                      "Community",
+                                      style: PairTaskerTheme.inputLabel,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: ((context) =>
+                                      const SelectCommunityScreen(
+                                        isUpdating: true,
+                                      )),
+                                ),
+                              ),
+                              child: Text(
+                                'change',
+                                style: GoogleFonts.lato(
+                                  color: HexColor('007FFF'),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ApartmentWidget(
+                          isSelected: false,
+                          name: _userdata['community']['name'],
+                          imageUrl: _userdata['community']['picture'],
+                          address: _userdata['community']['address']['line'],
+                          city:
+                              '${_userdata['community']['address']['city']}, ${_userdata['community']['address']['state']} ${_userdata['community']['address']['pincode']}',
                         ),
                         if (error.isNotEmpty) ErrorMessage(error),
+                        const SizedBox(
+                          height: 10,
+                        ),
                         if (!_isTasker)
                           TextButton(
                             onPressed: () =>

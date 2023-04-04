@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/home_screen/drawer.dart';
 import 'package:pairtasker/screens/home_screen/tasker_widget.dart';
+import 'package:pairtasker/screens/screens.dart';
 import 'package:pairtasker/theme/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -366,52 +367,51 @@ class _HomePageState extends State<HomePage> {
                   onRefresh: searchTaskers,
                   child: Column(
                     children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 15,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                        decoration: BoxDecoration(
+                          color: HexColor(
+                            Helper.isDark(context) ? '252B30' : '#E4ECF5',
                           ),
-                          decoration: BoxDecoration(
-                            color: HexColor(
-                              Helper.isDark(context) ? '252B30' : '#E4ECF5',
-                            ),
-                          ),
-                          width: MediaQuery.of(context).size.width,
-                          height: 60,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: kOptions.length,
-                            itemBuilder: (context, i) => InkWell(
-                              onTap: () => manageWorkingCategories(kOptions[i]),
-                              child: Container(
-                                width: 100,
-                                margin: const EdgeInsets.only(right: 5),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 1,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _workingCategories
-                                          .contains(kOptions[i])
-                                      ? HexColor('007FFF')
-                                      : Helper.isDark(context)
-                                          ? const Color.fromRGBO(
-                                              255, 255, 255, 0.1)
-                                          : const Color.fromRGBO(0, 0, 0, 0.1),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    kOptions[i],
-                                    style: GoogleFonts.lato(
-                                      fontSize: 10,
-                                    ),
+                        ),
+                        width: MediaQuery.of(context).size.width,
+                        height: 60,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: kOptions.length,
+                          itemBuilder: (context, i) => InkWell(
+                            onTap: () => manageWorkingCategories(kOptions[i]),
+                            child: Container(
+                              width: 100,
+                              margin: const EdgeInsets.only(right: 5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 1,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _workingCategories.contains(kOptions[i])
+                                    ? HexColor('007FFF')
+                                    : Helper.isDark(context)
+                                        ? const Color.fromRGBO(
+                                            255, 255, 255, 0.1)
+                                        : const Color.fromRGBO(0, 0, 0, 0.1),
+                                borderRadius: BorderRadius.circular(50),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  kOptions[i],
+                                  style: GoogleFonts.lato(
+                                    fontSize: 10,
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
+                      ),
                       if (filteredTaskers.isEmpty && !_isLoading)
                         Container(
                           width: MediaQuery.of(context).size.width,
@@ -506,11 +506,14 @@ class _HomePageState extends State<HomePage> {
                       ),
                       backgroundColor: HexColor('007FFF'),
                     ),
-                    onPressed: () => Helper.showRequestModal(
-                      context,
-                      selectedTaskers,
-                      _workingCategories.join(''),
-                      setSelectedTaskers: setSelectedTaskersEmpty,
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => SendRequest(
+                          selectedTaskers: selectedTaskers,
+                          category: _workingCategories.join(''),
+                          setSelectedTaskers: setSelectedTaskersEmpty,
+                        ),
+                      ),
                     ),
                     child: Text(
                       'Request',

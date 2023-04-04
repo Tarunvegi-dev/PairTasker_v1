@@ -92,8 +92,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
           workingCategories = response.data['data']['taskCategoriesCount'].map(
             (key, value) => MapEntry(
               key.toString(),
-              1.0
-              // double.parse(value.toString()),
+              double.parse(value.toString()),
             ),
           );
         }
@@ -110,6 +109,9 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          duration: const Duration(
+            seconds: 2,
+          ),
           backgroundColor: taskerMode ? HexColor('00CE15') : HexColor('FF033E'),
           content: Text(
             response.data['message'],

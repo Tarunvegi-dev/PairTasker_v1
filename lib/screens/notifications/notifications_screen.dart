@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/screens/notifications/notification_widgets.dart';
 import 'package:provider/provider.dart';
@@ -28,12 +29,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
       setState(() {
         _isLoading = true;
       });
-      final prefs = await SharedPreferences.getInstance();
-      final userPref = prefs.getString('userdata');
-      Map<String, dynamic> userdata =
-          jsonDecode(userPref!) as Map<String, dynamic>;
       setState(() {
-        isTasker = userdata['isTasker'] ?? false;
+        isTasker = Provider.of<Auth>(context, listen: false).isTasker;
       });
       // ignore: use_build_context_synchronously
       Provider.of<Tasker>(context, listen: false).getNotifications().then((_) {
@@ -45,8 +42,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     _isInit = false;
     super.didChangeDependencies();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +110,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   itemBuilder: (ctx, i) {
                     if (notifications[i]['type'] == 'task') {
                       return RequestNotification(
+                          image: notifications[i]['image'] ?? '',
                           taskId: notifications[i]['taskId'],
                           description: notifications[i]['description'],
                           profilePicture: notifications[i]['user']

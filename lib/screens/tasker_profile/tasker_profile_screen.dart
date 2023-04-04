@@ -4,6 +4,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/providers/user.dart';
+import 'package:pairtasker/screens/screens.dart';
 import 'package:pairtasker/screens/tasker_profile/review_widget.dart';
 import 'package:provider/provider.dart';
 import '../../helpers/methods.dart';
@@ -378,10 +379,16 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                         horizontal: 25,
                                       ),
                                     ),
-                                    onPressed: () => Helper.showRequestModal(
-                                        context, [widget.id], '',
-                                        workingCategories:
-                                            workingCategories.join(' ')),
+                                    onPressed: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: ((context) => SendRequest(
+                                              selectedTaskers: [widget.id],
+                                              category: '',
+                                              workingCategories:
+                                                  workingCategories.join(' '),
+                                            )),
+                                      ),
+                                    ),
                                     child: Text(
                                       'REQUEST',
                                       style: GoogleFonts.lato(

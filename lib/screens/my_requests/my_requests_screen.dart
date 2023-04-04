@@ -24,6 +24,7 @@ class _MyRequestsState extends State<MyRequests> {
     setState(() {
       isLoading = true;
     });
+    checkUnreadMessages();
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     final requestPref = prefs.getString('requests');
@@ -48,13 +49,11 @@ class _MyRequestsState extends State<MyRequests> {
         isLoading = false;
       });
     }
-    checkUnreadMessages();
   }
 
   @override
   void initState() {
     fetchRequests();
-    checkUnreadMessages();
     super.initState();
   }
 
