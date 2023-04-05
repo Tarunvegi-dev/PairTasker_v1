@@ -40,7 +40,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
         isLoading = false;
       });
     } else {
@@ -87,7 +88,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         backgroundColor: HexColor('FF033E'),
         content: Text(
-          response.data['message'],
+          response.data['message'] ??
+              'Something went wrong! please, try again.',
           style: GoogleFonts.poppins(
             // ignore: use_build_context_synchronously
             color: Helper.isDark(context) ? Colors.white : Colors.black,

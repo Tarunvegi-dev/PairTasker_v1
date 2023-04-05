@@ -63,7 +63,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
             children: [
               Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height * 8 / 100,
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(

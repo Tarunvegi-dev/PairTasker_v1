@@ -210,7 +210,8 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                 );
                                 if (response.statusCode != 200) {
                                   updateState(() {
-                                    errorMessage = response.data['message'] ?? '';
+                                    errorMessage = response.data['message'] ??
+                                        'Something went wrong! please, try again.';
                                     isLoading = false;
                                   });
                                 } else {
@@ -288,7 +289,13 @@ class _TaskerProfileState extends State<TaskerProfile> {
                     onTap: handleWishlist,
                     child: Icon(
                       isWishlisted ? Icons.favorite : Icons.favorite_border,
-                      color: HexColor(isWishlisted ? 'FF033E' : 'FFFFFF'),
+                      color: HexColor(
+                        isWishlisted
+                            ? 'FF033E'
+                            : Helper.isDark(context)
+                                ? 'FFFFFF'
+                                : '000000',
+                      ),
                       size: 34,
                     ),
                   )

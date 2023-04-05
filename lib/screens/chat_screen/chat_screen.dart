@@ -229,7 +229,7 @@ class _ChatScreenState extends State<ChatScreen> {
         pendingTaskers = responsedata['pending'];
         terminatedTaskers = responsedata['terminated'];
         reqMessage = responsedata['message'];
-        reqImage = responsedata['image'];
+        reqImage = responsedata['image'] ?? '';
         currentTasker = responsedata['currentTasker'] ?? {};
         taskStatus = int.parse(responsedata['status']);
       });
@@ -791,34 +791,35 @@ class _ChatScreenState extends State<ChatScreen> {
                                   ),
                                 ),
                               ),
-                            PopupMenuItem(
-                              onTap: () {
-                                Future.delayed(
-                                  const Duration(seconds: 0),
-                                  () => Helper.showReportModal(
-                                    context,
-                                    screenType == 'user'
-                                        ? currentTasker['id']
-                                        : currentUser['id'],
-                                    userId,
-                                  ),
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.report),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    'Report',
-                                    style: GoogleFonts.lato(
-                                      fontSize: 14,
+                            if (taskStatus > 0)
+                              PopupMenuItem(
+                                onTap: () {
+                                  Future.delayed(
+                                    const Duration(seconds: 0),
+                                    () => Helper.showReportModal(
+                                      context,
+                                      screenType == 'user'
+                                          ? currentTasker['id']
+                                          : currentUser['id'],
+                                      userId,
                                     ),
-                                  )
-                                ],
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.report),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'Report',
+                                      style: GoogleFonts.lato(
+                                        fontSize: 14,
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
                           ])
                 ],
               ),

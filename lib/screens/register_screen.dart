@@ -44,7 +44,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
         isLoading = false;
       });
     } else {
@@ -66,249 +67,258 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(top: 200),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Sign up",
-                    style: PairTaskerTheme.title1,
-                  ),
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  TextFormField(
-                    controller: email,
-                    validator: (value) {
-                      if (value!.isEmpty ||
-                          !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(value)) {
-                        return 'Enter a valid email!';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      border: const UnderlineInputBorder(),
-                      labelText: "Email address",
-                      hintText: "Enter your email",
-                      prefixIcon: Container(
+            padding: const EdgeInsets.all(20),
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 10 / 100,
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Sign up",
+                      style: PairTaskerTheme.title1,
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    TextFormField(
+                      controller: email,
+                      validator: (value) {
+                        if (value!.isEmpty ||
+                            !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(value)) {
+                          return 'Enter a valid email!';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        border: const UnderlineInputBorder(),
+                        labelText: "Email address",
+                        hintText: "Enter your email",
+                        prefixIcon: Container(
+                            margin: const EdgeInsets.only(
+                              right: 15,
+                            ),
+                            child: const Icon(Icons.email)),
+                        labelStyle: PairTaskerTheme.inputLabel,
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: HexColor("#99A4AE"),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      controller: password,
+                      validator: (value) {
+                        if (value!.isEmpty ||
+                            !RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
+                                .hasMatch(value)) {
+                          setState(() {
+                            setState(() {
+                              error =
+                                  'Password must contain an uppercase, a lowercase, a special character, and a number';
+                            });
+                          });
+                        }
+                        if (value.length < 8) {
+                          return 'Password should contain at least 8 characters';
+                        }
+                        return null;
+                      },
+                      obscureText: _obscuretext,
+                      decoration: InputDecoration(
+                        border: const UnderlineInputBorder(),
+                        labelText: "Password",
+                        prefixIcon: Container(
                           margin: const EdgeInsets.only(
                             right: 15,
                           ),
-                          child: const Icon(Icons.email)),
-                      labelStyle: PairTaskerTheme.inputLabel,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: HexColor("#99A4AE"),
+                          child: const Icon(Icons.key),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    controller: password,
-                    validator: (value) {
-                      if (value!.isEmpty ||
-                          !RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
-                              .hasMatch(value)) {
-                        return 'Enter a valid password!';
-                      }
-                      if (value.length < 8) {
-                        return 'Password should contain at least 8 characters';
-                      }
-                      return null;
-                    },
-                    obscureText: _obscuretext,
-                    decoration: InputDecoration(
-                      border: const UnderlineInputBorder(),
-                      labelText: "Password",
-                      prefixIcon: Container(
-                        margin: const EdgeInsets.only(
-                          right: 15,
-                        ),
-                        child: const Icon(Icons.key),
-                      ),
-                      suffixIcon: InkWell(
-                        child: Icon(
-                          _obscuretext
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color:
-                              _obscuretext ? Colors.grey : HexColor("#99A4AE"),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            _obscuretext = !_obscuretext;
-                          });
-                        },
-                      ),
-                      hintText: "Enter password",
-                      labelStyle: PairTaskerTheme.inputLabel,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: HexColor("#99A4AE"),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  TextFormField(
-                    validator: (value) {
-                      if (value!.isEmpty ||
-                          !RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$')
-                              .hasMatch(value)) {
-                        return 'Enter a valid password!';
-                      }
-                      if (value != password.text) {
-                        return 'Passwords dont match!';
-                      }
-                      if (value.length < 8) {
-                        return 'Password should contain at least 8 characters';
-                      }
-                      return null;
-                    },
-                    obscureText: _obscuretext2,
-                    decoration: InputDecoration(
-                      suffixIcon: InkWell(
-                        child: Icon(
-                          _obscuretext2
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color:
-                              _obscuretext ? Colors.grey : HexColor("#99A4AE"),
-                        ),
-                        onTap: () {
-                          setState(() {
-                            _obscuretext2 = !_obscuretext2;
-                          });
-                        },
-                      ),
-                      border: const UnderlineInputBorder(),
-                      labelText: "Confirm Password",
-                      hintText: "Re-Enter password",
-                      prefixIcon: Container(
-                          margin: const EdgeInsets.only(
-                            right: 15,
+                        suffixIcon: InkWell(
+                          child: Icon(
+                            _obscuretext
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color:
+                                _obscuretext ? Colors.grey : HexColor("#99A4AE"),
                           ),
-                          child: const Icon(Icons.key)),
-                      labelStyle: PairTaskerTheme.inputLabel,
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: HexColor("#99A4AE"),
+                          onTap: () {
+                            setState(() {
+                              _obscuretext = !_obscuretext;
+                            });
+                          },
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: Checkbox(
-                            activeColor: HexColor('#007FFF'),
-                            value: isTermsAgreed,
-                            onChanged: (bool? value) => {
-                              setState(() {
-                                isTermsAgreed = value!;
-                              })
-                            },
+                        hintText: "Enter password",
+                        labelStyle: PairTaskerTheme.inputLabel,
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: HexColor("#99A4AE"),
                           ),
                         ),
                       ),
-                      InkWell(
-                        onTap: () => Navigator.of(context).pushNamed('/terms-and-conditions'),
-                        child: Text(
-                          'Terms and conditions',
-                          style: GoogleFonts.nunito(
-                            color: HexColor('#007FFF'),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      validator: (value) {
+                        if (value != password.text) {
+                          return 'Passwords dont match!';
+                        }
+                        if (value!.length < 8) {
+                          return 'Password should contain at least 8 characters';
+                        }
+                        return null;
+                      },
+                      obscureText: _obscuretext2,
+                      decoration: InputDecoration(
+                        suffixIcon: InkWell(
+                          child: Icon(
+                            _obscuretext2
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color:
+                                _obscuretext ? Colors.grey : HexColor("#99A4AE"),
+                          ),
+                          onTap: () {
+                            setState(() {
+                              _obscuretext2 = !_obscuretext2;
+                            });
+                          },
+                        ),
+                        border: const UnderlineInputBorder(),
+                        labelText: "Confirm Password",
+                        hintText: "Re-Enter password",
+                        prefixIcon: Container(
+                            margin: const EdgeInsets.only(
+                              right: 15,
+                            ),
+                            child: const Icon(Icons.key)),
+                        labelStyle: PairTaskerTheme.inputLabel,
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: HexColor("#99A4AE"),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: Checkbox(
+                              activeColor: HexColor('#007FFF'),
+                              value: isTermsAgreed,
+                              onChanged: (bool? value) => {
+                                setState(() {
+                                  isTermsAgreed = value!;
+                                })
+                              },
+                            ),
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () => Navigator.of(context)
+                              .pushNamed('/terms-and-conditions'),
+                          child: Text(
+                            'Terms and conditions',
+                            style: GoogleFonts.nunito(
+                              color: HexColor('#007FFF'),
+                              fontSize: 14,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    if (error != '')
+                      Column(
+                        children: [
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          ErrorMessage(error)
+                        ],
+                      ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 90 / 100,
+                      height: 43,
+                      child: ElevatedButton(
+                        onPressed: isLoading ||
+                                !isTermsAgreed ||
+                                email.text.isEmpty ||
+                                password.text.isEmpty
+                            ? null
+                            : registerUser,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromRGBO(0, 127, 255, 1),
+                          elevation: 3,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5),
+                            ),
+                          ),
+                        ),
+                        child: isLoading
+                            ? const LoadingSpinner()
+                            : Text(
+                                'Register',
+                                style: PairTaskerTheme.buttonText,
+                              ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Already had account?',
+                          style: GoogleFonts.lato(
+                            color: HexColor('#99A4AE'),
                             fontSize: 14,
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                  if (error != '')
-                    Column(
-                      children: [
-                        const SizedBox(
-                          height: 15,
+                        TextButton(
+                          onPressed: () {
+                            Navigator.popAndPushNamed(context, '/login');
+                          },
+                          style: TextButton.styleFrom(
+                            splashFactory: NoSplash.splashFactory,
+                          ),
+                          child: Text(
+                            'Login',
+                            style: GoogleFonts.lato(
+                              color: HexColor('#007FFF'),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
-                        ErrorMessage(error)
                       ],
                     ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 90 / 100,
-                    height: 43,
-                    child: ElevatedButton(
-                      onPressed:
-                          isLoading || !isTermsAgreed ? null : registerUser,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromRGBO(0, 127, 255, 1),
-                        elevation: 3,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
-                        ),
-                      ),
-                      child: isLoading
-                          ? const LoadingSpinner()
-                          : Text(
-                              'Register',
-                              style: PairTaskerTheme.buttonText,
-                            ),
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Already had account?',
-                        style: GoogleFonts.lato(
-                          color: HexColor('#99A4AE'),
-                          fontSize: 14,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.popAndPushNamed(context, '/login');
-                        },
-                        style: TextButton.styleFrom(
-                          splashFactory: NoSplash.splashFactory,
-                        ),
-                        child: Text(
-                          'Login',
-                          style: GoogleFonts.lato(
-                            color: HexColor('#007FFF'),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

@@ -61,6 +61,7 @@ class _MyProfileState extends State<MyProfile> {
   void didChangeDependencies() async {
     if (_isinit) {
       final prefs = await SharedPreferences.getInstance();
+      await prefs.reload();
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
@@ -78,7 +79,7 @@ class _MyProfileState extends State<MyProfile> {
         _isTasker = userdata['isTasker'] ?? false;
         email = userdata['email'];
       });
-      convertUrlToFile(userdata['profilePicture']);
+      convertUrlToFile(userdata['profilePicture'] ?? '');
     }
     _isinit = false;
     super.didChangeDependencies();
@@ -111,7 +112,8 @@ class _MyProfileState extends State<MyProfile> {
     if (response.statusCode != 200) {
       setState(() {
         isLoading = false;
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
       });
     } else {
       setState(() {
@@ -693,74 +695,76 @@ class _MyProfileState extends State<MyProfile> {
                         const SizedBox(
                           height: 15,
                         ),
-                        if(_userdata['communityId'] != null)
-                        Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.only(
-                                    left: 10,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.people,
-                                        color: HexColor('AAABAB'),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Container(
-                                        margin: const EdgeInsets.only(
-                                          bottom: 5,
+                        if (_userdata['communityId'] != null)
+                          Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                      left: 10,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.people,
+                                          color: HexColor('AAABAB'),
                                         ),
-                                        child: Text(
-                                          "Community",
-                                          style: PairTaskerTheme.inputLabel,
+                                        const SizedBox(
+                                          width: 10,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: ((context) =>
-                                          const SelectCommunityScreen(
-                                            isUpdating: true,
-                                          )),
+                                        Container(
+                                          margin: const EdgeInsets.only(
+                                            bottom: 5,
+                                          ),
+                                          child: Text(
+                                            "Community",
+                                            style: PairTaskerTheme.inputLabel,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  child: Text(
-                                    'change',
-                                    style: GoogleFonts.lato(
-                                      color: HexColor('007FFF'),
+                                  InkWell(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: ((context) =>
+                                            const SelectCommunityScreen(
+                                              isUpdating: true,
+                                            )),
+                                      ),
                                     ),
-                                  ),
-                                )
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            ApartmentWidget(
-                              isSelected: false,
-                              name: _userdata['community']['name'],
-                              imageUrl: _userdata['community']['picture'],
-                              address: _userdata['community']['address']['line'],
-                              city:
-                                  '${_userdata['community']['address']['city']}, ${_userdata['community']['address']['state']} ${_userdata['community']['address']['pincode']}',
-                            ),
-                          ],
-                        ),
+                                    child: Text(
+                                      'change',
+                                      style: GoogleFonts.lato(
+                                        color: HexColor('007FFF'),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              ApartmentWidget(
+                                isSelected: false,
+                                name: _userdata['community']['name'],
+                                imageUrl: _userdata['community']['picture'],
+                                address: _userdata['community']['address']
+                                    ['line'],
+                                city:
+                                    '${_userdata['community']['address']['city']}, ${_userdata['community']['address']['state']} ${_userdata['community']['address']['pincode']}',
+                              ),
+                            ],
+                          ),
                         if (error.isNotEmpty) ErrorMessage(error),
                         const SizedBox(
                           height: 10,
                         ),
-                        if (!_isTasker)
+                        if (_userdata['role'] == 'user')
                           TextButton(
                             onPressed: () =>
                                 Navigator.of(context).pushNamed('/taskerform'),
@@ -772,7 +776,7 @@ class _MyProfileState extends State<MyProfile> {
                               ),
                             ),
                           ),
-                        if (_isTasker)
+                        if (_userdata['role'] == 'tasker')
                           TextButton(
                             onPressed: deleteTaskerAccount,
                             child: Text(

@@ -105,6 +105,7 @@ class _SendRequestState extends State<SendRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
           children: [

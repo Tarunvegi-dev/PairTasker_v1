@@ -40,11 +40,11 @@ class _HomePageState extends State<HomePage> {
         .fetchWorkingCategories();
     final workingCategories = response.data['data'] as List<dynamic>;
     if (response.statusCode == 200) {
-      for (var w in workingCategories) {
-        setState(() {
-          kOptions.add(w['name']);
-        });
-      }
+      var options = [];
+      workingCategories.forEach((w) => options.add(w['name']));
+      setState(() {
+        kOptions = options;
+      });
     }
     setState(() {
       address = a.toString();
@@ -79,10 +79,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> sortTaskers() async {
-    Provider.of<User>(context, listen: false).getTaskers(
+    final response = await Provider.of<User>(context, listen: false).getTaskers(
       sortBy: sortCategory,
       sort: true,
     );
+    setState(() {
+      filteredTaskers = response;
+    });
   }
 
   Future<void> loadMoreTaskers() async {
@@ -351,8 +354,9 @@ class _HomePageState extends State<HomePage> {
                                     ? const Color.fromRGBO(242, 242, 243, 0.35)
                                     : const Color.fromRGBO(0, 0, 0, 0.1),
                               ),
-                              child: SvgPicture.asset(
-                                "assets/images/icons/filter.svg",
+                              child: Icon(
+                                Icons.sort_sharp,
+                                color: HexColor('AAABAB'),
                               ),
                             ),
                           ),

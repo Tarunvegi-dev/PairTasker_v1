@@ -71,7 +71,9 @@ class RequestWidget extends StatelessWidget {
                       ),
                       Container(
                         color: status == '0'
-                            ? Colors.black
+                            ? Helper.isDark(context)
+                                ? Colors.black
+                                : Colors.white
                             : status == '1'
                                 ? HexColor('FFC72C')
                                 : status == '2'

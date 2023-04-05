@@ -62,7 +62,8 @@ class _TaskerDetailsState extends State<TaskerDetails> {
         .createTasker(_workingCategories);
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
         isLoading = false;
       });
     } else {
@@ -90,7 +91,8 @@ class _TaskerDetailsState extends State<TaskerDetails> {
         .updateTasker(taskerdata);
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
         isLoading = false;
       });
     } else {

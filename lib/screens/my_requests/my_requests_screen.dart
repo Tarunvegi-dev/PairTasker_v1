@@ -81,7 +81,6 @@ class _MyRequestsState extends State<MyRequests> {
             children: [
               Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height * 8 / 100,
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
@@ -93,7 +92,7 @@ class _MyRequestsState extends State<MyRequests> {
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 20,
+                  vertical: 15,
                 ),
                 child: Text(
                   'My Requests',

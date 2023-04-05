@@ -47,7 +47,8 @@ class _OtpVerificationState extends State<OtpVerification> {
     );
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
         isLoading = false;
       });
     } else {
@@ -76,7 +77,8 @@ class _OtpVerificationState extends State<OtpVerification> {
       });
     } else {
       setState(() {
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
       });
     }
   }

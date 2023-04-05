@@ -77,7 +77,8 @@ class _RequestNotificationState extends State<RequestNotification> {
         ),
         backgroundColor: HexColor('FF033E'),
         content: Text(
-          response.data['message'],
+          response.data['message'] ??
+              'Something went wrong! please, try again.',
           style: GoogleFonts.poppins(
             // ignore: use_build_context_synchronously
             color: Helper.isDark(context) ? Colors.white : Colors.black,

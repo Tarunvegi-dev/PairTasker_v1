@@ -56,7 +56,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
             children: [
               Container(
                 width: double.infinity,
-                height: MediaQuery.of(context).size.height * 8 / 100,
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(

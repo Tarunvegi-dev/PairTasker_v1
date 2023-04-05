@@ -77,7 +77,7 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
             seconds: 2,
           ),
           // ignore: use_build_context_synchronously
-          backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
+          backgroundColor: taskerMode ? HexColor('00CE15') : HexColor('FF033E'),
           content: Text(
             response.data['message'],
             style: GoogleFonts.poppins(
@@ -102,7 +102,8 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
         .updateTasker(taskerdata);
     if (response.statusCode != 200) {
       setState(() {
-        error = response.data['message'];
+        error = response.data['message'] ??
+            'Something went wrong! please, try again.';
         isLoading = false;
       });
     } else {

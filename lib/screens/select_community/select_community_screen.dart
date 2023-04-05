@@ -57,10 +57,10 @@ class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
     Response response;
     if (role == 'user') {
       response = await Provider.of<Auth>(context, listen: false)
-          .updateCommunity(selectedCommunities.join(' '));
+          .updateCommunity(selectedCommunities.join(' '), context);
     } else {
       response = await Provider.of<Auth>(context, listen: false)
-          .updateCommunities(selectedCommunities);
+          .updateCommunities(selectedCommunities, context);
     }
     if (response.statusCode == 200) {
       if (widget.isUpdating) {

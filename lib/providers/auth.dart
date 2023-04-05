@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pairtasker/providers/tasker.dart';
 import 'package:pairtasker/providers/user.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../helpers/methods.dart';
@@ -165,7 +166,7 @@ class Auth with ChangeNotifier {
     Map<String, dynamic> userdata =
         jsonDecode(userPref!) as Map<String, dynamic>;
     _communityId = userdata['communityId'] ?? '';
-    _role = userdata['role'];
+    _role = userdata['role'] ?? 'user';
     notifyListeners();
     return true;
   }
@@ -523,8 +524,10 @@ class Auth with ChangeNotifier {
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
       userdata['isTasker'] = false;
+      userdata['role'] = 'user';
       prefs.setString('userdata', jsonEncode(userdata));
       _isTasker = false;
+      _role = 'user';
       notifyListeners();
     }
     return response;
@@ -592,7 +595,8 @@ class Auth with ChangeNotifier {
     return [];
   }
 
-  Future<Response> updateCommunity(String communityId) async {
+  Future<Response> updateCommunity(
+      String communityId, BuildContext context) async {
     const url = '${BaseURL.url}/user/update-community';
 
     final response = await Dio().post(
@@ -615,12 +619,15 @@ class Auth with ChangeNotifier {
       userdata['communityId'] = communityId;
       prefs.setString('userdata', jsonEncode(userdata));
       _communityId = communityId;
+      // ignore: use_build_context_synchronously
+      getUserData(context, navigate: false);
       notifyListeners();
     }
     return response;
   }
 
-  Future<Response> updateCommunities(List<dynamic> communityIds) async {
+  Future<Response> updateCommunities(
+      List<dynamic> communityIds, BuildContext context) async {
     const url = '${BaseURL.url}/tasker/update-communities';
     final response = await Dio().post(
       url,
@@ -634,6 +641,8 @@ class Auth with ChangeNotifier {
         },
       ),
     );
+    // ignore: use_build_context_synchronously
+    getUserData(context);
     return response;
   }
 
@@ -643,7 +652,7 @@ class Auth with ChangeNotifier {
       url,
       data: {
         'message': message,
-        'communityId': communityId,
+        if (communityId.isNotEmpty) 'communityId': communityId,
       },
       options: Options(
         validateStatus: (_) => true,
@@ -652,7 +661,6 @@ class Auth with ChangeNotifier {
         },
       ),
     );
-    print(response);
     return response;
   }
 }

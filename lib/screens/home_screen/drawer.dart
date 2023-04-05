@@ -41,6 +41,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   void didChangeDependencies() async {
     if (_isinit) {
       final prefs = await SharedPreferences.getInstance();
+      await prefs.reload();
       final userPref = prefs.getString('userdata');
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;

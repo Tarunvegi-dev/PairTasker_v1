@@ -609,7 +609,7 @@ class Helper {
       isDismissible: true,
       context: context,
       builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 26 / 100,
+        height: MediaQuery.of(context).size.height * 30 / 100,
         color: Helper.isDark(context) ? Colors.black : Colors.white,
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
