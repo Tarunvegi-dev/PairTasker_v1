@@ -136,6 +136,7 @@ flutter:
     - assets/images/icons/drawer/faq.png
     - assets/images/icons/drawer/share.png
     - assets/images/icons/drawer/switch.png
+    - assets/images/icons/drawer/feedback.png
   
   fonts:
     - family: PairTasker

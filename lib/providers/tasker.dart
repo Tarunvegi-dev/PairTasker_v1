@@ -239,4 +239,23 @@ class Tasker extends ChangeNotifier {
     );
     return response;
   }
+
+  Future<List<dynamic>> getMyCommunities() async {
+    const url = '${BaseURL.url}/tasker/get-tasker-communities';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final response = await Dio().get(
+      url,
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': token,
+        },
+      ),
+    );
+    if(response.statusCode == 200){
+      return response.data['data'];
+    }
+    return [];
+  }
 }

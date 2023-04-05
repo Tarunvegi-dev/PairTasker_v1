@@ -693,63 +693,68 @@ class _MyProfileState extends State<MyProfile> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        if(_userdata['communityId'] != null)
+                        Column(
                           children: [
-                            Container(
-                              margin: const EdgeInsets.only(
-                                left: 10,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.people,
-                                    color: HexColor('AAABAB'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                    left: 10,
                                   ),
-                                  const SizedBox(
-                                    width: 10,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.people,
+                                        color: HexColor('AAABAB'),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 5,
+                                        ),
+                                        child: Text(
+                                          "Community",
+                                          style: PairTaskerTheme.inputLabel,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Container(
-                                    margin: const EdgeInsets.only(
-                                      bottom: 5,
+                                ),
+                                InkWell(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: ((context) =>
+                                          const SelectCommunityScreen(
+                                            isUpdating: true,
+                                          )),
                                     ),
-                                    child: Text(
-                                      "Community",
-                                      style: PairTaskerTheme.inputLabel,
+                                  ),
+                                  child: Text(
+                                    'change',
+                                    style: GoogleFonts.lato(
+                                      color: HexColor('007FFF'),
                                     ),
                                   ),
-                                ],
-                              ),
+                                )
+                              ],
                             ),
-                            InkWell(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: ((context) =>
-                                      const SelectCommunityScreen(
-                                        isUpdating: true,
-                                      )),
-                                ),
-                              ),
-                              child: Text(
-                                'change',
-                                style: GoogleFonts.lato(
-                                  color: HexColor('007FFF'),
-                                ),
-                              ),
-                            )
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            ApartmentWidget(
+                              isSelected: false,
+                              name: _userdata['community']['name'],
+                              imageUrl: _userdata['community']['picture'],
+                              address: _userdata['community']['address']['line'],
+                              city:
+                                  '${_userdata['community']['address']['city']}, ${_userdata['community']['address']['state']} ${_userdata['community']['address']['pincode']}',
+                            ),
                           ],
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        ApartmentWidget(
-                          isSelected: false,
-                          name: _userdata['community']['name'],
-                          imageUrl: _userdata['community']['picture'],
-                          address: _userdata['community']['address']['line'],
-                          city:
-                              '${_userdata['community']['address']['city']}, ${_userdata['community']['address']['state']} ${_userdata['community']['address']['pincode']}',
                         ),
                         if (error.isNotEmpty) ErrorMessage(error),
                         const SizedBox(

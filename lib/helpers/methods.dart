@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:pairtasker/providers/auth.dart';
 import 'package:pairtasker/providers/chat.dart';
 import 'package:provider/provider.dart';
 import 'package:pairtasker/providers/user.dart';
@@ -161,7 +162,8 @@ class Helper {
                             );
                             if (response.statusCode != 200) {
                               setState(() {
-                                errorMessage = response.data['message'];
+                                errorMessage = response.data['message'] ??
+                                    'Something went wrong! please, try again.';
                                 isLoading = false;
                               });
                             } else {
@@ -279,7 +281,8 @@ class Helper {
                             );
                             if (response.statusCode != 200) {
                               setState(() {
-                                errorMessage = response.data['message'];
+                                errorMessage = response.data['message'] ??
+                                    'Something went wrong! please, try again.';
                                 isLoading = false;
                               });
                             } else {
@@ -311,6 +314,135 @@ class Helper {
                               ? const LoadingSpinner()
                               : const Text(
                                   'Submit Report',
+                                ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  static void showFeedbackModal(BuildContext context, String communityId) {
+    final messageController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return BottomSheet(
+          onClosing: () {},
+          builder: (context) {
+            var errorMessage = '';
+            var isLoading = false;
+            return StatefulBuilder(
+              builder: (context, setState) => Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Container(
+                  color: Helper.isDark(context) ? Colors.black : Colors.white,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Suggestions',
+                        style: GoogleFonts.lato(fontSize: 20),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextField(
+                        controller: messageController,
+                        maxLines: 4,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(10),
+                            ),
+                            borderSide: BorderSide(
+                              color: Helper.isDark(context)
+                                  ? Colors.black
+                                  : Colors.white,
+                            ),
+                          ),
+                          hintText: 'Enter your message here..',
+                        ),
+                      ),
+                      if (errorMessage != '')
+                        Column(
+                          children: [
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            ErrorMessage(errorMessage)
+                          ],
+                        ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0),
+                            ),
+                            backgroundColor: HexColor('007FFF'),
+                          ),
+                          onPressed: () async {
+                            setState(() {
+                              errorMessage = '';
+                              isLoading = true;
+                            });
+                            final response =
+                                await Provider.of<Auth>(context, listen: false)
+                                    .submitFeedback(
+                              messageController.text,
+                              communityId,
+                            );
+                            if (response.statusCode != 200) {
+                              setState(() {
+                                errorMessage = response.data['message'] ??
+                                    'Something went wrong! please, try again.';
+                                isLoading = false;
+                              });
+                            } else {
+                              setState(() {
+                                isLoading = false;
+                              });
+                              // ignore: use_build_context_synchronously
+                              Navigator.of(context).pop();
+                              // ignore: use_build_context_synchronously
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                duration: const Duration(
+                                  seconds: 2,
+                                ),
+                                backgroundColor: HexColor('007FFF'),
+                                content: Text(
+                                  response.data['message'],
+                                  style: GoogleFonts.poppins(
+                                    // ignore: use_build_context_synchronously
+                                    color: Helper.isDark(context)
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                ),
+                              ));
+                            }
+                          },
+                          child: isLoading
+                              ? const LoadingSpinner()
+                              : const Text(
+                                  'Submit Feedback',
                                 ),
                         ),
                       )
@@ -443,7 +575,8 @@ class Helper {
                                 );
                                 if (response.statusCode != 200) {
                                   updateState(() {
-                                    errorMessage = response.data['message'];
+                                    errorMessage = response.data['message'] ??
+                                        'Something went wrong! please, try again.';
                                     isLoading = false;
                                   });
                                 } else {
@@ -578,13 +711,11 @@ class Helper {
 }
 
 class BaseURL {
-  static const url =
-      // 'http://65.0.31.100/api';
-      'http://192.168.236.47:3000/api';
+  static const url = 'http://65.0.31.100/api';
+  // 'http://192.168.236.47:3000/api';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
-  static const socketURL =
-      // 'http://65.0.31.100/';
-      'http://192.168.236.47:3000';
+  static const socketURL = 'http://65.0.31.100/';
+  // 'http://192.168.236.47:3000';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

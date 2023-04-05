@@ -210,7 +210,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                 );
                                 if (response.statusCode != 200) {
                                   updateState(() {
-                                    errorMessage = response.data['message'];
+                                    errorMessage = response.data['message'] ?? '';
                                     isLoading = false;
                                   });
                                 } else {

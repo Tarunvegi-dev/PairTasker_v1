@@ -156,7 +156,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
       });
       // ignore: use_build_context_synchronously
       Navigator.of(context)
-          .pushReplacementNamed(isChecked ? '/taskerform' : '/home');
+          .pushReplacementNamed(isChecked ? '/taskerform' : '/select-community');
     }
   }
 

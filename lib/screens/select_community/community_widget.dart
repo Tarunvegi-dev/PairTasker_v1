@@ -10,7 +10,7 @@ class ApartmentWidget extends StatelessWidget {
     required this.imageUrl,
     required this.address,
     required this.city,
-    this.isSelected,
+    this.isSelected = false,
   }) : super(key: key);
 
   final String name;
@@ -22,7 +22,9 @@ class ApartmentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 100,
+      margin: const EdgeInsets.only(
+        bottom: 20,
+      ),
       decoration: BoxDecoration(
         border: isSelected ? Border.all(color: HexColor('007FFF')) : null,
         color: HexColor(

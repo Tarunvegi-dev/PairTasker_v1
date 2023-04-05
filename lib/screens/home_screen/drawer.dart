@@ -26,7 +26,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   var profilePicture = '';
   bool isTasker = false;
   var _isinit = true;
-
+  String communityId = '';
   File? myFile;
 
   Future<void> convertUrlToFile(profilePicture) async {
@@ -49,8 +49,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         displayName = userdata['displayName'] ?? '';
         profilePicture = userdata['profilePicture'] ?? '';
         isTasker = Provider.of<Auth>(context, listen: false).isTasker;
+        communityId = userdata['communityId'] ?? '';
       });
-      convertUrlToFile(userdata['profilePicture']);
+      convertUrlToFile(userdata['profilePicture'] ?? '');
     }
     _isinit = false;
     super.didChangeDependencies();
@@ -312,8 +313,46 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       ),
                     ),
                     InkWell(
+                      onTap: () => Helper.showFeedbackModal(
+                        context,
+                        communityId,
+                      ),
+                      child: Container(
+                        color: Helper.isDark(context)
+                            ? Colors.black
+                            : Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 23,
+                        ),
+                        margin: const EdgeInsets.only(
+                          bottom: 5,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              'assets/images/icons/drawer/feedback.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              "Feedback",
+                              style: GoogleFonts.lato(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    InkWell(
                       onTap: () {
-                        final uri = Uri.parse('https://pairtaskerapp.web.app/');
+                        final uri = Uri.parse('https://pairtasker.com/');
                         launchUrl(uri);
                       },
                       child: Container(

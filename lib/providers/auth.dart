@@ -16,6 +16,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 class Auth with ChangeNotifier {
   String _token = '';
   String _username = '';
+  String _role = 'user';
   String _communityId = '';
   bool _isTasker = false;
   bool _unreadNotifications = false;
@@ -31,7 +32,7 @@ class Auth with ChangeNotifier {
   }
 
   bool get isCommunitySelected {
-    return _communityId != '';
+    return _communityId != '' || _role == 'tasker';
   }
 
   bool get isTasker {
@@ -43,6 +44,10 @@ class Auth with ChangeNotifier {
       return _token;
     }
     return '';
+  }
+
+  String get role {
+    return _role;
   }
 
   bool get unreadNotifications {
@@ -153,11 +158,14 @@ class Auth with ChangeNotifier {
 
   Future<bool> checkIsCommunitySelected() async {
     final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('communityId')) {
+    if (!prefs.containsKey('userdata')) {
       return false;
     }
-    final communityId = prefs.getString('communityId');
-    _communityId = communityId!;
+    final userPref = prefs.getString('userdata');
+    Map<String, dynamic> userdata =
+        jsonDecode(userPref!) as Map<String, dynamic>;
+    _communityId = userdata['communityId'] ?? '';
+    _role = userdata['role'];
     notifyListeners();
     return true;
   }
@@ -188,7 +196,7 @@ class Auth with ChangeNotifier {
     Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
   }
 
-  Future<Response> getUserData(BuildContext context) async {
+  Future<Response> getUserData(BuildContext context, {navigate = true}) async {
     const url = '${BaseURL.url}/user/get-user';
 
     final response = await Dio().get(
@@ -208,12 +216,14 @@ class Auth with ChangeNotifier {
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('userdata', jsonEncode(responseData));
-      if (response.data['isTasker'] == true) {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pushReplacementNamed('/tasker-dashboard');
-      } else {
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pushReplacementNamed('/home');
+      if (navigate) {
+        if (response.data['isTasker'] == true) {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pushReplacementNamed('/tasker-dashboard');
+        } else {
+          // ignore: use_build_context_synchronously
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
       }
     }
     return response;
@@ -346,7 +356,7 @@ class Auth with ChangeNotifier {
         _username = responseData['data']['username'];
         notifyListeners();
         // ignore: use_build_context_synchronously
-        getUserData(context);
+        getUserData(context, navigate: false);
       } else {
         final userPref = prefs.getString('userdata');
         Map<String, dynamic> userdataPref =
@@ -455,9 +465,11 @@ class Auth with ChangeNotifier {
       Map<String, dynamic> userdata =
           jsonDecode(userPref!) as Map<String, dynamic>;
       userdata['isTasker'] = true;
+      userdata['role'] = 'tasker';
       userdata['tasker'] = responseData['data'];
       prefs.setString('userdata', jsonEncode(userdata));
       _isTasker = true;
+      _role = 'tasker';
       notifyListeners();
     }
     return response;
@@ -597,10 +609,50 @@ class Auth with ChangeNotifier {
     );
     if (response.statusCode == 200) {
       final prefs = await SharedPreferences.getInstance();
-      prefs.setString('communityId', communityId);
+      final userPref = prefs.getString('userdata');
+      Map<String, dynamic> userdata =
+          jsonDecode(userPref!) as Map<String, dynamic>;
+      userdata['communityId'] = communityId;
+      prefs.setString('userdata', jsonEncode(userdata));
       _communityId = communityId;
       notifyListeners();
     }
+    return response;
+  }
+
+  Future<Response> updateCommunities(List<dynamic> communityIds) async {
+    const url = '${BaseURL.url}/tasker/update-communities';
+    final response = await Dio().post(
+      url,
+      data: {
+        'communityIds': communityIds,
+      },
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': _token,
+        },
+      ),
+    );
+    return response;
+  }
+
+  Future<Response> submitFeedback(String message, String communityId) async {
+    const url = '${BaseURL.url}/add-feedback';
+    final response = await Dio().post(
+      url,
+      data: {
+        'message': message,
+        'communityId': communityId,
+      },
+      options: Options(
+        validateStatus: (_) => true,
+        headers: {
+          'token': _token,
+        },
+      ),
+    );
+    print(response);
     return response;
   }
 }

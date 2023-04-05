@@ -1,3 +1,4 @@
+import 'package:dio/src/response.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -9,20 +10,23 @@ import 'package:pairtasker/helpers/methods.dart';
 
 class SelectCommunityScreen extends StatefulWidget {
   final isUpdating;
+  final selectedCommunities;
 
-  const SelectCommunityScreen({this.isUpdating, Key? key}) : super(key: key);
+  const SelectCommunityScreen(
+      {this.isUpdating = false, this.selectedCommunities = '', Key? key})
+      : super(key: key);
 
   @override
   State<SelectCommunityScreen> createState() => _SelectCommunityScreenState();
 }
 
 class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
-  String email = '';
   bool _isInit = true;
   List<dynamic> communities = [];
   List<dynamic> filteredCommunities = [];
   final keyword = TextEditingController();
   String selectedCommunityId = '';
+  List<dynamic> selectedCommunities = [];
   bool isLoading = false;
 
   @override
@@ -30,40 +34,42 @@ class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
     if (_isInit) {
       final response =
           await Provider.of<Auth>(context, listen: false).getCommunities();
+      if (widget.selectedCommunities.toString().isNotEmpty) {
+        setState(() {
+          selectedCommunities =
+              widget.selectedCommunities.toString().split(' ');
+        });
+      }
       setState(() {
         communities = response;
         filteredCommunities = response;
       });
-      fetchArguments();
     }
     _isInit = false;
     super.didChangeDependencies();
-  }
-
-  void fetchArguments() {
-    final arguments = (ModalRoute.of(context)?.settings.arguments ??
-        <String, dynamic>{}) as Map;
-    setState(() {
-      email = arguments['email'] ?? '';
-    });
   }
 
   void updateCommunity() async {
     setState(() {
       isLoading = true;
     });
-    final response = await Provider.of<Auth>(context, listen: false)
-        .updateCommunity(selectedCommunityId);
-    print(response);
+    final role = Provider.of<Auth>(context, listen: false).role;
+    Response response;
+    if (role == 'user') {
+      response = await Provider.of<Auth>(context, listen: false)
+          .updateCommunity(selectedCommunities.join(' '));
+    } else {
+      response = await Provider.of<Auth>(context, listen: false)
+          .updateCommunities(selectedCommunities);
+    }
     if (response.statusCode == 200) {
       if (widget.isUpdating) {
         // ignore: use_build_context_synchronously
         Navigator.of(context).pop();
+      } else {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pushReplacementNamed('/');
       }
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacementNamed('/userform', arguments: {
-        "email": email,
-      });
     }
     setState(() {
       isLoading = false;
@@ -72,6 +78,7 @@ class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final role = Provider.of<Auth>(context).role;
     return Scaffold(
       backgroundColor: Helper.isDark(context) ? Colors.black : Colors.white,
       body: Column(
@@ -105,9 +112,16 @@ class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
             child: TextFormField(
               controller: keyword,
               onEditingComplete: () {
+                if (keyword.text.isEmpty) {
+                  setState(() {
+                    filteredCommunities = communities;
+                  });
+                }
                 final filtered = communities.where(
                   (community) => community['name']
                       .toString()
+                      .trim()
+                      .replaceAll(' ', '')
                       .toLowerCase()
                       .contains(keyword.text.toLowerCase()),
                 );
@@ -165,20 +179,33 @@ class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
                 itemCount: filteredCommunities.length,
                 itemBuilder: (context, i) => InkWell(
                   onTap: () {
-                    if (selectedCommunityId == filteredCommunities[i]['id']) {
+                    final communityId = filteredCommunities[i]['id'];
+                    final isTasker = role == 'tasker';
+                    if (!isTasker) {
                       setState(() {
-                        selectedCommunityId = '';
+                        if (selectedCommunities.contains(communityId)) {
+                          selectedCommunities.remove(communityId);
+                        } else {
+                          if (selectedCommunities.isNotEmpty) {
+                            selectedCommunities.removeLast();
+                          }
+                          selectedCommunities.add(communityId);
+                        }
                       });
                     } else {
                       setState(() {
-                        selectedCommunityId = filteredCommunities[i]['id'];
+                        if (selectedCommunities.contains(communityId)) {
+                          selectedCommunities.remove(communityId);
+                        } else {
+                          selectedCommunities.add(communityId);
+                        }
                       });
                     }
                   },
                   child: ApartmentWidget(
                     key: ValueKey(i + 1),
-                    isSelected:
-                        selectedCommunityId == filteredCommunities[i]['id'],
+                    isSelected: selectedCommunities
+                        .contains(filteredCommunities[i]['id']),
                     name: filteredCommunities[i]['name'],
                     imageUrl: filteredCommunities[i]['picture'],
                     address: filteredCommunities[i]['address']['line'],
@@ -191,7 +218,7 @@ class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
           ),
         ],
       ),
-      floatingActionButton: selectedCommunityId.isNotEmpty
+      floatingActionButton: selectedCommunities.isNotEmpty
           ? Container(
               margin: const EdgeInsets.only(bottom: 20, right: 5),
               width: MediaQuery.of(context).size.width * 30 / 100,

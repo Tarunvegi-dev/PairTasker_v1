@@ -1,5 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:pairtasker/providers/auth.dart';
+import 'package:pairtasker/screens/select_community/community_widget.dart';
+import 'package:pairtasker/screens/select_community/select_community_screen.dart';
+import 'package:pairtasker/theme/theme.dart';
 import '../helpers/methods.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,6 +25,7 @@ class MyTaskerProfile extends StatefulWidget {
 class _MyTaskerProfileState extends State<MyTaskerProfile> {
   bool taskerMode = false;
   List<dynamic> workingCategories = [];
+  List<dynamic> communities = [];
 
   bool isLoading = false;
   var _isinit = true;
@@ -41,8 +47,15 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
     final userPref = prefs.getString('userdata');
     Map<String, dynamic> userdata =
         jsonDecode(userPref!) as Map<String, dynamic>;
+    List<dynamic> communitiesData = userdata['tasker']['communities'];
+    if (communitiesData.isEmpty) {
+      final responseData =
+          await Provider.of<Tasker>(context, listen: false).getMyCommunities();
+      communitiesData = responseData;
+    }
     if (userdata['isTasker'] != null) {
       setState(() {
+        communities = communitiesData;
         taskerMode = userdata['tasker']['isOnline'];
         workingCategories = userdata['tasker']['workingCategories'];
         bio = TextEditingController(text: userdata['tasker']['bio'] ?? '');
@@ -181,24 +194,24 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                 child: ListView(
                   shrinkWrap: true,
                   children: [
-                      TextField(
-                        readOnly: !_isEditing,
-                        maxLines: 3,
-                        controller: bio,
-                        decoration: InputDecoration(
-                          hintText: 'Describe yourself',
-                          hintStyle: GoogleFonts.lato(
-                            fontSize: 12,
-                          ),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: HexColor(
-                                '99A4AE',
-                              ),
+                    TextField(
+                      readOnly: !_isEditing,
+                      maxLines: 3,
+                      controller: bio,
+                      decoration: InputDecoration(
+                        hintText: 'Describe yourself',
+                        hintStyle: GoogleFonts.lato(
+                          fontSize: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: HexColor(
+                              '99A4AE',
                             ),
                           ),
                         ),
                       ),
+                    ),
                     if (error != '')
                       Column(
                         children: [
@@ -333,6 +346,81 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                         ),
                       ),
                     ),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: HexColor('99A4AE'),
+                            width: 0.5,
+                          ),
+                        ),
+                      ),
+                      margin: const EdgeInsets.only(
+                        top: 20,
+                      ),
+                      padding: const EdgeInsets.only(
+                        bottom: 18,
+                        left: 15,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.people,
+                                color: HexColor('AAABAB'),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                'Communities',
+                                style: GoogleFonts.lato(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          InkWell(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: ((context) => SelectCommunityScreen(
+                                      isUpdating: true,
+                                      selectedCommunities: communities
+                                          .map((community) => community['id'])
+                                          .toList()
+                                          .join(' '),
+                                    )),
+                              ),
+                            ).then((value) {
+                              fetchTaskerProfile();
+                            }),
+                            child: Text(
+                              'manage',
+                              style: GoogleFonts.lato(
+                                color: HexColor('007FFF'),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ListView.builder(
+                      itemCount: communities.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, i) => ApartmentWidget(
+                          isSelected: false,
+                          name: communities[i]['name'],
+                          imageUrl: communities[i]['picture'],
+                          address: communities[i]['address']['line'],
+                          city:
+                              '${communities[i]['address']['city']}, ${communities[i]['address']['state']}, ${communities[i]['address']['pincode']}'),
+                    )
                   ],
                 ),
               ),

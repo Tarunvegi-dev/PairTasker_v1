@@ -357,21 +357,27 @@ class _MyAppState extends State<MyApp> {
           title: 'PairTasker',
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
-          home: auth.isAuth && auth.isSignUpCompleted
-              ? auth.isTasker
-                  ? const TaskerDashboard()
-                  : const HomePage()
-              : auth.isAuth && !auth.isSignUpCompleted
-                  ? auth.isCommunitySelected
-                      ? const UserFormScreen()
-                      : const SelectCommunityScreen()
-                  : FutureBuilder(
-                      future: auth.tryAutoLogin(),
-                      builder: (ctx, authResult) =>
-                          authResult.connectionState == ConnectionState.waiting
-                              ? const SplashScreen()
-                              : const InitialScreen(),
-                    ),
+          home:
+              auth.isAuth && auth.isSignUpCompleted && auth.isCommunitySelected
+                  ? auth.isTasker
+                      ? const TaskerDashboard()
+                      : const HomePage()
+                  : auth.isAuth &&
+                          auth.isSignUpCompleted &&
+                          !auth.isCommunitySelected
+                      ? const SelectCommunityScreen()
+                      : auth.isAuth &&
+                              !auth.isSignUpCompleted &&
+                              !auth.isCommunitySelected
+                          ? const UserFormScreen()
+                          : FutureBuilder(
+                              future: auth.tryAutoLogin(),
+                              builder: (ctx, authResult) =>
+                                  authResult.connectionState ==
+                                          ConnectionState.waiting
+                                      ? const SplashScreen()
+                                      : const InitialScreen(),
+                            ),
           routes: {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),

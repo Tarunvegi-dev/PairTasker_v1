@@ -82,7 +82,8 @@ class _SendRequestState extends State<SendRequest> {
     );
     if (response.statusCode != 200) {
       setState(() {
-        errorMessage = response.data['message'];
+        errorMessage = response.data['message'] ??
+            'Something went wrong! please, try again.';
         isLoading = false;
       });
     } else {
