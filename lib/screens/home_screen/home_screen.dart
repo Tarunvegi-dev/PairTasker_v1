@@ -23,7 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> key = GlobalKey();
   List<dynamic> kOptions = [];
-  final List<dynamic> _workingCategories = ['DeliveryBoy'];
+  final List<dynamic> _workingCategories = [];
   List<dynamic> filteredTaskers = [];
   var _isInit = true;
   var _isLoading = false;
@@ -44,6 +44,9 @@ class _HomePageState extends State<HomePage> {
       workingCategories.forEach((w) => options.add(w['name']));
       setState(() {
         kOptions = options;
+      });
+      setState(() {
+        _workingCategories.add(options[0]);
       });
     }
     setState(() {
@@ -389,7 +392,6 @@ class _HomePageState extends State<HomePage> {
                           itemBuilder: (context, i) => InkWell(
                             onTap: () => manageWorkingCategories(kOptions[i]),
                             child: Container(
-                              width: 100,
                               margin: const EdgeInsets.only(right: 5),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,

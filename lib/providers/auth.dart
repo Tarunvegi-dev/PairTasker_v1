@@ -23,6 +23,7 @@ class Auth with ChangeNotifier {
   bool _unreadNotifications = false;
   bool _unreadRequests = false;
   bool _unreadTasks = false;
+  List<dynamic> _communityIds = [];
 
   bool get isAuth {
     return _token != '';
@@ -33,7 +34,7 @@ class Auth with ChangeNotifier {
   }
 
   bool get isCommunitySelected {
-    return _communityId != '' || _role == 'tasker';
+    return _communityId != '' || _communityIds.isNotEmpty;
   }
 
   bool get isTasker {
@@ -167,6 +168,7 @@ class Auth with ChangeNotifier {
         jsonDecode(userPref!) as Map<String, dynamic>;
     _communityId = userdata['communityId'] ?? '';
     _role = userdata['role'] ?? 'user';
+    _communityIds = userdata['tasker']['communities'];
     notifyListeners();
     return true;
   }
@@ -641,8 +643,12 @@ class Auth with ChangeNotifier {
         },
       ),
     );
-    // ignore: use_build_context_synchronously
-    getUserData(context);
+    if (response.statusCode == 200) {
+      // ignore: use_build_context_synchronously
+      getUserData(context);
+      _communityIds = communityIds;
+      notifyListeners();
+    }
     return response;
   }
 

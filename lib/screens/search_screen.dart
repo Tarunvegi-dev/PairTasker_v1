@@ -136,7 +136,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (context, i) => InkWell(
                   onTap: () => manageWorkingCategories(kOptions[i]),
                   child: Container(
-                    width: 100,
                     margin: const EdgeInsets.only(right: 5),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
