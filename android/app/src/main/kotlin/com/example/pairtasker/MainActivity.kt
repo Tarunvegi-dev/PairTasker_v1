@@ -1,4 +1,4 @@
-package com.example.pairtasker
+package com.pair_tasker.android
 
 import io.flutter.embedding.android.FlutterActivity
 

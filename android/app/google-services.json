@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:557927434341:android:e529ca5b8f62c300351e8c",
         "android_client_info": {
-          "package_name": "com.example.pairtasker"
+          "package_name": "com.pair_tasker.android"
         }
       },
       "oauth_client": [

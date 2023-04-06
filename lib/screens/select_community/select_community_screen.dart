@@ -169,11 +169,11 @@ class _SelectCommunityScreenState extends State<SelectCommunityScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-            ),
-            child: Expanded(
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: filteredCommunities.length,

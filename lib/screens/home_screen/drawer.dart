@@ -84,8 +84,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               title: 'Create a new Tasker account',
               text:
                   'You are currently not a tasker, please create a tasker account to continue',
-              onConfirmBtnTap: () =>
-                  Navigator.of(context).pushNamed('/taskerform'),
+              onConfirmBtnTap: () {
+                Future.delayed(
+                  const Duration(seconds: 0),
+                  () => Navigator.of(context).pushReplacementNamed('/taskerform'),
+                );
+              },
               onCancelBtnTap: () => Navigator.of(context).pop());
         }
       }
