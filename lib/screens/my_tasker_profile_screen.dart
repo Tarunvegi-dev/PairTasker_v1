@@ -134,7 +134,7 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                 ),
               ),
               padding: const EdgeInsets.symmetric(
-                horizontal: 20,
+                horizontal: 12,
                 vertical: 20,
               ),
               child: Row(
@@ -191,15 +191,19 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(12),
                 child: ListView(
                   shrinkWrap: true,
                   children: [
                     TextField(
                       readOnly: !_isEditing,
-                      maxLines: 3,
+                      maxLines: 5,
                       controller: bio,
                       decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         hintText: 'Describe yourself',
                         hintStyle: GoogleFonts.lato(
                           fontSize: 12,

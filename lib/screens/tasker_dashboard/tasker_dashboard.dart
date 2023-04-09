@@ -145,7 +145,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
                         ),
                       ),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
+                        horizontal: 12,
                         vertical: 15,
                       ),
                       child: Row(

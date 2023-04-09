@@ -53,8 +53,7 @@ class RatioWidget extends StatelessWidget {
                       Text(
                         title,
                         style: GoogleFonts.lato(
-                          fontSize: 12,
-                          color: HexColor('AAABAB'),
+                          fontSize: 14,
                         ),
                       )
                     ],
@@ -68,6 +67,7 @@ class RatioWidget extends StatelessWidget {
                       style: GoogleFonts.lato(
                         fontWeight: FontWeight.bold,
                         fontSize: 10,
+                        color: HexColor('AAABAB'),
                       ),
                     )
                   else
@@ -79,6 +79,7 @@ class RatioWidget extends StatelessWidget {
                           style: GoogleFonts.lato(
                             fontWeight: FontWeight.bold,
                             fontSize: 10,
+                            color: HexColor('AAABAB'),
                           ),
                         ),
                         Text(
@@ -86,6 +87,7 @@ class RatioWidget extends StatelessWidget {
                           style: GoogleFonts.lato(
                             fontWeight: FontWeight.bold,
                             fontSize: 10,
+                            color: HexColor('AAABAB'),
                           ),
                         ),
                       ],

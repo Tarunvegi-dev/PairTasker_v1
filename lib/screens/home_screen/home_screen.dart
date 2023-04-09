@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
@@ -23,7 +25,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   GlobalKey<ScaffoldState> key = GlobalKey();
   List<dynamic> kOptions = [];
-  final List<dynamic> _workingCategories = [];
+  List<dynamic> _workingCategories = [];
   List<dynamic> filteredTaskers = [];
   var _isInit = true;
   var _isLoading = false;
@@ -45,8 +47,19 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         kOptions = options;
       });
+    }
+    if (prefs.containsKey('workingCategories')) {
+      final workingCategoriesPref = prefs.getString('workingCategories');
+      List<dynamic> workingCategoriesData =
+          jsonDecode(workingCategoriesPref!) as List<dynamic>;
       setState(() {
-        _workingCategories.add(options[0]);
+        _workingCategories = workingCategoriesData;
+        kOptions.remove(_workingCategories[0]);
+        kOptions.insert(0, _workingCategories[0]);
+      });
+    } else {
+      setState(() {
+        _workingCategories.add(kOptions[0]);
       });
     }
     setState(() {
@@ -114,11 +127,14 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void manageWorkingCategories(category) {
+  void manageWorkingCategories(category) async {
     setState(() {
       _workingCategories.removeRange(0, _workingCategories.length);
       _workingCategories.add(category.toString().trim());
     });
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('workingCategories');
+    prefs.setString('workingCategories', jsonEncode(_workingCategories));
     searchTaskers();
   }
 
