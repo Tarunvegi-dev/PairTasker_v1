@@ -728,23 +728,29 @@ class _TaskerProfileState extends State<TaskerProfile> {
                               spacing: 5.0,
                               runSpacing: 15.0,
                               children: workingCategories
-                                  .map((category) => Container(
-                                        width: 100,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                          vertical: 10,
+                                  .map((category) => ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                          minWidth: 100,
+                                          maxWidth: 130,
                                         ),
-                                        margin: const EdgeInsets.only(right: 5),
-                                        decoration: BoxDecoration(
-                                          color: HexColor('007FFF'),
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                        ),
-                                        child: Center(
-                                          child: Text(
-                                            category,
-                                            style: const TextStyle(
-                                              fontSize: 10,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 10,
+                                          ),
+                                          margin:
+                                              const EdgeInsets.only(right: 5),
+                                          decoration: BoxDecoration(
+                                            color: HexColor('007FFF'),
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              category,
+                                              style: const TextStyle(
+                                                fontSize: 10,
+                                              ),
                                             ),
                                           ),
                                         ),

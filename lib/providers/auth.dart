@@ -34,7 +34,11 @@ class Auth with ChangeNotifier {
   }
 
   bool get isCommunitySelected {
-    return _communityId != '' || _communityIds.isNotEmpty;
+    if (_role == 'user') {
+      return _communityId != '';
+    } else {
+      return _communityIds.isNotEmpty;
+    }
   }
 
   bool get isTasker {
@@ -168,7 +172,9 @@ class Auth with ChangeNotifier {
         jsonDecode(userPref!) as Map<String, dynamic>;
     _communityId = userdata['communityId'] ?? '';
     _role = userdata['role'] ?? 'user';
-    _communityIds = userdata['tasker']['communities'];
+    if (_role == 'tasker') {
+      _communityIds = userdata['tasker']['communities'];
+    }
     notifyListeners();
     return true;
   }
