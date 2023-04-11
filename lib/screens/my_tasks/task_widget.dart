@@ -43,7 +43,7 @@ class TaskWidget extends StatelessWidget {
             color: Helper.isDark(context) ? Colors.black : Colors.white,
             child: Container(
               margin: const EdgeInsets.symmetric(
-                vertical: 20,
+                vertical: 15,
                 horizontal: 20,
               ),
               child: Column(
@@ -123,7 +123,7 @@ class TaskWidget extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,8 +131,8 @@ class TaskWidget extends StatelessWidget {
                       Text(
                         message,
                         style: GoogleFonts.lato(
-                          color: HexColor('6F7273'),
-                          fontSize: 14,
+                          color: HexColor('FFFFFF'),
+                          fontSize: 16,
                         ),
                       ),
                       if (unreadCount > 0)
@@ -157,7 +157,7 @@ class TaskWidget extends StatelessWidget {
               Helper.isDark(context) ? '252B30' : '#E4ECF5',
             ),
           ),
-          height: 4,
+          height: 3,
         )
       ],
     );

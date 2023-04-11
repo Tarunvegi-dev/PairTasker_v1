@@ -23,6 +23,7 @@ class TaskerWidget extends StatelessWidget {
   final isWishlist;
   final List<dynamic> selectedTaskers;
   final Function selectTaskers;
+  final isVerified;
 
   const TaskerWidget(
       {this.index,
@@ -35,6 +36,7 @@ class TaskerWidget extends StatelessWidget {
       this.profilePicture,
       this.isSelected,
       this.availability,
+      this.isVerified,
       this.workingCategories,
       required this.selectedTaskers,
       required this.selectTaskers,
@@ -86,8 +88,8 @@ class TaskerWidget extends StatelessWidget {
                                   ),
                                 )
                               : SizedBox(
-                                  height: 40,
-                                  width: 40,
+                                  height: 45,
+                                  width: 45,
                                   child: CircleAvatar(
                                     radius: 30,
                                     backgroundImage: profilePicture == null
@@ -112,16 +114,27 @@ class TaskerWidget extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  displayName,
-                                  style: GoogleFonts.lato(
-                                    fontSize: 14,
-                                  ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      displayName,
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    if (isVerified)
+                                      Image.asset(
+                                        'assets/images/icons/verified_badge.png',
+                                        width: 16,
+                                        height: 20,
+                                      )
+                                  ],
                                 ),
                                 Text(
                                   '@$username',
-                                  style: GoogleFonts.lato(
-                                    fontSize: 10,
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 12,
                                     color: HexColor('#AAABAB'),
                                   ),
                                 ),
@@ -138,7 +151,7 @@ class TaskerWidget extends StatelessWidget {
                                       category
                                           .toUpperCase()
                                           .replaceAll(',', ''),
-                                      textStyle: GoogleFonts.lato(
+                                      textStyle: GoogleFonts.nunito(
                                         color: HexColor('#AAABAB'),
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
@@ -151,7 +164,7 @@ class TaskerWidget extends StatelessWidget {
                             )
                           : Text(
                               'SELECTED',
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 color: HexColor('#007FFF'),
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -181,7 +194,7 @@ class TaskerWidget extends StatelessWidget {
                             ),
                             Text(
                               rating,
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,
                               ),
@@ -200,7 +213,7 @@ class TaskerWidget extends StatelessWidget {
                             ),
                             Text(
                               saves,
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,
                               ),
@@ -220,7 +233,7 @@ class TaskerWidget extends StatelessWidget {
                             ),
                             Text(
                               tasks,
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,
                               ),
@@ -243,7 +256,7 @@ class TaskerWidget extends StatelessWidget {
                             ),
                             Text(
                               '$availability%',
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,
                               ),

@@ -67,6 +67,23 @@ class RequestWidget extends StatelessWidget {
                                 color: HexColor('AAABAB'),
                               ),
                             )
+                          else if (int.parse(status) == 0)
+                            Text(
+                              'waiting to accept...',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                color: HexColor('AAABAB'),
+                              ),
+                            )
+                          else
+                            Text(
+                              'terminated',
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                color: HexColor('AAABAB'),
+                              ),
+                            )
+
                         ],
                       ),
                       Container(
@@ -104,7 +121,7 @@ class RequestWidget extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(
-                    height: 20,
+                    height: 15,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -120,8 +137,8 @@ class RequestWidget extends StatelessWidget {
                             message.toString(),
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.lato(
-                              color: HexColor('6F7273'),
-                              fontSize: 14,
+                              color: HexColor('FFFFFF'),
+                              fontSize: 16,
                             ),
                           ),
                         ),
@@ -148,7 +165,7 @@ class RequestWidget extends StatelessWidget {
               Helper.isDark(context) ? '252B30' : '#E4ECF5',
             ),
           ),
-          height: 4,
+          height: 3,
         )
       ],
     );

@@ -222,7 +222,7 @@ class _RequestNotificationState extends State<RequestNotification> {
                         : const Text(
                             'Reject',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -247,7 +247,7 @@ class _RequestNotificationState extends State<RequestNotification> {
                         : const Text(
                             'Accept',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

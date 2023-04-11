@@ -155,8 +155,8 @@ class _UserFormScreenState extends State<UserFormScreen> {
         isLoading = false;
       });
       // ignore: use_build_context_synchronously
-      Navigator.of(context)
-          .pushReplacementNamed(isChecked ? '/taskerform' : '/select-community');
+      Navigator.of(context).pushReplacementNamed(
+          isChecked ? '/taskerform' : '/select-community');
     }
   }
 
@@ -296,6 +296,20 @@ class _UserFormScreenState extends State<UserFormScreen> {
                           height: 20,
                         ),
                         TextFormField(
+                          onTap: () async {
+                            final pickedDate = await showDatePicker(
+                              context: context,
+                              initialDate: _currentDate,
+                              firstDate: DateTime(1950),
+                              lastDate: DateTime(2050),
+                            );
+                            if (pickedDate != null &&
+                                pickedDate != _currentDate) {
+                              setState(() {
+                                _currentDate = pickedDate;
+                              });
+                            }
+                          },
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'This Field is required';
@@ -315,26 +329,10 @@ class _UserFormScreenState extends State<UserFormScreen> {
                               borderSide:
                                   BorderSide(color: HexColor("#007FFF")),
                             ),
-                            prefixIcon: InkWell(
-                              child: Icon(
-                                Icons.calendar_today,
-                                color: HexColor('99A4AE'),
-                                size: 22,
-                              ),
-                              onTap: () async {
-                                final pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: _currentDate,
-                                  firstDate: DateTime(1950),
-                                  lastDate: DateTime(2050),
-                                );
-                                if (pickedDate != null &&
-                                    pickedDate != _currentDate) {
-                                  setState(() {
-                                    _currentDate = pickedDate;
-                                  });
-                                }
-                              },
+                            prefixIcon: Icon(
+                              Icons.calendar_today,
+                              color: HexColor('99A4AE'),
+                              size: 22,
                             ),
                           ),
                         ),

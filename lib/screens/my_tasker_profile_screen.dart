@@ -263,7 +263,7 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                       ),
                     ),
                     const SizedBox(
-                      height: 25,
+                      height: 20,
                     ),
                     Container(
                       decoration: BoxDecoration(
@@ -275,8 +275,8 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                         ),
                       ),
                       padding: const EdgeInsets.only(
-                        bottom: 18,
-                        left: 15,
+                        bottom: 12,
+                        left: 8,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -315,9 +315,9 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                       itemBuilder: (context, index) => Container(
                         padding: const EdgeInsets.only(
                           top: 12,
-                          left: 15,
+                          left: 8,
                           right: 5,
-                          bottom: 10,
+                          bottom: 5,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -364,8 +364,8 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                         top: 20,
                       ),
                       padding: const EdgeInsets.only(
-                        bottom: 18,
-                        left: 15,
+                        bottom: 12,
+                        left: 8,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -413,7 +413,7 @@ class _MyTaskerProfileState extends State<MyTaskerProfile> {
                       ),
                     ),
                     const SizedBox(
-                      height: 20,
+                      height: 10,
                     ),
                     ListView.builder(
                       itemCount: communities.length,

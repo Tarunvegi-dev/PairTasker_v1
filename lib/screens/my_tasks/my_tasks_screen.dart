@@ -97,7 +97,7 @@ class _MyTasksState extends State<MyTasks> {
                   ),
                 ),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
+                  horizontal: 15,
                   vertical: 20,
                 ),
                 child: Text(

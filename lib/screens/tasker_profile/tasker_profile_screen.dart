@@ -39,6 +39,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
   int saves = 0;
   String bio = 'I am a delivery boy';
   bool isOnline = false;
+  bool isVerified = false;
 
   @override
   void didChangeDependencies() async {
@@ -75,6 +76,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
           saves = taskerData['tasker']['saves'] ?? 0;
           bio = taskerData['tasker']['bio'] ?? '';
           isOnline = taskerData['tasker']['isOnline'] ?? false;
+          isVerified = taskerData['tasker']['isVerififed'] ?? false;
         });
       }
     }
@@ -144,7 +146,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                           ),
                           Text(
                             'Message',
-                            style: GoogleFonts.lato(fontSize: 20),
+                            style: GoogleFonts.nunito(fontSize: 20),
                           ),
                           const SizedBox(
                             height: 20,
@@ -287,8 +289,9 @@ class _TaskerProfileState extends State<TaskerProfile> {
                   ),
                   InkWell(
                     onTap: handleWishlist,
-                    child: Icon(
-                      isWishlisted ? Icons.favorite : Icons.favorite_border,
+                    child: SvgPicture.asset(
+                      isWishlisted ? 'assets/images/icons/wishlist.svg' : 'assets/images/icons/wishlist_border.svg',
+                      height: 34,
                       color: HexColor(
                         isWishlisted
                             ? 'FF033E'
@@ -296,7 +299,6 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                 ? 'FFFFFF'
                                 : '000000',
                       ),
-                      size: 34,
                     ),
                   )
                 ],
@@ -355,16 +357,26 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          displayName,
-                                          style: GoogleFonts.lato(
-                                            fontSize: 14,
-                                          ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              displayName,
+                                              style: GoogleFonts.nunito(
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            if (!isVerified)
+                                              Image.asset(
+                                                'assets/images/icons/verified_badge.png',
+                                                width: 16,
+                                                height: 20,
+                                              )
+                                          ],
                                         ),
                                         Text(
                                           '@$username',
-                                          style: GoogleFonts.lato(
-                                            fontSize: 12,
+                                          style: GoogleFonts.nunito(
+                                            fontSize: 14,
                                             color: HexColor('#AAABAB'),
                                           ),
                                         ),
@@ -398,8 +410,8 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     ),
                                     child: Text(
                                       'REQUEST',
-                                      style: GoogleFonts.lato(
-                                        fontSize: 10,
+                                      style: GoogleFonts.nunito(
+                                        fontSize: 12,
                                       ),
                                     ),
                                   ),
@@ -423,16 +435,16 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     Icon(
                                       Icons.star,
                                       color: HexColor('#FFC72C'),
-                                      size: 20,
+                                      size: 22,
                                     ),
                                     const SizedBox(
                                       width: 5,
                                     ),
                                     Text(
                                       rating,
-                                      style: GoogleFonts.lato(
+                                      style: GoogleFonts.nunito(
                                         color: HexColor('#AAABAB'),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     )
@@ -443,7 +455,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     SizedBox(
                                       child: SvgPicture.asset(
                                         'assets/images/icons/task.svg',
-                                        height: 20,
+                                        height: 22,
                                       ),
                                     ),
                                     const SizedBox(
@@ -451,9 +463,9 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     ),
                                     Text(
                                       totalTasks,
-                                      style: GoogleFonts.lato(
+                                      style: GoogleFonts.nunito(
                                         color: HexColor('#AAABAB'),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     )
@@ -464,7 +476,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     SizedBox(
                                       child: SvgPicture.asset(
                                         'assets/images/icons/wishlist.svg',
-                                        height: 20,
+                                        height: 22,
                                       ),
                                     ),
                                     const SizedBox(
@@ -472,9 +484,9 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     ),
                                     Text(
                                       saves.toString(),
-                                      style: GoogleFonts.lato(
+                                      style: GoogleFonts.nunito(
                                         color: HexColor('#AAABAB'),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     )
@@ -485,7 +497,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     SizedBox(
                                       child: SvgPicture.asset(
                                         'assets/images/icons/network.svg',
-                                        height: 20,
+                                        height: 22,
                                         color: HexColor('007FFF'),
                                       ),
                                     ),
@@ -494,9 +506,9 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                     ),
                                     Text(
                                       network.toString(),
-                                      style: GoogleFonts.lato(
+                                      style: GoogleFonts.nunito(
                                         color: HexColor('#AAABAB'),
-                                        fontSize: 14,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     )
@@ -537,7 +549,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                           ),
                                           Text(
                                             'Availability',
-                                            style: GoogleFonts.lato(
+                                            style: GoogleFonts.nunito(
                                               fontSize: 12,
                                               color: HexColor('6F7273'),
                                               fontWeight: FontWeight.w600,
@@ -549,8 +561,8 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                         height: 5,
                                       ),
                                       Text(
-                                        '$availability  %',
-                                        style: GoogleFonts.lato(
+                                        '$availability%',
+                                        style: GoogleFonts.nunito(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
                                           color: Helper.isDark(context)
@@ -574,7 +586,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                           ),
                                           Text(
                                             'Acceptance',
-                                            style: GoogleFonts.lato(
+                                            style: GoogleFonts.nunito(
                                               fontSize: 12,
                                               color: HexColor('6F7273'),
                                               fontWeight: FontWeight.w600,
@@ -586,8 +598,8 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                         height: 5,
                                       ),
                                       Text(
-                                        '$acceptanceRatio  %',
-                                        style: GoogleFonts.lato(
+                                        '$acceptanceRatio%',
+                                        style: GoogleFonts.nunito(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
                                           color: Helper.isDark(context)
@@ -611,7 +623,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                           ),
                                           Text(
                                             'Avg Task Time',
-                                            style: GoogleFonts.lato(
+                                            style: GoogleFonts.nunito(
                                               fontSize: 12,
                                               color: HexColor('6F7273'),
                                               fontWeight: FontWeight.w600,
@@ -630,7 +642,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                                         .toDouble())
                                                 .toString()
                                                 .substring(0, 3),
-                                            style: GoogleFonts.lato(
+                                            style: GoogleFonts.nunito(
                                               fontSize: 24,
                                               color: Helper.isDark(context)
                                                   ? Colors.white
@@ -648,7 +660,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                                           .toDouble())
                                                   .toString()
                                                   .substring(3),
-                                              style: GoogleFonts.lato(
+                                              style: GoogleFonts.nunito(
                                                 fontSize: 10,
                                                 color: HexColor('6F7273'),
                                               ),
@@ -677,7 +689,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                   Text(
                                     'Bio',
                                     textAlign: TextAlign.start,
-                                    style: GoogleFonts.lato(
+                                    style: GoogleFonts.nunito(
                                       color: HexColor('99A4AE'),
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -688,7 +700,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                   ),
                                   Text(
                                     bio,
-                                    style: GoogleFonts.lato(
+                                    style: GoogleFonts.nunito(
                                       fontSize: 14,
                                       color: Helper.isDark(context)
                                           ? Colors.white
@@ -709,7 +721,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                             child: Text(
                               'Working Categories',
                               textAlign: TextAlign.start,
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 color: HexColor('99A4AE'),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -728,11 +740,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                               spacing: 5.0,
                               runSpacing: 15.0,
                               children: workingCategories
-                                  .map((category) => ConstrainedBox(
-                                        constraints: const BoxConstraints(
-                                          minWidth: 100,
-                                          maxWidth: 130,
-                                        ),
+                                  .map((category) => FittedBox(
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 20,
@@ -749,7 +757,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                             child: Text(
                                               category,
                                               style: const TextStyle(
-                                                fontSize: 10,
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ),
@@ -769,7 +777,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                             child: Text(
                               'Reviews',
                               textAlign: TextAlign.start,
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 color: HexColor('99A4AE'),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,

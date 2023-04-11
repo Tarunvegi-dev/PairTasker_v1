@@ -183,8 +183,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           horizontal: 27,
                         ),
                         margin: const EdgeInsets.only(
-                          bottom: 5,
-                          top: 5,
+                          bottom: 3,
+                          top: 3,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -219,7 +219,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           horizontal: 27,
                         ),
                         margin: const EdgeInsets.only(
-                          bottom: 5,
+                          bottom: 3,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -256,7 +256,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           horizontal: 23,
                         ),
                         margin: const EdgeInsets.only(
-                          bottom: 5,
+                          bottom: 3,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -293,7 +293,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           horizontal: 23,
                         ),
                         margin: const EdgeInsets.only(
-                          bottom: 5,
+                          bottom: 3,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -331,7 +331,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           horizontal: 23,
                         ),
                         margin: const EdgeInsets.only(
-                          bottom: 5,
+                          bottom: 3,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -369,7 +369,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           horizontal: 23,
                         ),
                         margin: const EdgeInsets.only(
-                          bottom: 5,
+                          bottom: 3,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,

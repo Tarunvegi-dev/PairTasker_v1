@@ -161,7 +161,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Text(
                 'Rating',
-                style: GoogleFonts.lato(
+                style: GoogleFonts.nunito(
                   fontSize: 14,
                 ),
               )
@@ -187,7 +187,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Text(
                 'Wishlist',
-                style: GoogleFonts.lato(
+                style: GoogleFonts.nunito(
                   fontSize: 14,
                 ),
               )
@@ -213,7 +213,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Text(
                 'Total tasks',
-                style: GoogleFonts.lato(
+                style: GoogleFonts.nunito(
                   fontSize: 14,
                 ),
               )
@@ -239,7 +239,7 @@ class _HomePageState extends State<HomePage> {
               ),
               Text(
                 'Availability',
-                style: GoogleFonts.lato(
+                style: GoogleFonts.nunito(
                   fontSize: 14,
                 ),
               )
@@ -323,7 +323,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Text(
                               address != 'null' ? address : 'Andhra Pradesh',
-                              style: GoogleFonts.lato(
+                              style: GoogleFonts.nunito(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -425,8 +425,8 @@ class _HomePageState extends State<HomePage> {
                               child: Center(
                                 child: Text(
                                   kOptions[i],
-                                  style: GoogleFonts.lato(
-                                    fontSize: 10,
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
@@ -454,6 +454,7 @@ class _HomePageState extends State<HomePage> {
                           itemCount: filteredTaskers.length,
                           itemBuilder: (ctx, i) => TaskerWidget(
                             index: i,
+                            isVerified: filteredTaskers[i]['isVerified'] ?? false,
                             username: filteredTaskers[i]['user']['username'],
                             availability: filteredTaskers[i]['metrics']
                                 ['availabilityRatio'],
@@ -481,7 +482,7 @@ class _HomePageState extends State<HomePage> {
                           onPressed: loadMoreTaskers,
                           child: Text(
                             'Load More',
-                            style: GoogleFonts.lato(),
+                            style: GoogleFonts.nunito(),
                           ),
                         )
                     ],
@@ -509,7 +510,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: setSelectedTaskersEmpty,
                     child: Text(
                       'Cancel',
-                      style: GoogleFonts.lato(
+                      style: GoogleFonts.nunito(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: HexColor('99A4AE'),
@@ -539,7 +540,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Text(
                       'Request',
-                      style: GoogleFonts.lato(
+                      style: GoogleFonts.nunito(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: HexColor('FFFFFF'),
