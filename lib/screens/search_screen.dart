@@ -153,7 +153,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Text(
                         kOptions[i],
                         style: GoogleFonts.lato(
-                          fontSize: 10,
+                          fontSize: 12,
                         ),
                       ),
                     ),
@@ -173,33 +173,36 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: Text('No Taskers Found, please try again!'),
                 ),
               ),
-            Container(
-              padding: const EdgeInsets.only(top: 4),
-              decoration: BoxDecoration(
-                color: Helper.isDark(context)
-                    ? HexColor('252B30')
-                    : HexColor('DEE0E0'),
-              ),
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: filteredTaskers.length,
-                itemBuilder: (BuildContext context, int i) => TaskerWidget(
-                  index: i,
-                  username: filteredTaskers[i]['user']['username'],
-                  availability: filteredTaskers[i]['metrics']
-                      ['availabilityRatio'],
-                  id: filteredTaskers[i]['id'],
-                  displayName: filteredTaskers[i]['user']['displayName'],
-                  workingCategories: filteredTaskers[i]['workingCategories'],
-                  rating: filteredTaskers[i]['rating'].toString(),
-                  saves: filteredTaskers[i]['saves'].toString(),
-                  tasks: filteredTaskers[i]['completedTasks'].toString(),
-                  profilePicture: filteredTaskers[i]['user']['profilePicture'],
-                  selectedTaskers: selectedTaskers,
-                  isSelected:
-                      selectedTaskers.contains(filteredTaskers[i]['id']) !=
-                          false,
-                  selectTaskers: selectTaskers,
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.only(top: 4),
+                decoration: BoxDecoration(
+                  color: Helper.isDark(context)
+                      ? HexColor('252B30')
+                      : HexColor('DEE0E0'),
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: filteredTaskers.length,
+                  itemBuilder: (BuildContext context, int i) => TaskerWidget(
+                    index: i,
+                    isVerified: filteredTaskers[i]['user']['isVerified'] ?? false,
+                    username: filteredTaskers[i]['user']['username'],
+                    availability: filteredTaskers[i]['metrics']
+                        ['availabilityRatio'],
+                    id: filteredTaskers[i]['id'],
+                    displayName: filteredTaskers[i]['user']['displayName'],
+                    workingCategories: filteredTaskers[i]['workingCategories'],
+                    rating: filteredTaskers[i]['rating'].toString(),
+                    saves: filteredTaskers[i]['saves'].toString(),
+                    tasks: filteredTaskers[i]['completedTasks'].toString(),
+                    profilePicture: filteredTaskers[i]['user']['profilePicture'],
+                    selectedTaskers: selectedTaskers,
+                    isSelected:
+                        selectedTaskers.contains(filteredTaskers[i]['id']) !=
+                            false,
+                    selectTaskers: selectTaskers,
+                  ),
                 ),
               ),
             )

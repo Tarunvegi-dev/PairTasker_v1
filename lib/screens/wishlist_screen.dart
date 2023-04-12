@@ -104,6 +104,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   itemBuilder: (ctx, i) => TaskerWidget(
                     isWishlist: true,
                     index: i,
+                    isVerified: loadedTaskers[i]['user']['isVerified'] ?? false,
                     username: loadedTaskers[i]['user']['username'],
                     availability: loadedTaskers[i]['metrics']
                         ['availabilityRatio'],
