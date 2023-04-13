@@ -29,7 +29,7 @@ class _SearchScreenState extends State<SearchScreen> {
       workingCategories: _workingCategories.join(" "),
     );
     setState(() {
-      filteredTaskers = response;
+      filteredTaskers = response['taskers'];
     });
   }
 
@@ -186,7 +186,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemCount: filteredTaskers.length,
                   itemBuilder: (BuildContext context, int i) => TaskerWidget(
                     index: i,
-                    isVerified: filteredTaskers[i]['user']['isVerified'] ?? false,
+                    isVerified: filteredTaskers[i]['user']['verified'] ?? false,
                     username: filteredTaskers[i]['user']['username'],
                     availability: filteredTaskers[i]['metrics']
                         ['availabilityRatio'],

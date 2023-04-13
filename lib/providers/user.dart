@@ -13,7 +13,7 @@ class User with ChangeNotifier {
     return _taskers;
   }
 
-  Future<List<dynamic>> getTaskers(
+  Future<Map<String, dynamic>> getTaskers(
       {bool search = false,
       bool sort = false,
       String keyword = '',
@@ -45,7 +45,7 @@ class User with ChangeNotifier {
     final responsedata = response.data;
     if (!search || sort) {
       if (response.statusCode == 200) {
-        _taskers = responsedata['data'];
+        _taskers = responsedata['data']['taskers'] as List<dynamic>;
         notifyListeners();
       } else {
         _taskers = [];

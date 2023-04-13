@@ -365,7 +365,7 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                                 fontSize: 16,
                                               ),
                                             ),
-                                            if (!isVerified)
+                                            if (isVerified)
                                               Image.asset(
                                                 'assets/images/icons/verified_badge.png',
                                                 width: 16,

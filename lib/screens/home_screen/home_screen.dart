@@ -32,6 +32,8 @@ class _HomePageState extends State<HomePage> {
   String sortCategory = 'rating';
   String address = '';
   int page = 1;
+  bool loading = false;
+  int totalTaskers = 0;
 
   @override
   void didChangeDependencies() async {
@@ -96,23 +98,30 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> sortTaskers() async {
     final response = await Provider.of<User>(context, listen: false).getTaskers(
-      sortBy: sortCategory,
-      sort: true,
-    );
+        sortBy: sortCategory,
+        sort: true,
+        search: true,
+        keyword: '',
+        workingCategories: _workingCategories.join(' '));
     setState(() {
-      filteredTaskers = response;
+      filteredTaskers = response['taskers'];
     });
   }
 
   Future<void> loadMoreTaskers() async {
     setState(() {
       page += 1;
+      loading = true;
     });
     final response = await Provider.of<User>(context, listen: false).getTaskers(
       page: page.toString(),
+      search: true,
+      workingCategories: _workingCategories.join(' '),
+      keyword: '',
     );
     setState(() {
-      filteredTaskers.addAll(response);
+      filteredTaskers.addAll(response['taskers']);
+      loading = false;
     });
   }
 
@@ -123,7 +132,9 @@ class _HomePageState extends State<HomePage> {
       workingCategories: _workingCategories.join(" "),
     );
     setState(() {
-      filteredTaskers = response;
+      filteredTaskers = response['taskers'];
+      totalTaskers = int.parse(response['totalTaskers'] ?? 0);
+      page = 1;
     });
   }
 
@@ -135,6 +146,9 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('workingCategories');
     prefs.setString('workingCategories', jsonEncode(_workingCategories));
+    setState(() {
+      sortCategory = 'rating';
+    });
     searchTaskers();
   }
 
@@ -448,42 +462,55 @@ class _HomePageState extends State<HomePage> {
                             child: Text('No Taskers Found, please try again!'),
                           ),
                         ),
-                      Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: filteredTaskers.length,
-                          itemBuilder: (ctx, i) => TaskerWidget(
-                            index: i,
-                            isVerified: filteredTaskers[i]['isVerified'] ?? false,
-                            username: filteredTaskers[i]['user']['username'],
-                            availability: filteredTaskers[i]['metrics']
-                                ['availabilityRatio'],
-                            id: filteredTaskers[i]['id'],
-                            displayName: filteredTaskers[i]['user']
-                                ['displayName'],
-                            workingCategories: filteredTaskers[i]
-                                ['workingCategories'],
-                            rating: filteredTaskers[i]['rating'].toString(),
-                            saves: filteredTaskers[i]['saves'].toString(),
-                            tasks:
-                                filteredTaskers[i]['completedTasks'].toString(),
-                            profilePicture: filteredTaskers[i]['user']
-                                ['profilePicture'],
-                            selectedTaskers: selectedTaskers,
-                            isSelected: selectedTaskers
-                                    .contains(filteredTaskers[i]['id']) !=
-                                false,
-                            selectTaskers: selectTaskers,
+                      NotificationListener<ScrollNotification>(
+                        onNotification: (ScrollNotification scrollInfo) {
+                          if (scrollInfo.metrics.pixels ==
+                                  scrollInfo.metrics.maxScrollExtent &&
+                              totalTaskers > 15 &&
+                              filteredTaskers.length < totalTaskers) {
+                            loadMoreTaskers();
+                          }
+                          return false;
+                        },
+                        child: Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: filteredTaskers.length,
+                            itemBuilder: (ctx, i) => TaskerWidget(
+                              index: i,
+                              isVerified:
+                                  filteredTaskers[i]['verified'] ?? false,
+                              username: filteredTaskers[i]['user']['username'],
+                              availability: filteredTaskers[i]['metrics']
+                                  ['availabilityRatio'],
+                              id: filteredTaskers[i]['id'],
+                              displayName: filteredTaskers[i]['user']
+                                  ['displayName'],
+                              workingCategories: filteredTaskers[i]
+                                  ['workingCategories'],
+                              rating: filteredTaskers[i]['rating'].toString(),
+                              saves: filteredTaskers[i]['saves'].toString(),
+                              tasks: filteredTaskers[i]['completedTasks']
+                                  .toString(),
+                              profilePicture: filteredTaskers[i]['user']
+                                  ['profilePicture'],
+                              selectedTaskers: selectedTaskers,
+                              isSelected: selectedTaskers
+                                      .contains(filteredTaskers[i]['id']) !=
+                                  false,
+                              selectTaskers: selectTaskers,
+                            ),
                           ),
                         ),
                       ),
-                      if (filteredTaskers.length > 15)
-                        TextButton(
-                          onPressed: loadMoreTaskers,
-                          child: Text(
-                            'Load More',
-                            style: GoogleFonts.nunito(),
-                          ),
+                      if (loading)
+                        Column(
+                          children: const [
+                            LoadingSpinner(),
+                            SizedBox(
+                              height: 10,
+                            )
+                          ],
                         )
                     ],
                   ),
