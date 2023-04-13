@@ -87,7 +87,7 @@ class _TaskerDashboardState extends State<TaskerDashboard> {
         availabilityRatio = response.data['data']['availabilityRatio'];
         avgTaskCompletionTime = response.data['data']['avgTaskCompletionTime'];
         network = response.data['data']['network'];
-        terminatedTasks = totalTasks - completedTasks;
+        terminatedTasks = totalTasks - completedTasks - activeTasks;
         if (response.data['data']['taskCategoriesCount'] != null) {
           workingCategories = response.data['data']['taskCategoriesCount'].map(
             (key, value) => MapEntry(

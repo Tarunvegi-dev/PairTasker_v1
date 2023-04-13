@@ -137,7 +137,6 @@ class RequestWidget extends StatelessWidget {
                             message.toString(),
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.lato(
-                              color: HexColor('FFFFFF'),
                               fontSize: 16,
                             ),
                           ),

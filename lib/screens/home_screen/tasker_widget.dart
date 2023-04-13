@@ -7,8 +7,10 @@ import 'package:pairtasker/helpers/methods.dart';
 import 'package:pairtasker/screens/screens.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-class TaskerWidget extends StatelessWidget {
+class TaskerWidget extends StatefulWidget {
   final index;
   final username;
   final id;
@@ -44,8 +46,86 @@ class TaskerWidget extends StatelessWidget {
       super.key});
 
   @override
+  State<TaskerWidget> createState() => _TaskerWidgetState();
+}
+
+class _TaskerWidgetState extends State<TaskerWidget> {
+  TutorialCoachMark tutorialCoachMark = TutorialCoachMark(targets: []);
+  List<TargetFocus> targets = [];
+  final GlobalKey _key = GlobalKey();
+  var newUser = 'false';
+
+  @override
+  void initState() {
+    initTargets();
+    WidgetsBinding.instance.addPostFrameCallback(_afterLayout);
+    super.initState();
+  }
+
+  void _afterLayout(_) {
+    Future.delayed(const Duration(milliseconds: 1000), showTutorial);
+  }
+
+  void showTutorial() {
+    tutorialCoachMark = TutorialCoachMark(
+      targets: targets,
+      colorShadow: HexColor('007FFF'),
+      opacityShadow: 0.5,
+    )..show(
+        context: context,
+      );
+  }
+
+  void initTargets() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    if (prefs.containsKey('newUser')) {
+      setState(() {
+        newUser = prefs.getString('newUser') as String;
+      });
+      Future.delayed(const Duration(seconds: 500), () {
+        setState(() {
+          newUser = 'false';
+        });
+      });
+      prefs.setString('newUser', 'false');
+    }
+    targets.add(
+      TargetFocus(
+        identify: "Target 0",
+        keyTarget: _key,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+              ),
+              padding: const EdgeInsets.all(10),
+              child: Text(
+                "Long press on any tasker to send a request",
+                style: GoogleFonts.poppins(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                  color: HexColor('007FFF'),
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+    tutorialCoachMark = TutorialCoachMark(targets: targets);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final _workingCategories = workingCategories
+    final workingCategories = widget.workingCategories
         .toString()
         .replaceAll('[', '')
         .replaceAll(']', '')
@@ -53,11 +133,14 @@ class TaskerWidget extends StatelessWidget {
     return Column(
       children: [
         InkWell(
-          onLongPress: () =>
-              isSelected || isWishlist ? null : selectTaskers(id),
-          onTap: () => (isSelected || selectedTaskers.isNotEmpty) && !isWishlist
-              ? selectTaskers(id)
-              : null,
+          onLongPress: () => widget.isSelected || widget.isWishlist
+              ? null
+              : widget.selectTaskers(widget.id),
+          onTap: () =>
+              (widget.isSelected || widget.selectedTaskers.isNotEmpty) &&
+                      !widget.isWishlist
+                  ? widget.selectTaskers(widget.id)
+                  : null,
           child: Container(
             color: Helper.isDark(context) ? Colors.black : Colors.white,
             child: Padding(
@@ -69,10 +152,10 @@ class TaskerWidget extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          isSelected
+                          widget.isSelected
                               ? Container(
-                                  height: 40,
-                                  width: 40,
+                                  height: 45,
+                                  width: 45,
                                   decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(
                                       Radius.circular(125),
@@ -87,17 +170,36 @@ class TaskerWidget extends StatelessWidget {
                                     ),
                                   ),
                                 )
-                              : SizedBox(
-                                  height: 45,
-                                  width: 45,
-                                  child: CircleAvatar(
-                                    radius: 30,
-                                    backgroundImage: profilePicture == null
-                                        ? const AssetImage(
-                                            'assets/images/default_user.png',
+                              : InkWell(
+                                  onTap: widget.selectedTaskers.isEmpty
+                                      ? () => Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TaskerProfile(
+                                                id: widget.id,
+                                              ),
+                                            ),
                                           )
-                                        : NetworkImage(profilePicture)
-                                            as ImageProvider,
+                                      : null,
+                                  child: SizedBox(
+                                    height: 45,
+                                    width: 45,
+                                    child: CircleAvatar(
+                                      key:
+                                          widget.index == 0 && newUser == 'true'
+                                              ? _key
+                                              : ValueKey(
+                                                  widget.index,
+                                                ),
+                                      radius: 30,
+                                      backgroundImage: widget.profilePicture ==
+                                              null
+                                          ? const AssetImage(
+                                              'assets/images/default_user.png',
+                                            )
+                                          : NetworkImage(widget.profilePicture)
+                                              as ImageProvider,
+                                    ),
                                   ),
                                 ),
                           const SizedBox(
@@ -107,7 +209,7 @@ class TaskerWidget extends StatelessWidget {
                             onTap: () => Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => TaskerProfile(
-                                  id: id,
+                                  id: widget.id,
                                 ),
                               ),
                             ),
@@ -118,12 +220,12 @@ class TaskerWidget extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      displayName,
+                                      widget.displayName,
                                       style: GoogleFonts.nunito(
                                         fontSize: 16,
                                       ),
                                     ),
-                                    if (isVerified)
+                                    if (widget.isVerified)
                                       Image.asset(
                                         'assets/images/icons/verified_badge.png',
                                         width: 16,
@@ -132,7 +234,7 @@ class TaskerWidget extends StatelessWidget {
                                   ],
                                 ),
                                 Text(
-                                  '@$username',
+                                  '@${widget.username}',
                                   style: GoogleFonts.nunito(
                                     fontSize: 12,
                                     color: HexColor('#AAABAB'),
@@ -143,9 +245,9 @@ class TaskerWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      !isSelected
+                      !widget.isSelected
                           ? AnimatedTextKit(
-                              animatedTexts: _workingCategories
+                              animatedTexts: workingCategories
                                   .map(
                                     (category) => TyperAnimatedText(
                                       category
@@ -193,7 +295,7 @@ class TaskerWidget extends StatelessWidget {
                               width: 5,
                             ),
                             Text(
-                              rating,
+                              widget.rating,
                               style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,
@@ -212,7 +314,7 @@ class TaskerWidget extends StatelessWidget {
                               width: 5,
                             ),
                             Text(
-                              saves,
+                              widget.saves,
                               style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,
@@ -232,7 +334,7 @@ class TaskerWidget extends StatelessWidget {
                               width: 5,
                             ),
                             Text(
-                              tasks,
+                              widget.tasks,
                               style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,
@@ -243,10 +345,13 @@ class TaskerWidget extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              availability == 0 ? Icons.wifi_off : Icons.wifi,
-                              color: availability < 33.3
+                              widget.availability == 0
+                                  ? Icons.wifi_off
+                                  : Icons.wifi,
+                              color: widget.availability < 33.3
                                   ? HexColor('FF033E')
-                                  : availability > 33.33 && availability < 66.66
+                                  : widget.availability > 33.33 &&
+                                          widget.availability < 66.66
                                       ? HexColor('FFC72C')
                                       : HexColor('#00CE15'),
                               size: 18,
@@ -255,7 +360,7 @@ class TaskerWidget extends StatelessWidget {
                               width: 4,
                             ),
                             Text(
-                              '$availability%',
+                              '${widget.availability}%',
                               style: GoogleFonts.nunito(
                                 color: HexColor('#AAABAB'),
                                 fontSize: 14,

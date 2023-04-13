@@ -711,11 +711,13 @@ class Helper {
 }
 
 class BaseURL {
-  static const url = 'http://api.pairtasker.com/v1';
+  static const url = 
+  'http://api.pairtasker.com/v1';
   // 'http://192.168.236.47:3000/api';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/api';
 
-  static const socketURL = 'http://api.pairtasker.com/';
-  // 'http://192.168.236.47:3000';
+  static const socketURL =
+      'http://3.110.42.229:80/';
+      // 'http://192.168.160.47:4000';
   // 'http://pairtasker-prod.ap-south-1.elasticbeanstalk.com/';
 }

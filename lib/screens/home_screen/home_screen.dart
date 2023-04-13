@@ -12,7 +12,6 @@ import 'package:pairtasker/theme/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/auth.dart';
-import 'recents.dart';
 import '../../helpers/methods.dart';
 
 class HomePage extends StatefulWidget {
@@ -441,6 +440,9 @@ class _HomePageState extends State<HomePage> {
                                   kOptions[i],
                                   style: GoogleFonts.nunito(
                                     fontSize: 12,
+                                    color: Helper.isDark(context)
+                                        ? Colors.black
+                                        : Colors.white,
                                   ),
                                 ),
                               ),

@@ -327,7 +327,7 @@ class Auth with ChangeNotifier {
       notifyListeners();
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('token', responseData['token']);
-      prefs.setString('token', responseData['token']);
+      prefs.setString('newUser', 'true');
       // ignore: use_build_context_synchronously
       updateFcmToken();
       updateGeoLocation();

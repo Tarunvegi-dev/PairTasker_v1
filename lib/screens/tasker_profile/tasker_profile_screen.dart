@@ -290,7 +290,9 @@ class _TaskerProfileState extends State<TaskerProfile> {
                   InkWell(
                     onTap: handleWishlist,
                     child: SvgPicture.asset(
-                      isWishlisted ? 'assets/images/icons/wishlist.svg' : 'assets/images/icons/wishlist_border.svg',
+                      isWishlisted
+                          ? 'assets/images/icons/wishlist.svg'
+                          : 'assets/images/icons/wishlist_border.svg',
                       height: 34,
                       color: HexColor(
                         isWishlisted
@@ -334,8 +336,8 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                 Row(
                                   children: [
                                     Container(
-                                      height: 37,
-                                      width: 37,
+                                      height: 45,
+                                      width: 45,
                                       margin: const EdgeInsets.symmetric(
                                         vertical: 12,
                                       ),
@@ -756,8 +758,11 @@ class _TaskerProfileState extends State<TaskerProfile> {
                                           child: Center(
                                             child: Text(
                                               category,
-                                              style: const TextStyle(
+                                              style: GoogleFonts.lato(
                                                 fontSize: 12,
+                                                color: Helper.isDark(context)
+                                                    ? Colors.black
+                                                    : Colors.white,
                                               ),
                                             ),
                                           ),
