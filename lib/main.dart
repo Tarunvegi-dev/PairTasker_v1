@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 // import 'package:flutter/scheduler.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:new_version_plus/new_version_plus.dart';
 import 'package:pairtasker/providers/chat.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/providers/tasker.dart';
+import 'package:pairtasker/screens/offline_screen.dart';
 import 'package:pairtasker/screens/privacy_policy.dart';
 import 'package:pairtasker/screens/select_community/select_community_screen.dart';
 import 'helpers/methods.dart';
@@ -216,9 +219,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  var isOffline = false;
 
   @override
   void initState() {
+    checkIsOffline();
+    // Instantiate NewVersion manager object (Using GCP Console app as example)
+    final newVersion = NewVersionPlus(
+      androidId: 'com.pair_tasker.android',
+    );
+
+    basicStatusCheck(newVersion);
     var androiInit =
         const AndroidInitializationSettings('@mipmap/ic_launcher'); //for logo
     var initSettings = InitializationSettings(android: androiInit);
@@ -334,6 +345,28 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  Future<void> checkIsOffline() async {
+    bool result = await InternetConnectionChecker().hasConnection;
+    setState(() {
+      isOffline = !result;
+    });
+  }
+
+  void refreshScreen() {
+    checkIsOffline();
+  }
+
+  basicStatusCheck(NewVersionPlus newVersion) async {
+    final status = await newVersion.getVersionStatus();
+    print(status!.canUpdate);
+    print(status.storeVersion);
+    // ignore: use_build_context_synchronously
+    newVersion.showAlertIfNecessary(
+      context: context,
+      launchModeVersion: LaunchModeVersion.external,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -357,8 +390,13 @@ class _MyAppState extends State<MyApp> {
           title: 'PairTasker',
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
-          home:
-              auth.isAuth && auth.isSignUpCompleted && auth.isCommunitySelected
+          home: isOffline
+              ? OfflineScreen(
+                  refreshScreen: refreshScreen,
+                )
+              : auth.isAuth &&
+                      auth.isSignUpCompleted &&
+                      auth.isCommunitySelected
                   ? auth.isTasker
                       ? const TaskerDashboard()
                       : const HomePage()
