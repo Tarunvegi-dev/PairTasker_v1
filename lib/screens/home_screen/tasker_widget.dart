@@ -71,6 +71,21 @@ class _TaskerWidgetState extends State<TaskerWidget> {
       targets: targets,
       colorShadow: HexColor('007FFF'),
       opacityShadow: 0.5,
+      textSkip: 'GOT IT',
+      skipWidget: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        child: Text(
+          'GOT IT',
+          style: GoogleFonts.lato(
+            color: HexColor('007FFF'),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
     )..show(
         context: context,
       );

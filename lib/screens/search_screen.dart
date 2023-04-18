@@ -154,6 +154,11 @@ class _SearchScreenState extends State<SearchScreen> {
                         kOptions[i],
                         style: GoogleFonts.lato(
                           fontSize: 12,
+                          color: _workingCategories.contains(kOptions[i])
+                              ? Colors.white
+                              : Helper.isDark(context)
+                                  ? Colors.white
+                                  : Colors.black,
                         ),
                       ),
                     ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:new_version/new_version.dart';
 import 'package:pairtasker/providers/user.dart';
 import 'package:pairtasker/screens/home_screen/drawer.dart';
 import 'package:pairtasker/screens/home_screen/tasker_widget.dart';
@@ -33,6 +34,22 @@ class _HomePageState extends State<HomePage> {
   int page = 1;
   bool loading = false;
   int totalTaskers = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Instantiate NewVersion manager object (Using GCP Console app as example)
+    final newVersion = NewVersion(
+      androidId: 'com.pair_tasker.android',
+    );
+
+    basicStatusCheck(newVersion);
+  }
+
+  basicStatusCheck(NewVersion newVersion) {
+    newVersion.showAlertIfNecessary(context: context);
+  }
 
   @override
   void didChangeDependencies() async {
@@ -440,9 +457,12 @@ class _HomePageState extends State<HomePage> {
                                   kOptions[i],
                                   style: GoogleFonts.nunito(
                                     fontSize: 12,
-                                    color: Helper.isDark(context)
-                                        ? Colors.black
-                                        : Colors.white,
+                                    color:
+                                        _workingCategories.contains(kOptions[i])
+                                            ? Colors.white
+                                            : Helper.isDark(context)
+                                                ? Colors.white
+                                                : Colors.black,
                                   ),
                                 ),
                               ),
